@@ -14,6 +14,11 @@ import OrderManagement from './pages/admin/OrderManagement';
 
 // Shop pages
 import Landing from './pages/shop/Landing';
+import Shop from './pages/shop/Shop';
+import ProductDetail from './pages/shop/ProductDetail';
+import Cart from './pages/shop/Cart';
+import Checkout from './pages/shop/Checkout';
+import CategoryPage from './pages/shop/CategoryPage';
 
 const routes: RouteObject[] = [
   {
@@ -35,7 +40,12 @@ const routes: RouteObject[] = [
     element: <ShopLayout />,
     children: [
       { path: '', element: <Landing /> },
-      // Add more shop pages as needed
+      { path: 'shop', element: <Shop /> },
+      { path: 'products/:id', element: <ProductDetail /> },
+      { path: 'cart', element: <Cart /> },
+      { path: 'checkout', element: <Checkout /> },
+      { path: 'category/:categoryId', element: <CategoryPage /> },
+      { path: 'category/:categoryId/:subcategoryId', element: <CategoryPage /> },
     ],
   },
 ];

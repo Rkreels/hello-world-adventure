@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Star, ChevronLeft, ChevronRight, Heart, ShoppingCart } from 'lucide-react';
@@ -16,13 +15,13 @@ const Landing = () => {
             <h1 className="text-3xl md:text-4xl font-bold mb-4">Discover the Latest Deals -</h1>
             <p className="text-xl md:text-2xl font-semibold mb-6">Up to 50% Off!</p>
             <Button className="bg-white text-emerald-700 hover:bg-gray-100 px-6">
-              Shop Now
+              <Link to="/shop">Shop Now</Link>
             </Button>
           </div>
         </div>
         <div className="absolute inset-0 z-0">
           <img 
-            src="/hero-bg.jpg" 
+            src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=2070&auto=format&fit=crop"
             alt="Shop collection" 
             className="w-full h-full object-cover opacity-30"
           />
@@ -53,7 +52,7 @@ const Landing = () => {
               <Link to="/category/fashion" className="block">
                 <div className="relative h-64 bg-gray-100">
                   <img 
-                    src="/products/fashion.jpg" 
+                    src="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop" 
                     alt="New Year! New Fashion" 
                     className="w-full h-full object-cover"
                   />
@@ -65,7 +64,7 @@ const Landing = () => {
                       size="sm" 
                       className="mt-2 bg-white/20 backdrop-blur-sm hover:bg-white/40 text-white"
                     >
-                      Shop Now
+                      <Link to="/category/fashion">Shop Now</Link>
                     </Button>
                   </div>
                 </div>
@@ -82,7 +81,7 @@ const Landing = () => {
                     <div className="grid grid-cols-2 gap-2">
                       <div>
                         <img 
-                          src="/products/headset.jpg" 
+                          src="https://images.unsplash.com/photo-1615655114865-4cc1bda5901e?q=80&w=2070&auto=format&fit=crop" 
                           alt="Headset" 
                           className="w-full h-20 object-contain mb-1"
                         />
@@ -90,7 +89,7 @@ const Landing = () => {
                       </div>
                       <div>
                         <img 
-                          src="/products/mouse.jpg" 
+                          src="https://images.unsplash.com/photo-1615655114658-e308f5805efe?q=80&w=2026&auto=format&fit=crop" 
                           alt="Mouse" 
                           className="w-full h-20 object-contain mb-1"
                         />
@@ -98,7 +97,7 @@ const Landing = () => {
                       </div>
                       <div>
                         <img 
-                          src="/products/controller.jpg" 
+                          src="https://images.unsplash.com/photo-1592840496694-26d035b52b48?q=80&w=1974&auto=format&fit=crop" 
                           alt="Controller" 
                           className="w-full h-20 object-contain mb-1"
                         />
@@ -106,7 +105,7 @@ const Landing = () => {
                       </div>
                       <div>
                         <img 
-                          src="/products/chair.jpg" 
+                          src="https://images.unsplash.com/photo-1603665270146-bbdf9858ea55?q=80&w=1780&auto=format&fit=crop" 
                           alt="Chair" 
                           className="w-full h-20 object-contain mb-1"
                         />
@@ -118,7 +117,7 @@ const Landing = () => {
                       size="sm" 
                       className="mt-2 text-blue-600"
                     >
-                      See more
+                      <Link to="/category/accessories">See more</Link>
                     </Button>
                   </div>
                 </div>
@@ -141,12 +140,12 @@ const Landing = () => {
                       </div>
                       <div className="mt-auto flex gap-2">
                         <img 
-                          src="/products/phone-1.jpg" 
+                          src="https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=2127&auto=format&fit=crop" 
                           alt="Phone" 
                           className="w-1/2 object-contain"
                         />
                         <img 
-                          src="/products/phone-2.jpg" 
+                          src="https://images.unsplash.com/photo-1605236453806-6ff36851218e?q=80&w=2064&auto=format&fit=crop" 
                           alt="Phone" 
                           className="w-1/2 object-contain"
                         />
@@ -168,7 +167,7 @@ const Landing = () => {
                       </div>
                       <div className="mt-auto">
                         <img 
-                          src="/products/tv.jpg" 
+                          src="https://images.unsplash.com/photo-1593784991095-a205069470b6?q=80&w=2070&auto=format&fit=crop" 
                           alt="TV" 
                           className="w-full object-contain max-h-32"
                         />
@@ -177,7 +176,7 @@ const Landing = () => {
                           size="sm" 
                           className="mt-2 bg-white/20 backdrop-blur-sm hover:bg-white/40 text-white"
                         >
-                          Shop Now
+                          <Link to="/category/electronics">Shop Now</Link>
                         </Button>
                       </div>
                     </div>
@@ -192,7 +191,7 @@ const Landing = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
           <Link to="/category/clothing" className="relative h-32 rounded-md overflow-hidden group">
             <img 
-              src="/category/clothing.jpg" 
+              src="https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?q=80&w=2070&auto=format&fit=crop" 
               alt="Clothing" 
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
@@ -203,7 +202,7 @@ const Landing = () => {
           
           <Link to="/category/watches" className="relative h-32 rounded-md overflow-hidden group">
             <img 
-              src="/category/watches.jpg" 
+              src="https://images.unsplash.com/photo-1557531365-e8b22d93dbd0?q=80&w=1964&auto=format&fit=crop" 
               alt="Men's Fashion" 
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
@@ -214,7 +213,7 @@ const Landing = () => {
           
           <Link to="/category/denim" className="relative h-32 rounded-md overflow-hidden group">
             <img 
-              src="/category/denim.jpg" 
+              src="https://images.unsplash.com/photo-1565084888279-aca607ecce0c?q=80&w=2070&auto=format&fit=crop" 
               alt="Denim" 
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
@@ -225,7 +224,7 @@ const Landing = () => {
           
           <Link to="/category/appliances" className="relative h-32 rounded-md overflow-hidden group">
             <img 
-              src="/category/appliances.jpg" 
+              src="https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?q=80&w=2071&auto=format&fit=crop" 
               alt="Philips Appliances" 
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
@@ -242,7 +241,7 @@ const Landing = () => {
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-semibold">Trending Product</h2>
             <Button variant="outline" size="sm">
-              View All
+              <Link to="/shop">View All</Link>
             </Button>
           </div>
           
@@ -251,7 +250,7 @@ const Landing = () => {
               <CardContent className="p-4">
                 <div className="relative mb-4">
                   <img 
-                    src="/products/serum.jpg" 
+                    src="https://images.unsplash.com/photo-1615900119312-2acd3a71f3aa?q=80&w=1964&auto=format&fit=crop" 
                     alt="Radiant Glow Hydrating Serum" 
                     className="w-full h-48 object-cover rounded"
                   />
@@ -288,10 +287,10 @@ const Landing = () => {
                 
                 <div className="flex space-x-2">
                   <Button variant="outline" size="sm" className="flex-1">
-                    View Details
+                    <Link to="/products/1">View Details</Link>
                   </Button>
                   <Button className="bg-green-500 hover:bg-green-600">
-                    Add to cart
+                    <Link to="/cart">Add to cart</Link>
                   </Button>
                 </div>
               </CardContent>
@@ -301,7 +300,7 @@ const Landing = () => {
               <CardContent className="p-4">
                 <div className="relative mb-4">
                   <img 
-                    src="/products/vase.jpg" 
+                    src="https://images.unsplash.com/photo-1602746588630-8ce6147c406c?q=80&w=1964&auto=format&fit=crop" 
                     alt="Modern Minimalist Vase" 
                     className="w-full h-48 object-cover rounded"
                   />
@@ -335,10 +334,10 @@ const Landing = () => {
                 
                 <div className="flex space-x-2">
                   <Button variant="outline" size="sm" className="flex-1">
-                    View Details
+                    <Link to="/products/2">View Details</Link>
                   </Button>
                   <Button className="bg-green-500 hover:bg-green-600">
-                    Add to cart
+                    <Link to="/cart">Add to cart</Link>
                   </Button>
                 </div>
               </CardContent>
@@ -348,7 +347,7 @@ const Landing = () => {
               <CardContent className="p-4">
                 <div className="relative mb-4">
                   <img 
-                    src="/products/smartwatch.jpg" 
+                    src="https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?q=80&w=2044&auto=format&fit=crop" 
                     alt="FitPro 3000 Smartwatch" 
                     className="w-full h-48 object-cover rounded"
                   />
@@ -385,10 +384,10 @@ const Landing = () => {
                 
                 <div className="flex space-x-2">
                   <Button variant="outline" size="sm" className="flex-1">
-                    View Details
+                    <Link to="/products/3">View Details</Link>
                   </Button>
                   <Button className="bg-green-500 hover:bg-green-600">
-                    Add to cart
+                    <Link to="/cart">Add to cart</Link>
                   </Button>
                 </div>
               </CardContent>
@@ -401,7 +400,7 @@ const Landing = () => {
                   <div className="grid grid-cols-2 gap-2 flex-1">
                     <div>
                       <img 
-                        src="/products/pants.jpg" 
+                        src="https://images.unsplash.com/photo-1542272604-787c3835535d?q=80&w=2026&auto=format&fit=crop" 
                         alt="Pants" 
                         className="w-full h-24 object-cover rounded mb-2"
                       />
@@ -415,7 +414,7 @@ const Landing = () => {
                     </div>
                     <div>
                       <img 
-                        src="/products/shirt.jpg" 
+                        src="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?q=80&w=2015&auto=format&fit=crop" 
                         alt="Shirt" 
                         className="w-full h-24 object-cover rounded mb-2"
                       />
@@ -429,7 +428,7 @@ const Landing = () => {
                     </div>
                     <div>
                       <img 
-                        src="/products/hat.jpg" 
+                        src="https://images.unsplash.com/photo-1576871337622-98d48d1cf531?q=80&w=1974&auto=format&fit=crop" 
                         alt="Hat" 
                         className="w-full h-24 object-cover rounded mb-2"
                       />
@@ -443,7 +442,7 @@ const Landing = () => {
                     </div>
                     <div>
                       <img 
-                        src="/products/shoes.jpg" 
+                        src="https://images.unsplash.com/photo-1460353581641-37baddab0fa2?q=80&w=2071&auto=format&fit=crop" 
                         alt="Shoes" 
                         className="w-full h-24 object-cover rounded mb-2"
                       />
@@ -461,7 +460,7 @@ const Landing = () => {
                     size="sm" 
                     className="mt-4 w-full"
                   >
-                    See All
+                    <Link to="/category/mens">See All</Link>
                   </Button>
                 </div>
               </CardContent>
