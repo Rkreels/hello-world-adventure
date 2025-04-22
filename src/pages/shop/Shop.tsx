@@ -1,6 +1,5 @@
-
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Star, Filter, Grid3X3, LayoutList, ChevronDown, Heart, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -14,8 +13,9 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { formatCurrency } from '@/lib/utils';
+import { toast } from '@/components/ui/use-toast';
 
-const products = [
+const productsData = [
   {
     id: 1,
     name: "Radiant Glow Hydrating Serum",
@@ -27,6 +27,7 @@ const products = [
     reviews: 287,
     isNew: true,
     discount: 25,
+    category: "Beauty",
   },
   {
     id: 2,
@@ -39,6 +40,7 @@ const products = [
     reviews: 186,
     isNew: false,
     discount: 30,
+    category: "Home",
   },
   {
     id: 3,
@@ -51,6 +53,7 @@ const products = [
     reviews: 152,
     isNew: false,
     discount: 20,
+    category: "Electronics",
   },
   {
     id: 4,
@@ -63,6 +66,7 @@ const products = [
     reviews: 215,
     isNew: false,
     discount: 24,
+    category: "Electronics",
   },
   {
     id: 5,
@@ -75,6 +79,7 @@ const products = [
     reviews: 92,
     isNew: true,
     discount: 25,
+    category: "Fashion",
   },
   {
     id: 6,
@@ -87,6 +92,7 @@ const products = [
     reviews: 178,
     isNew: false,
     discount: 28,
+    category: "Home",
   },
   {
     id: 7,
@@ -99,6 +105,7 @@ const products = [
     reviews: 124,
     isNew: false,
     discount: 33,
+    category: "Fashion",
   },
   {
     id: 8,
@@ -111,6 +118,7 @@ const products = [
     reviews: 86,
     isNew: true,
     discount: 20,
+    category: "Electronics",
   },
   {
     id: 9,
@@ -123,42 +131,177 @@ const products = [
     reviews: 142,
     isNew: false,
     discount: 30,
+    category: "Home",
   },
 ];
 
+const categories = [
+  { id: 'electronics', name: 'Electronics' },
+  { id: 'fashion', name: 'Fashion' },
+  { id: 'home', name: 'Home & Kitchen' },
+  { id: 'beauty', name: 'Beauty & Personal Care' },
+  { id: 'sports', name: 'Sports & Outdoors' },
+];
+
+const brands = [
+  { id: 'saltform', name: 'SaltForm' },
+  { id: 'design-denmark', name: 'Design Denmark' },
+  { id: 'gadgetpro', name: 'GadgetPro' },
+  { id: 'audiotech', name: 'AudioTech' },
+  { id: 'leathercraft', name: 'LeatherCraft' },
+  { id: 'ecolife', name: 'EcoLife' },
+  { id: 'ecowear', name: 'EcoWear' },
+  { id: 'soundwave', name: 'SoundWave' },
+  { id: 'homestyle', name: 'HomeStyle' },
+];
+
 const Shop = () => {
-  const [view, setView] = useState<'grid' | 'list'>('grid');
-  const [priceRange, setPriceRange] = useState([0, 300]);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [view, setView] = useState<'grid' | 'list'>(searchParams.get('view') as 'grid' | 'list' || 'grid');
+  const [priceRange, setPriceRange] = useState([
+    parseInt(searchParams.get('minPrice') || '0'),
+    parseInt(searchParams.get('maxPrice') || '300')
+  ]);
+  const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'featured');
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    searchParams.get('categories')?.split(',') || []
+  );
+  const [selectedBrands, setSelectedBrands] = useState<string[]>(
+    searchParams.get('brands')?.split(',') || []
+  );
+  const [minRating, setMinRating] = useState<number>(
+    parseInt(searchParams.get('rating') || '0')
+  );
+  const [filteredProducts, setFilteredProducts] = useState(productsData);
+  const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page') || '1'));
+  const productsPerPage = 9;
+  
+  useEffect(() => {
+    let filtered = [...productsData];
+    
+    if (selectedCategories.length > 0) {
+      filtered = filtered.filter(product => 
+        selectedCategories.includes(product.category.toLowerCase())
+      );
+    }
+    
+    if (selectedBrands.length > 0) {
+      filtered = filtered.filter(product => 
+        selectedBrands.includes(product.brand.toLowerCase().replace(/\s+/g, '-'))
+      );
+    }
+    
+    filtered = filtered.filter(product => 
+      product.price >= priceRange[0] && product.price <= priceRange[1]
+    );
+    
+    if (minRating > 0) {
+      filtered = filtered.filter(product => product.rating >= minRating);
+    }
+    
+    switch (sortBy) {
+      case 'price-low':
+        filtered.sort((a, b) => a.price - b.price);
+        break;
+      case 'price-high':
+        filtered.sort((a, b) => b.price - a.price);
+        break;
+      case 'newest':
+        filtered.sort((a, b) => (a.isNew === b.isNew) ? 0 : a.isNew ? -1 : 1);
+        break;
+      case 'rating':
+        filtered.sort((a, b) => b.rating - a.rating);
+        break;
+      case 'featured':
+      default:
+        break;
+    }
+    
+    setFilteredProducts(filtered);
+    
+    const params: Record<string, string> = {};
+    
+    if (view !== 'grid') params.view = view;
+    if (priceRange[0] > 0) params.minPrice = priceRange[0].toString();
+    if (priceRange[1] < 300) params.maxPrice = priceRange[1].toString();
+    if (sortBy !== 'featured') params.sort = sortBy;
+    if (selectedCategories.length > 0) params.categories = selectedCategories.join(',');
+    if (selectedBrands.length > 0) params.brands = selectedBrands.join(',');
+    if (minRating > 0) params.rating = minRating.toString();
+    if (currentPage > 1) params.page = currentPage.toString();
+    
+    setSearchParams(params);
+  }, [view, priceRange, sortBy, selectedCategories, selectedBrands, minRating, currentPage]);
+  
+  const handleCategoryChange = (category: string, checked: boolean) => {
+    setSelectedCategories(prev => {
+      if (checked) {
+        return [...prev, category];
+      } else {
+        return prev.filter(c => c !== category);
+      }
+    });
+  };
+  
+  const handleBrandChange = (brand: string, checked: boolean) => {
+    setSelectedBrands(prev => {
+      if (checked) {
+        return [...prev, brand];
+      } else {
+        return prev.filter(b => b !== brand);
+      }
+    });
+  };
+  
+  const handleRatingChange = (rating: number, checked: boolean) => {
+    if (checked) {
+      setMinRating(rating);
+    } else if (minRating === rating) {
+      setMinRating(0);
+    }
+  };
+  
+  const handleAddToCart = (productId: number) => {
+    toast({
+      title: "Added to cart",
+      description: "Product added to your cart successfully",
+    });
+  };
+  
+  const handleAddToWishlist = (productId: number) => {
+    toast({
+      title: "Added to wishlist",
+      description: "Product added to your wishlist",
+    });
+  };
+  
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
   
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row gap-8">
-        {/* Sidebar Filters */}
         <div className="w-full md:w-1/4">
           <div className="sticky top-4 space-y-6">
             <div className="bg-white rounded-lg shadow p-5">
               <h3 className="font-medium text-lg mb-4">Categories</h3>
               <div className="space-y-2">
-                <div className="flex items-center">
-                  <Checkbox id="cat-electronics" />
-                  <label htmlFor="cat-electronics" className="ml-2 text-sm">Electronics</label>
-                </div>
-                <div className="flex items-center">
-                  <Checkbox id="cat-fashion" />
-                  <label htmlFor="cat-fashion" className="ml-2 text-sm">Fashion</label>
-                </div>
-                <div className="flex items-center">
-                  <Checkbox id="cat-home" />
-                  <label htmlFor="cat-home" className="ml-2 text-sm">Home & Kitchen</label>
-                </div>
-                <div className="flex items-center">
-                  <Checkbox id="cat-beauty" />
-                  <label htmlFor="cat-beauty" className="ml-2 text-sm">Beauty & Personal Care</label>
-                </div>
-                <div className="flex items-center">
-                  <Checkbox id="cat-sports" />
-                  <label htmlFor="cat-sports" className="ml-2 text-sm">Sports & Outdoors</label>
-                </div>
+                {categories.map((category) => (
+                  <div key={category.id} className="flex items-center">
+                    <Checkbox 
+                      id={`cat-${category.id}`} 
+                      checked={selectedCategories.includes(category.id)}
+                      onCheckedChange={(checked) => 
+                        handleCategoryChange(category.id, checked === true)
+                      }
+                    />
+                    <label htmlFor={`cat-${category.id}`} className="ml-2 text-sm">
+                      {category.name}
+                    </label>
+                  </div>
+                ))}
               </div>
               <Button variant="link" className="mt-2 px-0 text-sm text-blue-600">
                 Show more
@@ -168,10 +311,9 @@ const Shop = () => {
             <div className="bg-white rounded-lg shadow p-5">
               <h3 className="font-medium text-lg mb-4">Price Range</h3>
               <Slider 
-                defaultValue={[0, 300]} 
+                value={priceRange} 
                 max={500} 
                 step={10}
-                value={priceRange}
                 onValueChange={setPriceRange}
                 className="my-6"
               />
@@ -195,71 +337,46 @@ const Shop = () => {
             <div className="bg-white rounded-lg shadow p-5">
               <h3 className="font-medium text-lg mb-4">Customer Ratings</h3>
               <div className="space-y-2">
-                <div className="flex items-center">
-                  <Checkbox id="rating-5" />
-                  <label htmlFor="rating-5" className="ml-2 text-sm flex items-center">
-                    <div className="flex text-yellow-400 mr-2">
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                    </div>
-                    <span>& Up</span>
-                  </label>
-                </div>
-                <div className="flex items-center">
-                  <Checkbox id="rating-4" />
-                  <label htmlFor="rating-4" className="ml-2 text-sm flex items-center">
-                    <div className="flex text-yellow-400 mr-2">
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4" />
-                    </div>
-                    <span>& Up</span>
-                  </label>
-                </div>
-                <div className="flex items-center">
-                  <Checkbox id="rating-3" />
-                  <label htmlFor="rating-3" className="ml-2 text-sm flex items-center">
-                    <div className="flex text-yellow-400 mr-2">
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4" />
-                      <Star className="h-4 w-4" />
-                    </div>
-                    <span>& Up</span>
-                  </label>
-                </div>
+                {[5, 4, 3].map((rating) => (
+                  <div key={rating} className="flex items-center">
+                    <Checkbox 
+                      id={`rating-${rating}`}
+                      checked={minRating === rating}
+                      onCheckedChange={(checked) => 
+                        handleRatingChange(rating, checked === true)
+                      }
+                    />
+                    <label htmlFor={`rating-${rating}`} className="ml-2 text-sm flex items-center">
+                      <div className="flex text-yellow-400 mr-2">
+                        {[...Array(5)].map((_, i) => (
+                          <Star 
+                            key={i} 
+                            className={`h-4 w-4 ${i < rating ? 'fill-yellow-400' : ''}`} 
+                          />
+                        ))}
+                      </div>
+                      <span>& Up</span>
+                    </label>
+                  </div>
+                ))}
               </div>
             </div>
             
             <div className="bg-white rounded-lg shadow p-5">
               <h3 className="font-medium text-lg mb-4">Brands</h3>
               <div className="space-y-2">
-                <div className="flex items-center">
-                  <Checkbox id="brand-samsung" />
-                  <label htmlFor="brand-samsung" className="ml-2 text-sm">Samsung</label>
-                </div>
-                <div className="flex items-center">
-                  <Checkbox id="brand-apple" />
-                  <label htmlFor="brand-apple" className="ml-2 text-sm">Apple</label>
-                </div>
-                <div className="flex items-center">
-                  <Checkbox id="brand-sony" />
-                  <label htmlFor="brand-sony" className="ml-2 text-sm">Sony</label>
-                </div>
-                <div className="flex items-center">
-                  <Checkbox id="brand-logitech" />
-                  <label htmlFor="brand-logitech" className="ml-2 text-sm">Logitech</label>
-                </div>
-                <div className="flex items-center">
-                  <Checkbox id="brand-adidas" />
-                  <label htmlFor="brand-adidas" className="ml-2 text-sm">Adidas</label>
-                </div>
+                {brands.slice(0, 5).map((brand) => (
+                  <div key={brand.id} className="flex items-center">
+                    <Checkbox 
+                      id={`brand-${brand.id}`}
+                      checked={selectedBrands.includes(brand.id)}
+                      onCheckedChange={(checked) => 
+                        handleBrandChange(brand.id, checked === true)
+                      }
+                    />
+                    <label htmlFor={`brand-${brand.id}`} className="ml-2 text-sm">{brand.name}</label>
+                  </div>
+                ))}
               </div>
               <Button variant="link" className="mt-2 px-0 text-sm text-blue-600">
                 Show more
@@ -268,19 +385,19 @@ const Shop = () => {
           </div>
         </div>
         
-        {/* Products */}
         <div className="w-full md:w-3/4">
-          {/* Filters bar */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
             <div className="flex items-center gap-2">
               <Filter className="h-5 w-5 text-gray-500" />
-              <span className="text-sm text-gray-500">Showing 1-9 of 36 products</span>
+              <span className="text-sm text-gray-500">
+                Showing {indexOfFirstProduct + 1}-{Math.min(indexOfLastProduct, filteredProducts.length)} of {filteredProducts.length} products
+              </span>
             </div>
             
             <div className="flex flex-wrap items-center gap-3">
               <div className="flex items-center">
                 <span className="text-sm mr-2">Sort by:</span>
-                <Select defaultValue="featured">
+                <Select value={sortBy} onValueChange={setSortBy}>
                   <SelectTrigger className="w-[180px] h-9">
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
@@ -311,83 +428,23 @@ const Shop = () => {
             </div>
           </div>
           
-          {/* Products grid */}
           {view === 'grid' && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {products.map((product) => (
-                <Card key={product.id}>
-                  <CardContent className="p-4">
-                    <div className="relative mb-4">
-                      <img 
-                        src={product.image} 
-                        alt={product.name} 
-                        className="w-full h-48 object-cover rounded"
-                      />
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="absolute top-2 right-2 h-8 w-8 rounded-full p-0 bg-white"
-                      >
-                        <Heart className="h-4 w-4" />
-                      </Button>
-                      {product.isNew && (
-                        <div className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
-                          New
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="mb-2">
-                      <div className="flex text-yellow-400 mb-1">
-                        {[...Array(5)].map((_, i) => (
-                          <Star 
-                            key={i} 
-                            className={`h-4 w-4 ${i < product.rating ? 'fill-yellow-400' : ''}`} 
-                          />
-                        ))}
-                        <span className="text-xs text-gray-500 ml-1">({product.reviews} reviews)</span>
-                      </div>
-                      <h3 className="font-medium">{product.name}</h3>
-                      <p className="text-sm text-gray-500">{product.brand}</p>
-                    </div>
-                    
-                    <div className="flex items-center mb-3">
-                      <span className="text-lg font-semibold">{formatCurrency(product.price)}</span>
-                      <span className="text-sm text-gray-500 line-through ml-2">{formatCurrency(product.oldPrice)}</span>
-                      <span className="text-xs text-green-600 ml-2">-{product.discount}% OFF</span>
-                    </div>
-                    
-                    <div className="flex space-x-2">
-                      <Button variant="outline" size="sm" className="flex-1">
-                        <Link to={`/products/${product.id}`}>View Details</Link>
-                      </Button>
-                      <Button className="bg-green-500 hover:bg-green-600">
-                        <Link to="/cart">Add to cart</Link>
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-          
-          {/* Products list */}
-          {view === 'list' && (
-            <div className="space-y-4">
-              {products.map((product) => (
-                <Card key={product.id}>
-                  <CardContent className="p-4">
-                    <div className="flex flex-col md:flex-row gap-4">
-                      <div className="relative md:w-1/4">
+              {currentProducts.length > 0 ? (
+                currentProducts.map((product) => (
+                  <Card key={product.id}>
+                    <CardContent className="p-4">
+                      <div className="relative mb-4">
                         <img 
                           src={product.image} 
                           alt={product.name} 
-                          className="w-full h-48 md:h-full object-cover rounded"
+                          className="w-full h-48 object-cover rounded"
                         />
                         <Button 
                           variant="outline" 
                           size="sm" 
                           className="absolute top-2 right-2 h-8 w-8 rounded-full p-0 bg-white"
+                          onClick={() => handleAddToWishlist(product.id)}
                         >
                           <Heart className="h-4 w-4" />
                         </Button>
@@ -398,69 +455,198 @@ const Shop = () => {
                         )}
                       </div>
                       
-                      <div className="md:w-3/4">
-                        <div className="mb-2">
-                          <div className="flex text-yellow-400 mb-1">
-                            {[...Array(5)].map((_, i) => (
-                              <Star 
-                                key={i} 
-                                className={`h-4 w-4 ${i < product.rating ? 'fill-yellow-400' : ''}`} 
-                              />
-                            ))}
-                            <span className="text-xs text-gray-500 ml-1">({product.reviews} reviews)</span>
-                          </div>
-                          <h3 className="font-medium text-lg">{product.name}</h3>
-                          <p className="text-sm text-gray-500">{product.brand}</p>
+                      <div className="mb-2">
+                        <div className="flex text-yellow-400 mb-1">
+                          {[...Array(5)].map((_, i) => (
+                            <Star 
+                              key={i} 
+                              className={`h-4 w-4 ${i < product.rating ? 'fill-yellow-400' : ''}`} 
+                            />
+                          ))}
+                          <span className="text-xs text-gray-500 ml-1">({product.reviews} reviews)</span>
                         </div>
-                        
-                        <p className="text-gray-600 mb-4 text-sm">
-                          Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-                          Nulla facilisi. Sed euismod, nisl vel ultricies lacinia, 
-                          nunc nisl ultricies nisl, nec ultricies nisl nunc vel nisl.
-                        </p>
-                        
-                        <div className="flex items-center mb-3">
-                          <span className="text-lg font-semibold">{formatCurrency(product.price)}</span>
-                          <span className="text-sm text-gray-500 line-through ml-2">{formatCurrency(product.oldPrice)}</span>
-                          <span className="text-xs text-green-600 ml-2">-{product.discount}% OFF</span>
-                        </div>
-                        
-                        <div className="flex space-x-2">
-                          <Button variant="outline" size="sm">
-                            <Link to={`/products/${product.id}`}>View Details</Link>
-                          </Button>
-                          <Button className="bg-green-500 hover:bg-green-600">
-                            <Link to="/cart">Add to cart</Link>
-                          </Button>
-                        </div>
+                        <h3 className="font-medium">{product.name}</h3>
+                        <p className="text-sm text-gray-500">{product.brand}</p>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                      
+                      <div className="flex items-center mb-3">
+                        <span className="text-lg font-semibold">{formatCurrency(product.price)}</span>
+                        <span className="text-sm text-gray-500 line-through ml-2">{formatCurrency(product.oldPrice)}</span>
+                        <span className="text-xs text-green-600 ml-2">-{product.discount}% OFF</span>
+                      </div>
+                      
+                      <div className="flex space-x-2">
+                        <Button variant="outline" size="sm" className="flex-1">
+                          <Link to={`/products/${product.id}`}>View Details</Link>
+                        </Button>
+                        <Button 
+                          className="bg-green-500 hover:bg-green-600"
+                          onClick={() => handleAddToCart(product.id)}
+                        >
+                          <ShoppingCart className="h-4 w-4 mr-2" />
+                          Add to cart
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <div className="col-span-3 py-10 text-center">
+                  <p className="text-gray-500">No products match your filters.</p>
+                  <Button 
+                    variant="outline" 
+                    className="mt-4"
+                    onClick={() => {
+                      setSelectedCategories([]);
+                      setSelectedBrands([]);
+                      setPriceRange([0, 300]);
+                      setMinRating(0);
+                      setSortBy('featured');
+                    }}
+                  >
+                    Clear all filters
+                  </Button>
+                </div>
+              )}
             </div>
           )}
           
-          {/* Pagination */}
-          <div className="flex justify-center mt-8">
-            <nav className="flex items-center space-x-1">
-              <Button variant="outline" size="sm" className="px-2">
-                Previous
-              </Button>
-              <Button variant="outline" size="sm" className="w-9 h-9 bg-emerald-50 border-emerald-200">
-                1
-              </Button>
-              <Button variant="outline" size="sm" className="w-9 h-9">
-                2
-              </Button>
-              <Button variant="outline" size="sm" className="w-9 h-9">
-                3
-              </Button>
-              <Button variant="outline" size="sm" className="px-2">
-                Next
-              </Button>
-            </nav>
-          </div>
+          {view === 'list' && (
+            <div className="space-y-4">
+              {currentProducts.length > 0 ? (
+                currentProducts.map((product) => (
+                  <Card key={product.id}>
+                    <CardContent className="p-4">
+                      <div className="flex flex-col md:flex-row gap-4">
+                        <div className="relative md:w-1/4">
+                          <img 
+                            src={product.image} 
+                            alt={product.name} 
+                            className="w-full h-48 md:h-full object-cover rounded"
+                          />
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="absolute top-2 right-2 h-8 w-8 rounded-full p-0 bg-white"
+                            onClick={() => handleAddToWishlist(product.id)}
+                          >
+                            <Heart className="h-4 w-4" />
+                          </Button>
+                          {product.isNew && (
+                            <div className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
+                              New
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="md:w-3/4">
+                          <div className="mb-2">
+                            <div className="flex text-yellow-400 mb-1">
+                              {[...Array(5)].map((_, i) => (
+                                <Star 
+                                  key={i} 
+                                  className={`h-4 w-4 ${i < product.rating ? 'fill-yellow-400' : ''}`} 
+                                />
+                              ))}
+                              <span className="text-xs text-gray-500 ml-1">({product.reviews} reviews)</span>
+                            </div>
+                            <h3 className="font-medium text-lg">{product.name}</h3>
+                            <p className="text-sm text-gray-500">{product.brand}</p>
+                          </div>
+                          
+                          <p className="text-gray-600 mb-4 text-sm">
+                            A high-quality {product.name.toLowerCase()} from {product.brand}. 
+                            Perfect for everyday use with excellent customer reviews.
+                          </p>
+                          
+                          <div className="flex items-center mb-3">
+                            <span className="text-lg font-semibold">{formatCurrency(product.price)}</span>
+                            <span className="text-sm text-gray-500 line-through ml-2">{formatCurrency(product.oldPrice)}</span>
+                            <span className="text-xs text-green-600 ml-2">-{product.discount}% OFF</span>
+                          </div>
+                          
+                          <div className="flex space-x-2">
+                            <Button variant="outline" size="sm">
+                              <Link to={`/products/${product.id}`}>View Details</Link>
+                            </Button>
+                            <Button 
+                              className="bg-green-500 hover:bg-green-600"
+                              onClick={() => handleAddToCart(product.id)}
+                            >
+                              <ShoppingCart className="h-4 w-4 mr-2" />
+                              Add to cart
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <div className="py-10 text-center">
+                  <p className="text-gray-500">No products match your filters.</p>
+                  <Button 
+                    variant="outline" 
+                    className="mt-4"
+                    onClick={() => {
+                      setSelectedCategories([]);
+                      setSelectedBrands([]);
+                      setPriceRange([0, 300]);
+                      setMinRating(0);
+                      setSortBy('featured');
+                    }}
+                  >
+                    Clear all filters
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+          
+          {filteredProducts.length > 0 && (
+            <div className="flex justify-center mt-8">
+              <nav className="flex items-center space-x-1">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="px-2"
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </Button>
+                
+                {[...Array(Math.min(totalPages, 5))].map((_, i) => {
+                  const pageNumber = i + 1;
+                  return (
+                    <Button 
+                      key={i}
+                      variant="outline" 
+                      size="sm" 
+                      className={`w-9 h-9 ${
+                        currentPage === pageNumber 
+                          ? 'bg-emerald-50 border-emerald-200' 
+                          : ''
+                      }`}
+                      onClick={() => setCurrentPage(pageNumber)}
+                    >
+                      {pageNumber}
+                    </Button>
+                  );
+                })}
+                
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="px-2"
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </Button>
+              </nav>
+            </div>
+          )}
         </div>
       </div>
     </div>

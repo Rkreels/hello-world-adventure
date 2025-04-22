@@ -2,6 +2,10 @@
 import { Navigate, RouteObject } from 'react-router-dom';
 import AdminLayout from './layout/AdminLayout';
 import ShopLayout from './layout/ShopLayout';
+import ProtectedRoute from './components/ProtectedRoute';
+
+// Auth pages
+import Login from './pages/auth/Login';
 
 // Admin pages
 import Dashboard from './pages/admin/Dashboard';
@@ -11,6 +15,7 @@ import Transactions from './pages/admin/Transactions';
 import Categories from './pages/admin/Categories';
 import Customers from './pages/admin/Customers';
 import OrderManagement from './pages/admin/OrderManagement';
+import SearchResults from './pages/admin/SearchResults';
 
 // Shop pages
 import Landing from './pages/shop/Landing';
@@ -22,17 +27,28 @@ import CategoryPage from './pages/shop/CategoryPage';
 
 const routes: RouteObject[] = [
   {
+    path: '/login',
+    element: <Login />,
+  },
+  {
     path: '/admin',
-    element: <AdminLayout />,
+    element: <ProtectedRoute adminOnly={true} />,
     children: [
-      { path: '', element: <Navigate to="/admin/dashboard" replace /> },
-      { path: 'dashboard', element: <Dashboard /> },
-      { path: 'role', element: <AdminProfile /> },
-      { path: 'products/add', element: <AddProduct /> },
-      { path: 'transactions', element: <Transactions /> },
-      { path: 'categories', element: <Categories /> },
-      { path: 'customers', element: <Customers /> },
-      { path: 'orders', element: <OrderManagement /> },
+      {
+        path: '',
+        element: <AdminLayout />,
+        children: [
+          { path: '', element: <Navigate to="/admin/dashboard" replace /> },
+          { path: 'dashboard', element: <Dashboard /> },
+          { path: 'role', element: <AdminProfile /> },
+          { path: 'products/add', element: <AddProduct /> },
+          { path: 'transactions', element: <Transactions /> },
+          { path: 'categories', element: <Categories /> },
+          { path: 'customers', element: <Customers /> },
+          { path: 'orders', element: <OrderManagement /> },
+          { path: 'search', element: <SearchResults /> },
+        ],
+      },
     ],
   },
   {
@@ -46,6 +62,7 @@ const routes: RouteObject[] = [
       { path: 'checkout', element: <Checkout /> },
       { path: 'category/:categoryId', element: <CategoryPage /> },
       { path: 'category/:categoryId/:subcategoryId', element: <CategoryPage /> },
+      { path: 'login', element: <Login /> },
     ],
   },
 ];
