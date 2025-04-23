@@ -33,9 +33,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = (email: string, password: string) => {
     // Simple authentication logic
+    const userRole: 'admin' | 'customer' = email.includes('admin') ? 'admin' : 'customer';
+    
     const newUser = {
       email,
-      role: email.includes('admin') ? 'admin' : 'customer',
+      role: userRole,
       name: email.includes('admin') ? 'Admin User' : 'Customer User',
     };
     
