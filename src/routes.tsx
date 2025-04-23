@@ -24,6 +24,14 @@ import ProductDetail from './pages/shop/ProductDetail';
 import Cart from './pages/shop/Cart';
 import Checkout from './pages/shop/Checkout';
 import CategoryPage from './pages/shop/CategoryPage';
+import About from './pages/shop/About';
+import Blog from './pages/shop/Blog';
+import Careers from './pages/shop/Careers';
+import Contact from './pages/shop/Contact';
+import FAQ from './pages/shop/FAQ';
+import Terms from './pages/shop/Terms';
+import Privacy from './pages/shop/Privacy';
+import CookiePolicy from './pages/shop/CookiePolicy';
 
 const routes: RouteObject[] = [
   {
@@ -63,6 +71,15 @@ const routes: RouteObject[] = [
       { path: 'category/:categoryId', element: <CategoryPage /> },
       { path: 'category/:categoryId/:subcategoryId', element: <CategoryPage /> },
       { path: 'login', element: <Login /> },
+      // Footer pages
+      { path: 'about', element: <About /> },
+      { path: 'blog', element: <Blog /> },
+      { path: 'careers', element: <Careers /> },
+      { path: 'contact', element: <Contact /> },
+      { path: 'faq', element: <FAQ /> },
+      { path: 'terms', element: <Terms /> },
+      { path: 'privacy', element: <Privacy /> },
+      { path: 'cookie', element: <CookiePolicy /> },
     ],
   },
 ];
