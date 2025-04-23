@@ -4,30 +4,36 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 
 const StartExploring = () => {
+  const categories = [
+    { name: 'Grocery', icon: '🛒', path: '/category/grocery' },
+    { name: 'Home', icon: '🏠', path: '/category/home' },
+    { name: 'Fashion', icon: '👔', path: '/category/fashion' },
+    { name: 'Electronics', icon: '📱', path: '/category/electronics' },
+    { name: 'Toys', icon: '🧸', path: '/category/toys' },
+    { name: 'Gifts', icon: '🎁', path: '/category/gifts' },
+  ];
+
   return (
     <div className="container mx-auto px-4 py-12">
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl overflow-hidden">
-        <div className="py-14 px-6 md:px-12 flex flex-col md:flex-row items-center justify-between">
-          <div className="text-white text-center md:text-left mb-8 md:mb-0">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Start Exploring Now</h2>
-            <p className="text-white/80 text-lg max-w-md">
-              Discover thousands of products with amazing deals and discounts. Shop with confidence!
-            </p>
-          </div>
-          <div>
-            <Button 
-              asChild
-              size="lg" 
-              variant="outline" 
-              className="bg-white text-blue-600 hover:bg-blue-50 border-none text-lg px-8 py-6 h-auto"
-            >
-              <Link to="/shop" className="flex items-center">
-                Explore All Products
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-          </div>
-        </div>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold">Start exploring now</h2>
+        <Button variant="ghost" size="sm" className="text-primary">
+          View All
+          <ArrowRight className="ml-2 h-4 w-4" />
+        </Button>
+      </div>
+      
+      <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
+        {categories.map((category) => (
+          <Link 
+            key={category.name}
+            to={category.path}
+            className="flex flex-col items-center p-4 hover:bg-gray-50 rounded-lg transition-colors"
+          >
+            <span className="text-4xl mb-2">{category.icon}</span>
+            <span className="text-sm text-gray-600">{category.name}</span>
+          </Link>
+        ))}
       </div>
     </div>
   );

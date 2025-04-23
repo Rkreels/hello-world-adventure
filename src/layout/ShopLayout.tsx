@@ -1,8 +1,32 @@
-
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { Search, ShoppingCart, Menu, MapPin, User, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+
+const footerLinks = {
+  companyInfo: [
+    { name: 'About Us', path: '/about' },
+    { name: 'Blog', path: '/blog' },
+    { name: 'Careers', path: '/careers' },
+  ],
+  customerSupport: [
+    { name: 'Contact Us', path: '/contact' },
+    { name: 'Help Center (FAQ)', path: '/faq' },
+    { name: 'Returns & Refunds', path: '/returns' },
+    { name: 'Shipping Information', path: '/shipping-information' },
+  ],
+  explore: [
+    { name: 'Categories', path: '/categories' },
+    { name: 'Deals', path: '/deals' },
+    { name: 'New Arrivals', path: '/new-arrivals' },
+  ],
+  legal: [
+    { name: 'Terms & Conditions', path: '/terms' },
+    { name: 'Privacy Policy', path: '/privacy' },
+    { name: 'Cookie Policy', path: '/cookie' },
+    { name: 'Accessibility', path: '/accessibility' },
+  ],
+};
 
 const ShopLayout = () => {
   const location = useLocation();
@@ -113,53 +137,36 @@ const ShopLayout = () => {
         <Outlet />
       </main>
       
-      <footer className="bg-[#f8f9f6] pt-10">
+      <footer className="bg-[#f8f9f6]">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 pb-10">
-            <div>
-              <h3 className="font-semibold mb-4">Company Info</h3>
-              <ul className="space-y-2">
-                <li><Link to="/about" className="text-sm text-gray-600 hover:text-gray-900">About Us</Link></li>
-                <li><Link to="/blog" className="text-sm text-gray-600 hover:text-gray-900">Blog</Link></li>
-                <li><Link to="/careers" className="text-sm text-gray-600 hover:text-gray-900">Careers</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4">Customer Support</h3>
-              <ul className="space-y-2">
-                <li><Link to="/contact" className="text-sm text-gray-600 hover:text-gray-900">Contact Us</Link></li>
-                <li><Link to="/faq" className="text-sm text-gray-600 hover:text-gray-900">Help Center (FAQ)</Link></li>
-                <li><Link to="/returns" className="text-sm text-gray-600 hover:text-gray-900">Returns & Refunds</Link></li>
-                <li><Link to="/shipping-information" className="text-sm text-gray-600 hover:text-gray-900">Shipping Information</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4">Explore</h3>
-              <ul className="space-y-2">
-                <li><Link to="/categories" className="text-sm text-gray-600 hover:text-gray-900">Categories</Link></li>
-                <li><Link to="/deals" className="text-sm text-gray-600 hover:text-gray-900">Deals</Link></li>
-                <li><Link to="/new-arrivals" className="text-sm text-gray-600 hover:text-gray-900">New Arrivals</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4">Legal</h3>
-              <ul className="space-y-2">
-                <li><Link to="/terms" className="text-sm text-gray-600 hover:text-gray-900">Terms & Conditions</Link></li>
-                <li><Link to="/privacy" className="text-sm text-gray-600 hover:text-gray-900">Privacy Policy</Link></li>
-                <li><Link to="/cookie" className="text-sm text-gray-600 hover:text-gray-900">Cookie Policy</Link></li>
-                <li><Link to="/accessibility" className="text-sm text-gray-600 hover:text-gray-900">Accessibility Statement</Link></li>
-              </ul>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 py-12">
+            {Object.entries(footerLinks).map(([section, links]) => (
+              <div key={section}>
+                <h3 className="font-semibold mb-4 capitalize">{section.replace(/([A-Z])/g, ' $1').trim()}</h3>
+                <ul className="space-y-2">
+                  {links.map((link) => (
+                    <li key={link.path}>
+                      <Link to={link.path} className="text-sm text-gray-600 hover:text-gray-900">
+                        {link.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
           
-          <div className="py-6 border-t border-gray-200">
+          <div className="border-t border-gray-200 py-8">
             <div className="flex flex-col md:flex-row justify-between items-center">
-              <div className="mb-4 md:mb-0">
+              <Link to="/" className="flex items-center mb-4 md:mb-0">
                 <span className="text-xl font-bold text-green-600">DEALPORT</span>
-              </div>
-              <div className="flex items-center space-x-4">
-                <Link to="#" className="text-gray-600 hover:text-gray-900">
-                  <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 5.523 4.477 10 10 10 5.523 0 10-4.477 10-10zm-10 6a6 6 0 100-12 6 6 0 000 12z" /></svg>
+              </Link>
+              
+              <div className="space-x-4">
+                <Link to="/" className="text-gray-600 hover:text-gray-900">
+                  <svg className="inline-block h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 5.523 4.477 10 10 10 5.523 0 10-4.477 10-10zm-10 6a6 6 0 100-12 6 6 0 000 12z" />
+                  </svg>
                 </Link>
                 <Link to="#" className="text-gray-600 hover:text-gray-900">
                   <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 5.523 4.477 10 10 10 5.523 0 10-4.477 10-10zm-10 6a6 6 0 100-12 6 6 0 000 12z" /></svg>
@@ -172,10 +179,10 @@ const ShopLayout = () => {
                 </Link>
               </div>
             </div>
-          </div>
-          
-          <div className="py-4 text-sm text-center text-gray-600 border-t border-gray-200">
-            © {new Date().getFullYear()} Dealport. All rights reserved.
+            
+            <div className="text-center mt-6 text-sm text-gray-600">
+              © {new Date().getFullYear()} Dealport. All rights reserved.
+            </div>
           </div>
         </div>
       </footer>
