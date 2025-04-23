@@ -12,16 +12,10 @@ import StartExploring from '@/components/shop/StartExploring';
 const Landing = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
-    
-    // Add meta viewport tag to prevent zoom
-    const viewport = document.querySelector('meta[name=viewport]');
-    if (viewport) {
-      viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0');
-    }
   }, []);
 
   return (
-    <div className="relative space-y-8 md:space-y-12">
+    <div className="space-y-6">
       <div className="relative">
         <HeroCarousel />
         <div className="relative -mt-16 z-10">
@@ -29,23 +23,21 @@ const Landing = () => {
         </div>
       </div>
       
-      <div className="bg-gray-50 py-6">
-        <CategoryBanners />
-      </div>
+      <CategoryBanners />
       
-      <div className="shadow-sm">
+      <div className="bg-white shadow-sm hover:shadow-md transition-shadow duration-300">
         <TrendingProducts />
       </div>
       
-      <div className="py-2">
+      <div className="container mx-auto px-4">
         <StartExploring />
       </div>
       
-      <div className="bg-gray-50 py-6 shadow-inner">
+      <div className="bg-gray-50 shadow-inner">
         <BestSellingProducts />
       </div>
       
-      <div className="py-4">
+      <div className="container mx-auto px-4">
         <LimitedTimeDeals />
       </div>
       

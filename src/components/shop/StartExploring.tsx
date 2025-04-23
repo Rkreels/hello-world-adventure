@@ -15,8 +15,8 @@ const StartExploring = () => {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-white rounded-lg shadow-sm">
-      <div className="flex items-center justify-between mb-6 px-2">
+    <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
+      <div className="flex items-center justify-between mb-6 p-6">
         <h2 className="text-2xl font-bold text-gray-800">Start exploring now</h2>
         <Button variant="ghost" size="sm" className="text-primary flex items-center group">
           View All
@@ -24,15 +24,15 @@ const StartExploring = () => {
         </Button>
       </div>
       
-      <div className="grid grid-cols-3 md:grid-cols-6 gap-3 sm:gap-4">
+      <div className="grid grid-cols-3 md:grid-cols-6 gap-4 p-6">
         {categories.map((category) => (
           <Link 
             key={category.name}
             to={category.path}
-            className="flex flex-col items-center p-5 bg-white hover:bg-gray-50 rounded-lg transition-all duration-200 border border-gray-100 shadow-sm hover:shadow-md transform hover:-translate-y-1"
+            className="flex flex-col items-center p-4 bg-white hover:bg-gray-50 rounded-lg transition-all duration-300 border border-gray-100 shadow-sm hover:shadow-md transform hover:-translate-y-1"
           >
             <span className="text-4xl mb-3">{category.icon}</span>
-            <span className="text-sm font-medium text-gray-800">{category.name}</span>
+            <span className="text-sm font-medium text-gray-800 text-center">{category.name}</span>
           </Link>
         ))}
       </div>

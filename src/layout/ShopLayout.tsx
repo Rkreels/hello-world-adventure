@@ -1,4 +1,3 @@
-
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import {
@@ -58,7 +57,18 @@ const ShopLayout = () => {
   const [deliveryLocation, setDeliveryLocation] = useState("United States");
   const searchRef = useRef<HTMLDivElement>(null);
   
-  // Sample search suggestions
+  const categories = [
+    { name: 'Home', path: '/category/home' },
+    { name: 'Electronics', path: '/category/electronics' },
+    { name: 'Fashion', path: '/category/fashion' },
+    { name: 'Grocery & Essentials', path: '/category/grocery' },
+    { name: 'Streetwear', path: '/category/streetwear' },
+    { name: 'Shoes', path: '/category/shoes' },
+    { name: 'Accessories', path: '/category/accessories' },
+    { name: 'Beauty', path: '/category/beauty' },
+    { name: 'Industrial equipment', path: '/category/industrial' },
+  ];
+
   const searchSuggestions = [
     "Electronics",
     "Smartphones",
@@ -69,7 +79,6 @@ const ShopLayout = () => {
     "Sports Gear",
   ];
 
-  // Filtered suggestions based on search term
   const filteredSuggestions = searchSuggestions.filter(item =>
     item.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -91,7 +100,6 @@ const ShopLayout = () => {
     { code: "de", name: "Deutsch" },
   ];
 
-  // Handle click outside of search suggestions
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -105,12 +113,10 @@ const ShopLayout = () => {
     };
   }, []);
   
-  // Reset scroll position when navigating to a new page
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
-  // Handle search submit
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchTerm.trim()) {
@@ -121,249 +127,146 @@ const ShopLayout = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="container mx-auto px-4">
-          {/* Top bar */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between py-3">
-            <div className="flex items-center justify-between md:justify-start md:space-x-6">
+          <div className="py-2 border-b border-gray-100">
+            <div className="flex items-center justify-between">
               <Link to="/" className="flex items-center">
                 <span className="text-xl font-bold text-green-600">DEALPORT</span>
               </Link>
               
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <div className="hidden md:flex md:items-center md:space-x-1 text-sm cursor-pointer">
-                    <MapPin className="h-4 w-4" />
-                    <span>Deliver to</span>
-                    <span className="font-medium">{deliveryLocation}</span>
-                    <ChevronDown className="h-3 w-3" />
-                  </div>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-48">
-                  {locations.map((location) => (
-                    <DropdownMenuItem 
-                      key={location} 
-                      onClick={() => setDeliveryLocation(location)}
-                      className="cursor-pointer"
-                    >
-                      {location}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-              
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="sm" className="md:hidden">
-                    <Menu className="h-5 w-5" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="left" className="w-[80%] sm:w-[350px]">
-                  <div className="py-4">
-                    <div className="flex items-center mb-4">
-                      <MapPin className="h-4 w-4 mr-2" />
-                      <span className="text-sm">Deliver to</span>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      {locations.map((loc) => (
-                        <div 
-                          key={loc}
-                          className={`p-2 rounded cursor-pointer ${loc === deliveryLocation ? 'bg-green-50 text-green-600' : 'hover:bg-gray-50'}`}
-                          onClick={() => {
-                            setDeliveryLocation(loc);
-                          }}
+              <div className="flex items-center space-x-6">
+                <div className="flex items-center text-sm">
+                  <MapPin className="h-4 w-4 mr-1" />
+                  <span className="mr-1">Deliver to</span>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger className="font-medium flex items-center">
+                      {deliveryLocation}
+                      <ChevronDown className="h-3 w-3 ml-1" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      {locations.map((location) => (
+                        <DropdownMenuItem 
+                          key={location}
+                          onClick={() => setDeliveryLocation(location)}
+                          className="cursor-pointer"
                         >
-                          {loc}
-                        </div>
+                          {location}
+                        </DropdownMenuItem>
                       ))}
-                    </div>
-                    
-                    <div className="mt-6 pt-6 border-t">
-                      <h3 className="font-medium mb-2">Categories</h3>
-                      <nav className="space-y-2">
-                        <Link to="/shop" className="block p-2 hover:bg-gray-50 rounded">Shop All</Link>
-                        <Link to="/deals" className="block p-2 hover:bg-gray-50 rounded">Today's Deals</Link>
-                        <Link to="/new-arrivals" className="block p-2 hover:bg-gray-50 rounded">New Arrivals</Link>
-                        <Link to="/category/electronics" className="block p-2 hover:bg-gray-50 rounded">Electronics</Link>
-                        <Link to="/category/fashion" className="block p-2 hover:bg-gray-50 rounded">Fashion</Link>
-                        <Link to="/category/home" className="block p-2 hover:bg-gray-50 rounded">Home</Link>
-                      </nav>
-                    </div>
-                  </div>
-                </SheetContent>
-              </Sheet>
-            </div>
-            
-            <div className="flex-1 max-w-2xl mx-0 md:mx-6 mt-3 md:mt-0" ref={searchRef}>
-              <form onSubmit={handleSearchSubmit}>
-                <div className="relative">
-                  <div className="flex">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="hidden sm:flex items-center h-10 rounded-r-none border-r-0">
-                          <span className="mr-1">All</span>
-                          <ChevronDown className="h-3 w-3" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start" className="w-48">
-                        <DropdownMenuItem>All Categories</DropdownMenuItem>
-                        <DropdownMenuItem>Electronics</DropdownMenuItem>
-                        <DropdownMenuItem>Fashion</DropdownMenuItem>
-                        <DropdownMenuItem>Home & Garden</DropdownMenuItem>
-                        <DropdownMenuItem>Toys & Games</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                    
-                    <input
-                      type="text"
-                      placeholder="Search DEALPORT"
-                      className="w-full pl-4 pr-10 py-2 h-10 border border-gray-200 focus:outline-none focus:ring-1 focus:ring-primary rounded-l-md sm:rounded-l-none rounded-r-none"
-                      value={searchTerm}
-                      onChange={(e) => {
-                        setSearchTerm(e.target.value);
-                        setShowSuggestions(e.target.value.length > 0);
-                      }}
-                    />
-                    <Button type="submit" size="sm" className="h-10 rounded-l-none bg-green-600 hover:bg-green-700">
-                      <Search className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  
-                  {showSuggestions && filteredSuggestions.length > 0 && (
-                    <div className="absolute top-full left-0 right-0 bg-white shadow-lg rounded-b-md z-30 mt-1 border border-gray-200">
-                      <div className="p-2">
-                        {filteredSuggestions.map((suggestion, index) => (
-                          <div
-                            key={index}
-                            className="px-3 py-2 hover:bg-gray-50 cursor-pointer rounded flex items-center"
-                            onClick={() => {
-                              setSearchTerm(suggestion);
-                              setShowSuggestions(false);
-                              navigate(`/search?q=${encodeURIComponent(suggestion)}`);
-                            }}
-                          >
-                            <Search className="h-3 w-3 mr-2 text-gray-400" />
-                            <span>{suggestion}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
-              </form>
-            </div>
-            
-            <div className="hidden md:flex items-center space-x-5">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <div className="flex items-center space-x-1 text-sm cursor-pointer">
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="flex items-center text-sm">
                     <Globe className="h-4 w-4 mr-1" />
                     <span>EN</span>
                     <ChevronDown className="h-3 w-3 ml-1" />
-                  </div>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-40">
-                  {languages.map((lang) => (
-                    <DropdownMenuItem key={lang.code} className="cursor-pointer">
-                      {lang.name}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-              
-              <Link to="/login" className="flex flex-col items-center text-sm">
-                <span className="text-xs text-gray-500">Hello, Sign in</span>
-                <div className="flex items-center font-medium">
-                  <span>Account</span>
-                  <ChevronDown className="h-3 w-3 ml-1" />
-                </div>
-              </Link>
-              
-              <Link to="/cart" className="flex flex-col items-center">
-                <div className="relative">
-                  <ShoppingCart className="h-6 w-6" />
-                  <span className="absolute -top-2 -right-2 bg-green-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                    {cartCount}
-                  </span>
-                </div>
-                <span className="text-xs font-medium mt-1">Cart</span>
-              </Link>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-40">
+                    {languages.map((lang) => (
+                      <DropdownMenuItem key={lang.code} className="cursor-pointer">
+                        {lang.name}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                <Link to="/cart" className="flex items-center space-x-1">
+                  <ShoppingCart className="h-5 w-5" />
+                  <span className="text-sm">Cart</span>
+                  {cartCount > 0 && (
+                    <span className="bg-green-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                      {cartCount}
+                    </span>
+                  )}
+                </Link>
+              </div>
             </div>
           </div>
-          
-          {/* Main navigation */}
-          <div className="flex items-center overflow-x-auto py-2 bg-gray-100 text-sm">
+
+          <div className="py-3 relative flex items-center">
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="sm" className="flex items-center mr-4 font-medium min-w-max">
-                  <Menu className="h-5 w-5 mr-2" />
-                  <span>All Categories</span>
+                <Button variant="ghost" size="sm" className="mr-4">
+                  <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-[80%] sm:w-[350px]">
-                <div className="py-4">
-                  <h3 className="font-bold text-lg mb-4">Shop By Category</h3>
-                  
-                  <div className="space-y-6">
-                    <div>
-                      <h4 className="font-medium mb-2">Electronics</h4>
-                      <ul className="space-y-1">
-                        <li><Link to="/category/electronics/phones" className="block p-2 hover:bg-gray-50 rounded text-sm">Phones & Tablets</Link></li>
-                        <li><Link to="/category/electronics/computers" className="block p-2 hover:bg-gray-50 rounded text-sm">Computers & Laptops</Link></li>
-                        <li><Link to="/category/electronics/tv-audio" className="block p-2 hover:bg-gray-50 rounded text-sm">TV & Audio</Link></li>
-                        <li><Link to="/category/electronics/wearables" className="block p-2 hover:bg-gray-50 rounded text-sm">Wearables</Link></li>
-                      </ul>
-                    </div>
-                    
-                    <div>
-                      <h4 className="font-medium mb-2">Fashion</h4>
-                      <ul className="space-y-1">
-                        <li><Link to="/category/fashion/men" className="block p-2 hover:bg-gray-50 rounded text-sm">Men's Clothing</Link></li>
-                        <li><Link to="/category/fashion/women" className="block p-2 hover:bg-gray-50 rounded text-sm">Women's Clothing</Link></li>
-                        <li><Link to="/category/fashion/shoes" className="block p-2 hover:bg-gray-50 rounded text-sm">Shoes</Link></li>
-                        <li><Link to="/category/fashion/accessories" className="block p-2 hover:bg-gray-50 rounded text-sm">Accessories</Link></li>
-                      </ul>
-                    </div>
-                    
-                    <div>
-                      <h4 className="font-medium mb-2">Home</h4>
-                      <ul className="space-y-1">
-                        <li><Link to="/category/home/furniture" className="block p-2 hover:bg-gray-50 rounded text-sm">Furniture</Link></li>
-                        <li><Link to="/category/home/kitchen" className="block p-2 hover:bg-gray-50 rounded text-sm">Kitchen</Link></li>
-                        <li><Link to="/category/home/decor" className="block p-2 hover:bg-gray-50 rounded text-sm">Home Decor</Link></li>
-                        <li><Link to="/category/home/appliances" className="block p-2 hover:bg-gray-50 rounded text-sm">Appliances</Link></li>
-                      </ul>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-6">
-                    <Button asChild variant="default" className="w-full bg-green-600 hover:bg-green-700">
-                      <Link to="/categories">View All Categories</Link>
-                    </Button>
-                  </div>
-                </div>
+              <SheetContent side="left" className="w-[300px]">
+                <nav className="space-y-2 mt-4">
+                  {categories.map((category) => (
+                    <Link
+                      key={category.name}
+                      to={category.path}
+                      className="block p-2 hover:bg-gray-50 rounded"
+                    >
+                      {category.name}
+                    </Link>
+                  ))}
+                </nav>
               </SheetContent>
             </Sheet>
-            
-            <nav className="flex items-center space-x-6 min-w-max">
-              <Link to="/" className="font-medium hover:text-green-600">Home</Link>
-              <Link to="/deals" className="hover:text-green-600">Today's Deals</Link>
-              <Link to="/new-arrivals" className="hover:text-green-600">New Arrivals</Link>
-              <Link to="/best-selling" className="hover:text-green-600">Best Sellers</Link>
-              <Link to="/shop" className="hover:text-green-600">Shop All</Link>
-            </nav>
+
+            <div className="flex-1 max-w-2xl relative" ref={searchRef}>
+              <form onSubmit={handleSearchSubmit} className="flex">
+                <input
+                  type="text"
+                  placeholder="What you're looking for"
+                  className="w-full pl-4 pr-10 py-2 border border-gray-200 rounded-l focus:outline-none focus:ring-1 focus:ring-green-500"
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setShowSuggestions(e.target.value.length > 0);
+                  }}
+                />
+                <Button type="submit" className="rounded-l-none bg-green-600 hover:bg-green-700">
+                  <Search className="h-4 w-4" />
+                </Button>
+              </form>
+
+              {showSuggestions && filteredSuggestions.length > 0 && (
+                <div className="absolute top-full left-0 right-0 bg-white shadow-lg rounded-b-md z-30 mt-1 border border-gray-200">
+                  {filteredSuggestions.map((suggestion, index) => (
+                    <div
+                      key={index}
+                      className="px-4 py-2 hover:bg-gray-50 cursor-pointer"
+                      onClick={() => {
+                        setSearchTerm(suggestion);
+                        setShowSuggestions(false);
+                        navigate(`/search?q=${encodeURIComponent(suggestion)}`);
+                      }}
+                    >
+                      {suggestion}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
+
+          <nav className="flex items-center space-x-6 py-2 text-sm overflow-x-auto">
+            <Link to="/" className="whitespace-nowrap hover:text-green-600">Home</Link>
+            <Link to="/category/men" className="whitespace-nowrap hover:text-green-600">Men</Link>
+            <Link to="/category/women" className="whitespace-nowrap hover:text-green-600">Women</Link>
+            <Link to="/category/baby" className="whitespace-nowrap hover:text-green-600">Baby</Link>
+            <Link to="/category/grocery" className="whitespace-nowrap hover:text-green-600">Grocery & Essentials</Link>
+            <Link to="/category/streetwear" className="whitespace-nowrap hover:text-green-600">Streetwear</Link>
+            <Link to="/category/shoes" className="whitespace-nowrap hover:text-green-600">Shoes</Link>
+            <Link to="/category/accessories" className="whitespace-nowrap hover:text-green-600">Accessories</Link>
+            <Link to="/category/beauty" className="whitespace-nowrap hover:text-green-600">Beauty</Link>
+            <Link to="/category/electronics" className="whitespace-nowrap hover:text-green-600">Electronics</Link>
+            <Link to="/category/industrial" className="whitespace-nowrap hover:text-green-600">Industrial equipment</Link>
+          </nav>
         </div>
       </header>
-      
+
       <main className="flex-1">
         <Outlet />
       </main>
-      
+
       <footer className="bg-[#f8f9f6] mt-8">
         <div className="container mx-auto px-4">
-          {/* Newsletter Section */}
           <div className="py-10 border-b border-gray-200">
             <div className="max-w-4xl mx-auto text-center">
               <h3 className="text-xl font-bold mb-2">Subscribe to our newsletter</h3>
@@ -381,8 +284,7 @@ const ShopLayout = () => {
               </div>
             </div>
           </div>
-          
-          {/* Links Section */}
+
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 py-12">
             {Object.entries(footerLinks).map(([section, links]) => (
               <div key={section}>
@@ -399,8 +301,7 @@ const ShopLayout = () => {
               </div>
             ))}
           </div>
-          
-          {/* Payment Methods */}
+
           <div className="border-t border-gray-200 py-8">
             <div className="flex flex-wrap gap-4 justify-center mb-6">
               <img src="https://placehold.co/60x30" alt="Visa" className="h-8" />
