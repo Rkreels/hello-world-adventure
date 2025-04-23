@@ -8,7 +8,7 @@ const FeaturedCategories = () => {
     <div className="container mx-auto px-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 -mt-16 relative z-10">
         {/* New Year! New Fashion - Overlapping Card */}
-        <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow bg-white">
+        <Card className="overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 bg-white">
           <CardContent className="p-0">
             <div className="relative h-64 bg-gray-100">
               <img 
@@ -32,12 +32,12 @@ const FeaturedCategories = () => {
         </Card>
         
         {/* Gaming accessories */}
-        <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow bg-white">
+        <Card className="overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 bg-white">
           <CardContent className="p-0">
             <div className="h-64 bg-gray-100">
-              <div className="p-4 text-center">
+              <div className="p-4 h-full flex flex-col">
                 <h3 className="font-semibold text-lg mb-4">Gaming accessories</h3>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-3 flex-grow">
                   <div className="group">
                     <div className="h-20 mb-1 overflow-hidden rounded-lg">
                       <img 
@@ -82,7 +82,7 @@ const FeaturedCategories = () => {
                 <Button 
                   asChild
                   variant="link"
-                  className="text-blue-600 text-sm mt-4 hover:underline p-0 h-auto"
+                  className="text-blue-600 text-sm mt-2 hover:underline p-0 h-auto w-fit"
                 >
                   <Link to="/category/accessories">See more</Link>
                 </Button>
@@ -92,7 +92,7 @@ const FeaturedCategories = () => {
         </Card>
         
         {/* Combined Electronics Promotion Section */}
-        <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow bg-white h-64">
+        <Card className="overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 bg-white h-64">
           <CardContent className="p-0 h-full">
             <div className="bg-gradient-to-br from-blue-600 to-purple-700 h-full relative p-4 flex flex-col justify-between">
               <div>

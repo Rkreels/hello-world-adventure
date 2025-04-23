@@ -2,6 +2,7 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const StartExploring = () => {
   const categories = [
@@ -14,21 +15,21 @@ const StartExploring = () => {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-12 bg-gray-50 rounded-lg">
-      <div className="flex items-center justify-between mb-6 px-4">
+    <div className="container mx-auto px-4 py-8 bg-white rounded-lg shadow-sm">
+      <div className="flex items-center justify-between mb-6 px-2">
         <h2 className="text-2xl font-bold text-gray-800">Start exploring now</h2>
-        <Button variant="ghost" size="sm" className="text-primary">
+        <Button variant="ghost" size="sm" className="text-primary flex items-center group">
           View All
-          <ArrowRight className="ml-2 h-4 w-4" />
+          <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
         </Button>
       </div>
       
-      <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
+      <div className="grid grid-cols-3 md:grid-cols-6 gap-3 sm:gap-4">
         {categories.map((category) => (
           <Link 
             key={category.name}
             to={category.path}
-            className="flex flex-col items-center p-6 bg-white hover:bg-gray-50 rounded-lg transition-colors border border-gray-100 shadow-sm"
+            className="flex flex-col items-center p-5 bg-white hover:bg-gray-50 rounded-lg transition-all duration-200 border border-gray-100 shadow-sm hover:shadow-md transform hover:-translate-y-1"
           >
             <span className="text-4xl mb-3">{category.icon}</span>
             <span className="text-sm font-medium text-gray-800">{category.name}</span>

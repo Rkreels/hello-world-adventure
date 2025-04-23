@@ -21,7 +21,7 @@ const Landing = () => {
   }, []);
 
   return (
-    <div className="relative space-y-12 md:space-y-16">
+    <div className="relative space-y-8 md:space-y-12">
       <div className="relative">
         <HeroCarousel />
         <div className="relative -mt-16 z-10">
@@ -29,11 +29,26 @@ const Landing = () => {
         </div>
       </div>
       
-      <CategoryBanners />
-      <TrendingProducts />
-      <StartExploring />
-      <BestSellingProducts />
-      <LimitedTimeDeals />
+      <div className="bg-gray-50 py-6">
+        <CategoryBanners />
+      </div>
+      
+      <div className="shadow-sm">
+        <TrendingProducts />
+      </div>
+      
+      <div className="py-2">
+        <StartExploring />
+      </div>
+      
+      <div className="bg-gray-50 py-6 shadow-inner">
+        <BestSellingProducts />
+      </div>
+      
+      <div className="py-4">
+        <LimitedTimeDeals />
+      </div>
+      
       <CustomerReviews />
     </div>
   );
