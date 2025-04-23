@@ -16,6 +16,11 @@ import AdminCategories from './pages/admin/Categories';
 import Customers from './pages/admin/Customers';
 import OrderManagement from './pages/admin/OrderManagement';
 import SearchResults from './pages/admin/SearchResults';
+import ProductsList from './pages/admin/ProductsList';
+import ProductMedia from './pages/admin/ProductMedia';
+import ProductReviews from './pages/admin/ProductReviews';
+import AdminRole from './pages/admin/AdminRole';
+import AdminAuthority from './pages/admin/AdminAuthority';
 
 // Shop pages
 import Landing from './pages/shop/Landing';
@@ -54,13 +59,18 @@ const routes: RouteObject[] = [
         children: [
           { path: '', element: <Navigate to="/admin/dashboard" replace /> },
           { path: 'dashboard', element: <Dashboard /> },
-          { path: 'role', element: <AdminProfile /> },
+          { path: 'role', element: <AdminRole /> },
+          { path: 'authority', element: <AdminAuthority /> },
           { path: 'products/add', element: <AddProduct /> },
+          { path: 'products/list', element: <ProductsList /> },
+          { path: 'products/media', element: <ProductMedia /> },
+          { path: 'products/reviews', element: <ProductReviews /> },
           { path: 'transactions', element: <Transactions /> },
           { path: 'categories', element: <AdminCategories /> },
           { path: 'customers', element: <Customers /> },
           { path: 'orders', element: <OrderManagement /> },
           { path: 'search', element: <SearchResults /> },
+          { path: 'profile', element: <AdminProfile /> },
         ],
       },
     ],

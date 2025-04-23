@@ -28,10 +28,10 @@ const StartExploring = () => {
           <Link 
             key={category.name}
             to={category.path}
-            className="flex flex-col items-center p-4 hover:bg-gray-50 rounded-lg transition-colors"
+            className="flex flex-col items-center p-4 hover:bg-gray-50 rounded-lg transition-colors border border-gray-100 shadow-sm"
           >
-            <span className="text-4xl mb-2">{category.icon}</span>
-            <span className="text-sm text-gray-600">{category.name}</span>
+            <span className="text-4xl mb-3">{category.icon}</span>
+            <span className="text-sm font-medium">{category.name}</span>
           </Link>
         ))}
       </div>
