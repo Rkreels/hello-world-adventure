@@ -8,134 +8,28 @@ const Landing = () => {
   return (
     <div>
       {/* Hero Banner with Carousel */}
-      <HeroCarousel />
-      
-      {/* Featured Categories - Match exactly with the reference */}
-      <div className="container mx-auto px-4 py-10">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {/* New Year! New Fashion */}
-          <Card className="overflow-hidden">
-            <CardContent className="p-0">
-              <Link to="/category/fashion" className="block">
-                <div className="relative h-64 bg-gray-100">
-                  <img 
-                    src="/lovable-uploads/01c6fb91-b0da-4976-81df-07a0dacddee3.png"
-                    alt="New Year! New Fashion" 
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black bg-opacity-30"></div>
-                  <div className="absolute bottom-0 left-0 p-4 text-white">
-                    <h3 className="font-semibold text-lg">New Year! New Fashion</h3>
-                    <Button 
-                      size="sm" 
-                      className="mt-2 border border-white text-white bg-transparent hover:bg-white/20"
-                    >
-                      Shop Now
-                    </Button>
-                  </div>
-                </div>
-              </Link>
-            </CardContent>
-          </Card>
-          
-          {/* Gaming accessories */}
-          <Card className="overflow-hidden">
-            <CardContent className="p-0">
-              <Link to="/category/accessories" className="block">
-                <div className="relative h-64 bg-gray-100">
-                  <div className="p-4 text-center">
-                    <h3 className="font-semibold text-lg mb-4">Gaming accessories</h3>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <img 
-                          src="https://images.unsplash.com/photo-1615655406736-b37c4fabf923?q=80&w=2070&auto=format&fit=crop" 
-                          alt="Headset" 
-                          className="w-full h-20 object-contain mb-1"
-                        />
-                        <span className="text-xs">Headset</span>
-                      </div>
-                      <div>
-                        <img 
-                          src="https://images.unsplash.com/photo-1623820919239-0d0ff10797a1?q=80&w=2070&auto=format&fit=crop" 
-                          alt="Mouse" 
-                          className="w-full h-20 object-contain mb-1"
-                        />
-                        <span className="text-xs">Mouse</span>
-                      </div>
-                      <div>
-                        <img 
-                          src="https://images.unsplash.com/photo-1606318801954-d46d46d3360a?q=80&w=2070&auto=format&fit=crop" 
-                          alt="Controller" 
-                          className="w-full h-20 object-contain mb-1"
-                        />
-                        <span className="text-xs">Controller</span>
-                      </div>
-                      <div>
-                        <img 
-                          src="https://images.unsplash.com/photo-1598550476439-6847785fcea6?q=80&w=2070&auto=format&fit=crop" 
-                          alt="Chair" 
-                          className="w-full h-20 object-contain mb-1"
-                        />
-                        <span className="text-xs">Chair</span>
-                      </div>
-                    </div>
-                    <Link to="/category/accessories" className="text-blue-600 text-sm mt-3 inline-block">
-                      See more
-                    </Link>
-                  </div>
-                </div>
-              </Link>
-            </CardContent>
-          </Card>
-          
-          {/* Winner & Phone Promotions */}
-          <div className="col-span-2 grid grid-cols-2 gap-4">
-            <Card className="overflow-hidden h-64">
-              <CardContent className="p-0 h-full">
-                <Link to="/category/electronics" className="block h-full">
-                  <div className="bg-gradient-to-br from-red-600 to-red-800 h-full relative">
-                    <div className="p-4 text-white h-full flex flex-col justify-between">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="font-bold text-xl">WINNER</h3>
-                          <p className="text-sm">Best Phone 2023</p>
-                        </div>
-                        <span className="bg-red-500 px-2 py-1 text-xs font-bold rounded">SALE</span>
-                      </div>
-                      <div className="flex justify-between items-end">
-                        <div className="flex items-end justify-end w-full">
-                          <img 
-                            src="https://images.unsplash.com/photo-1544866092-1935c5ef2a8f?q=80&w=2069&auto=format&fit=crop" 
-                            alt="Phone" 
-                            className="max-h-32 object-contain"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              </CardContent>
-            </Card>
-            
-            <Card className="overflow-hidden h-64">
-              <CardContent className="p-0 h-full">
-                <Link to="/category/electronics" className="block h-full">
-                  <div className="bg-gradient-to-br from-blue-600 to-purple-700 h-full relative">
-                    <div className="p-4 text-white h-full flex flex-col justify-between">
-                      <div>
-                        <h3 className="font-bold text-lg">Home 4K Android TV</h3>
-                        <p className="text-sm text-white/90">Starting at $399.99</p>
-                      </div>
-                      <div className="flex items-end justify-center w-full">
-                        <img 
-                          src="https://images.unsplash.com/photo-1593784991095-a205069470b6?q=80&w=2070&auto=format&fit=crop" 
-                          alt="TV" 
-                          className="max-h-32 object-contain"
-                        />
-                      </div>
+      <div className="relative">
+        <HeroCarousel />
+        
+        {/* Featured Categories - Overlapping Cards */}
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 -mt-16 relative z-10">
+            {/* New Year! New Fashion - Overlapping Card */}
+            <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow bg-white">
+              <CardContent className="p-0">
+                <Link to="/category/fashion" className="block">
+                  <div className="relative h-64 bg-gray-100">
+                    <img 
+                      src="/lovable-uploads/01c6fb91-b0da-4976-81df-07a0dacddee3.png"
+                      alt="New Year! New Fashion" 
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-30"></div>
+                    <div className="absolute bottom-0 left-0 p-4 text-white">
+                      <h3 className="font-semibold text-lg mb-2">New Year! New Fashion</h3>
                       <Button 
                         size="sm" 
-                        className="mt-2 border border-white text-white bg-transparent hover:bg-white/20 w-max"
+                        className="border border-white text-white bg-transparent hover:bg-white/20"
                       >
                         Shop Now
                       </Button>
@@ -144,10 +38,124 @@ const Landing = () => {
                 </Link>
               </CardContent>
             </Card>
+            
+            {/* Gaming accessories */}
+            <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow bg-white">
+              <CardContent className="p-0">
+                <Link to="/category/accessories" className="block">
+                  <div className="h-64 bg-gray-100">
+                    <div className="p-4 text-center">
+                      <h3 className="font-semibold text-lg mb-4">Gaming accessories</h3>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="group">
+                          <div className="h-20 mb-1 overflow-hidden rounded-lg">
+                            <img 
+                              src="https://images.unsplash.com/photo-1615655406736-b37c4fabf923?q=80&w=2070&auto=format&fit=crop" 
+                              alt="Headset" 
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                          </div>
+                          <span className="text-xs">Headset</span>
+                        </div>
+                        <div className="group">
+                          <div className="h-20 mb-1 overflow-hidden rounded-lg">
+                            <img 
+                              src="https://images.unsplash.com/photo-1623820919239-0d0ff10797a1?q=80&w=2070&auto=format&fit=crop" 
+                              alt="Mouse" 
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                          </div>
+                          <span className="text-xs">Mouse</span>
+                        </div>
+                        <div className="group">
+                          <div className="h-20 mb-1 overflow-hidden rounded-lg">
+                            <img 
+                              src="https://images.unsplash.com/photo-1606318801954-d46d46d3360a?q=80&w=2070&auto=format&fit=crop" 
+                              alt="Controller" 
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                          </div>
+                          <span className="text-xs">Controller</span>
+                        </div>
+                        <div className="group">
+                          <div className="h-20 mb-1 overflow-hidden rounded-lg">
+                            <img 
+                              src="https://images.unsplash.com/photo-1598550476439-6847785fcea6?q=80&w=2070&auto=format&fit=crop" 
+                              alt="Chair" 
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                          </div>
+                          <span className="text-xs">Chair</span>
+                        </div>
+                      </div>
+                      <Link to="/category/accessories" className="text-blue-600 text-sm mt-4 inline-block hover:underline">
+                        See more
+                      </Link>
+                    </div>
+                  </div>
+                </Link>
+              </CardContent>
+            </Card>
+            
+            {/* Winner & Phone Promotions */}
+            <div className="col-span-1 sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow bg-white h-64">
+                <CardContent className="p-0 h-full">
+                  <Link to="/category/electronics" className="block h-full">
+                    <div className="bg-gradient-to-br from-red-600 to-red-800 h-full relative p-4 flex flex-col justify-between">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="font-bold text-xl text-white">WINNER</h3>
+                          <p className="text-sm text-white/90">Best Phone 2023</p>
+                        </div>
+                        <span className="bg-red-500 px-2 py-1 text-xs font-bold rounded text-white">SALE</span>
+                      </div>
+                      <div className="flex justify-end items-end mt-4">
+                        <img 
+                          src="https://images.unsplash.com/photo-1544866092-1935c5ef2a8f?q=80&w=2069&auto=format&fit=crop" 
+                          alt="Phone" 
+                          className="max-h-32 object-contain transform hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                    </div>
+                  </Link>
+                </CardContent>
+              </Card>
+              
+              <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow bg-white h-64">
+                <CardContent className="p-0 h-full">
+                  <Link to="/category/electronics" className="block h-full">
+                    <div className="bg-gradient-to-br from-blue-600 to-purple-700 h-full relative p-4 flex flex-col justify-between">
+                      <div>
+                        <h3 className="font-bold text-lg text-white">Home 4K Android TV</h3>
+                        <p className="text-sm text-white/90">Starting at $399.99</p>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <img 
+                          src="https://images.unsplash.com/photo-1593784991095-a205069470b6?q=80&w=2070&auto=format&fit=crop" 
+                          alt="TV" 
+                          className="max-h-32 object-contain transform hover:scale-105 transition-transform duration-300"
+                        />
+                        <Button 
+                          size="sm" 
+                          className="mt-2 border border-white text-white bg-transparent hover:bg-white/20 w-max"
+                        >
+                          Shop Now
+                        </Button>
+                      </div>
+                    </div>
+                  </Link>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
-        
-        {/* Category Banners exactly as reference */}
+      </div>
+
+      {/* Rest of the sections */}
+      
+      {/* Category Banners exactly as reference */}
+      <div className="container mx-auto px-4 py-10">
         <div className="grid grid-cols-4 gap-4 mt-6">
           <Link to="/category/clothing" className="relative h-32 rounded-md overflow-hidden group">
             <img 
@@ -470,7 +478,7 @@ const Landing = () => {
               alt="Computer Accessories" 
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
-            <div className="absolute inset-0 bg-black bg-opacity-40 p-6 flex flex-col justify-end">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent p-6 flex flex-col justify-end">
               <h3 className="text-white text-xl font-bold mb-2">Computer Accessories</h3>
               <div className="flex items-center mb-4">
                 <div className="flex text-yellow-400 mr-2">
@@ -563,6 +571,8 @@ const Landing = () => {
           </div>
         </div>
       </div>
+
+      {/* Categories Section */}
       
       {/* Categories Section - Matching reference exactly */}
       <div className="container mx-auto px-4 py-10">
@@ -597,545 +607,4 @@ const Landing = () => {
           </Link>
           
           <Link to="/category/fashion" className="text-center">
-            <div className="bg-gray-100 rounded-md p-4 mb-2 mx-auto w-20 h-20 flex items-center justify-center">
-              <img 
-                src="https://cdn-icons-png.flaticon.com/512/3626/3626932.png" 
-                alt="Fashion" 
-                className="w-12 h-12 object-contain"
-              />
-            </div>
-            <span className="text-sm">Fashion</span>
-          </Link>
-          
-          <Link to="/category/electronics" className="text-center">
-            <div className="bg-gray-100 rounded-md p-4 mb-2 mx-auto w-20 h-20 flex items-center justify-center">
-              <img 
-                src="https://cdn-icons-png.flaticon.com/512/3659/3659899.png" 
-                alt="Electronics" 
-                className="w-12 h-12 object-contain"
-              />
-            </div>
-            <span className="text-sm">Electronics</span>
-          </Link>
-          
-          <Link to="/category/toys" className="text-center">
-            <div className="bg-gray-100 rounded-md p-4 mb-2 mx-auto w-20 h-20 flex items-center justify-center">
-              <img 
-                src="https://cdn-icons-png.flaticon.com/512/3655/3655930.png" 
-                alt="Toys" 
-                className="w-12 h-12 object-contain"
-              />
-            </div>
-            <span className="text-sm">Toys</span>
-          </Link>
-          
-          <Link to="/category/more" className="text-center">
-            <div className="bg-gray-100 rounded-md p-4 mb-2 mx-auto w-20 h-20 flex items-center justify-center">
-              <img 
-                src="https://cdn-icons-png.flaticon.com/512/512/512142.png" 
-                alt="More" 
-                className="w-12 h-12 object-contain"
-              />
-            </div>
-            <span className="text-sm">More</span>
-          </Link>
-        </div>
-      </div>
-      
-      {/* Limited Time Deals - Exactly matching reference */}
-      <div className="container mx-auto px-4 py-10">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold">Limited-Time Deal</h2>
-          <Link to="/deals" className="text-sm border border-gray-300 rounded px-4 py-1 hover:bg-gray-50">
-            View All
-          </Link>
-        </div>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-          <Card>
-            <CardContent className="p-4">
-              <div className="relative mb-4">
-                <Link to="/products/samsung-galaxy">
-                  <img 
-                    src="https://images.unsplash.com/photo-1610945264803-c22b62d2a7b3?q=80&w=1974&auto=format&fit=crop" 
-                    alt="Samsung Galaxy S24" 
-                    className="w-full h-48 object-contain rounded"
-                  />
-                </Link>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="absolute top-2 right-2 h-8 w-8 rounded-full p-0 bg-white"
-                >
-                  <Heart className="h-4 w-4" />
-                </Button>
-                <div className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
-                  -25% OFF
-                </div>
-              </div>
-              
-              <div className="mb-2">
-                <div className="flex items-center justify-between mb-1">
-                  <div className="flex text-yellow-400">
-                    <Star className="h-4 w-4 fill-yellow-400" />
-                    <Star className="h-4 w-4 fill-yellow-400" />
-                    <Star className="h-4 w-4 fill-yellow-400" />
-                    <Star className="h-4 w-4 fill-yellow-400" />
-                    <Star className="h-4 w-4 fill-yellow-400" />
-                    <span className="text-xs text-gray-500 ml-1">(24)</span>
-                  </div>
-                  <span className="text-xs text-gray-500">Samsung...</span>
-                </div>
-                <h3 className="font-medium">Samsung Galaxy S24</h3>
-                <p className="text-xs text-gray-500">
-                  Color: <span className="text-black">Silver</span> | Size: <span className="text-black">128GB</span>
-                </p>
-              </div>
-              
-              <div className="flex items-center mb-3">
-                <span className="text-lg font-semibold">$799.99</span>
-                <span className="text-sm text-gray-500 line-through ml-2">$999.99</span>
-              </div>
-              
-              <div className="flex space-x-2">
-                <Button variant="link" size="sm" className="text-xs p-0 h-auto">
-                  Learn More
-                </Button>
-                <Button variant="outline" size="sm" className="text-xs flex-1">
-                  Add to wish
-                </Button>
-                <Button className="bg-green-500 hover:bg-green-600 text-xs">
-                  Add to cart
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4">
-              <div className="relative mb-4">
-                <Link to="/products/ut-earbuds">
-                  <img 
-                    src="https://images.unsplash.com/photo-1590658268037-6bf12165a8df?q=80&w=1972&auto=format&fit=crop" 
-                    alt="UT Pro TWS Earbuds" 
-                    className="w-full h-48 object-contain rounded"
-                  />
-                </Link>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="absolute top-2 right-2 h-8 w-8 rounded-full p-0 bg-white"
-                >
-                  <Heart className="h-4 w-4" />
-                </Button>
-                <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
-                  SPECIAL OFFER
-                </div>
-              </div>
-              
-              <div className="mb-2">
-                <div className="flex items-center justify-between mb-1">
-                  <div className="flex text-yellow-400">
-                    <Star className="h-4 w-4 fill-yellow-400" />
-                    <Star className="h-4 w-4 fill-yellow-400" />
-                    <Star className="h-4 w-4 fill-yellow-400" />
-                    <Star className="h-4 w-4 fill-yellow-400" />
-                    <Star className="h-4 w-4" />
-                    <span className="text-xs text-gray-500 ml-1">(18)</span>
-                  </div>
-                  <span className="text-xs text-gray-500">Auditory...</span>
-                </div>
-                <h3 className="font-medium">UT Pro TWS Earbuds</h3>
-                <p className="text-xs text-gray-500">
-                  Color: <span className="text-black">Black</span> | Type: <span className="text-black">Wireless</span>
-                </p>
-              </div>
-              
-              <div className="flex items-center mb-3">
-                <span className="text-lg font-semibold">$149.99</span>
-                <span className="text-sm text-gray-500 line-through ml-2">$199.99</span>
-                <span className="text-xs text-green-600 ml-2">-25% OFF</span>
-              </div>
-              
-              <div className="flex space-x-2">
-                <Button variant="link" size="sm" className="text-xs p-0 h-auto">
-                  Learn More
-                </Button>
-                <Button variant="outline" size="sm" className="text-xs flex-1">
-                  Add to wish
-                </Button>
-                <Button className="bg-green-500 hover:bg-green-600 text-xs">
-                  Add to cart
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4">
-              <div className="relative mb-4">
-                <Link to="/products/winter-jacket">
-                  <img 
-                    src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=1936&auto=format&fit=crop" 
-                    alt="Winter Fashion Jacket" 
-                    className="w-full h-48 object-contain rounded"
-                  />
-                </Link>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="absolute top-2 right-2 h-8 w-8 rounded-full p-0 bg-white"
-                >
-                  <Heart className="h-4 w-4" />
-                </Button>
-                <div className="absolute top-2 left-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded">
-                  WINTER
-                </div>
-              </div>
-              
-              <div className="mb-2">
-                <div className="flex items-center justify-between mb-1">
-                  <div className="flex text-yellow-400">
-                    <Star className="h-4 w-4 fill-yellow-400" />
-                    <Star className="h-4 w-4 fill-yellow-400" />
-                    <Star className="h-4 w-4 fill-yellow-400" />
-                    <Star className="h-4 w-4 fill-yellow-400" />
-                    <Star className="h-4 w-4" />
-                    <span className="text-xs text-gray-500 ml-1">(32)</span>
-                  </div>
-                  <span className="text-xs text-gray-500">Sporting...</span>
-                </div>
-                <h3 className="font-medium">Winter Fashion Jacket</h3>
-                <p className="text-xs text-gray-500">
-                  Color: <span className="text-black">Orange</span> | Size: <span className="text-black">XL</span>
-                </p>
-              </div>
-              
-              <div className="flex items-center mb-3">
-                <span className="text-lg font-semibold">$259.99</span>
-                <span className="text-sm text-gray-500 line-through ml-2">$399.99</span>
-                <span className="text-xs text-green-600 ml-2">-35% OFF</span>
-              </div>
-              
-              <div className="flex space-x-2">
-                <Button variant="link" size="sm" className="text-xs p-0 h-auto">
-                  Learn More
-                </Button>
-                <Button variant="outline" size="sm" className="text-xs flex-1">
-                  Add to wish
-                </Button>
-                <Button className="bg-green-500 hover:bg-green-600 text-xs">
-                  Add to cart
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4">
-              <div className="relative mb-4">
-                <Link to="/products/sneakers">
-                  <img 
-                    src="https://images.unsplash.com/photo-1597248881519-db089d3744a5?q=80&w=2080&auto=format&fit=crop" 
-                    alt="New Balance 574 Sneakers" 
-                    className="w-full h-48 object-contain rounded"
-                  />
-                </Link>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="absolute top-2 right-2 h-8 w-8 rounded-full p-0 bg-white"
-                >
-                  <Heart className="h-4 w-4" />
-                </Button>
-                <div className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
-                  HOT
-                </div>
-              </div>
-              
-              <div className="mb-2">
-                <div className="flex items-center justify-between mb-1">
-                  <div className="flex text-yellow-400">
-                    <Star className="h-4 w-4 fill-yellow-400" />
-                    <Star className="h-4 w-4 fill-yellow-400" />
-                    <Star className="h-4 w-4 fill-yellow-400" />
-                    <Star className="h-4 w-4 fill-yellow-400" />
-                    <Star className="h-4 w-4 fill-yellow-400" />
-                    <span className="text-xs text-gray-500 ml-1">(87)</span>
-                  </div>
-                  <span className="text-xs text-gray-500">Comfy...</span>
-                </div>
-                <h3 className="font-medium">New Balance 574 Sneakers</h3>
-                <p className="text-xs text-gray-500">
-                  Color: <span className="text-black">Grey/Red</span> | Size: <span className="text-black">10</span>
-                </p>
-              </div>
-              
-              <div className="flex items-center mb-3">
-                <span className="text-lg font-semibold">$79.99</span>
-                <span className="text-sm text-gray-500 line-through ml-2">$109.99</span>
-                <span className="text-xs text-green-600 ml-2">-27% OFF</span>
-              </div>
-              
-              <div className="flex space-x-2">
-                <Button variant="link" size="sm" className="text-xs p-0 h-auto">
-                  Learn More
-                </Button>
-                <Button variant="outline" size="sm" className="text-xs flex-1">
-                  Add to wish
-                </Button>
-                <Button className="bg-green-500 hover:bg-green-600 text-xs">
-                  Add to cart
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="hidden lg:block">
-            <CardContent className="p-4">
-              <div className="relative mb-4">
-                <Link to="/products/ut-pro-700z">
-                  <img 
-                    src="https://images.unsplash.com/photo-1606400082777-ef05f3c5252b?q=80&w=1936&auto=format&fit=crop" 
-                    alt="UT Pro 700Z Earbuds" 
-                    className="w-full h-48 object-contain rounded"
-                  />
-                </Link>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="absolute top-2 right-2 h-8 w-8 rounded-full p-0 bg-white"
-                >
-                  <Heart className="h-4 w-4" />
-                </Button>
-                <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
-                  SPECIAL OFFER
-                </div>
-              </div>
-              
-              <div className="mb-2">
-                <div className="flex items-center justify-between mb-1">
-                  <div className="flex text-yellow-400">
-                    <Star className="h-4 w-4 fill-yellow-400" />
-                    <Star className="h-4 w-4 fill-yellow-400" />
-                    <Star className="h-4 w-4 fill-yellow-400" />
-                    <Star className="h-4 w-4 fill-yellow-400" />
-                    <Star className="h-4 w-4" />
-                    <span className="text-xs text-gray-500 ml-1">(42)</span>
-                  </div>
-                  <span className="text-xs text-gray-500">Gaming...</span>
-                </div>
-                <h3 className="font-medium">UT Pro 700Z Earbuds</h3>
-                <p className="text-xs text-gray-500">
-                  Color: <span className="text-black">White</span> | Type: <span className="text-black">Wireless</span>
-                </p>
-              </div>
-              
-              <div className="flex items-center mb-3">
-                <span className="text-lg font-semibold">$179.99</span>
-                <span className="text-sm text-gray-500 line-through ml-2">$249.99</span>
-                <span className="text-xs text-green-600 ml-2">-28% OFF</span>
-              </div>
-              
-              <div className="flex space-x-2">
-                <Button variant="link" size="sm" className="text-xs p-0 h-auto">
-                  Learn More
-                </Button>
-                <Button variant="outline" size="sm" className="text-xs flex-1">
-                  Add to wish
-                </Button>
-                <Button className="bg-green-500 hover:bg-green-600 text-xs">
-                  Add to cart
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-      
-      {/* Testimonials - Exactly matching reference */}
-      <div className="bg-green-50 py-10">
-        <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-semibold text-center mb-8">Our Happy Customers</h2>
-          <p className="text-center text-gray-600 max-w-2xl mx-auto mb-10">
-            Don't just take our word for it - hear from some of our satisfied customers! Check out our numerous reviews from across the globe. Our customers' satisfaction is our priority.
-          </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 rounded-full overflow-hidden mr-4">
-                    <img 
-                      src="https://randomuser.me/api/portraits/women/44.jpg" 
-                      alt="Emily R." 
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <h4 className="font-medium">Emily R.</h4>
-                    <div className="flex text-yellow-400">
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                    </div>
-                  </div>
-                </div>
-                <p className="text-gray-600 text-sm">
-                  "Excellent service and fantastic quality! The customer support team was quick to resolve my query. Perfect for a retail experience."
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 rounded-full overflow-hidden mr-4">
-                    <img 
-                      src="https://randomuser.me/api/portraits/men/32.jpg" 
-                      alt="John D." 
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <h4 className="font-medium">John D.</h4>
-                    <div className="flex text-yellow-400">
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                    </div>
-                  </div>
-                </div>
-                <p className="text-gray-600 text-sm">
-                  "Products arrived on time and fantastic quality! The customer support team was quick to resolve my query. Perfect experience!"
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 rounded-full overflow-hidden mr-4">
-                    <img 
-                      src="https://randomuser.me/api/portraits/men/42.jpg" 
-                      alt="Ahmed M." 
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <h4 className="font-medium">Ahmed M.</h4>
-                    <div className="flex text-yellow-400">
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                    </div>
-                  </div>
-                </div>
-                <p className="text-gray-600 text-sm">
-                  "Splendid products and fantastic quality! The customer support team was quick to resolve my query. Perfect for a retail experience."
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 rounded-full overflow-hidden mr-4">
-                    <img 
-                      src="https://randomuser.me/api/portraits/men/22.jpg" 
-                      alt="Alex T." 
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <h4 className="font-medium">Alex T.</h4>
-                    <div className="flex text-yellow-400">
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                    </div>
-                  </div>
-                </div>
-                <p className="text-gray-600 text-sm">
-                  "Excellent service and fantastic quality! The customer support team was quick to resolve my query. Perfect for a retail experience."
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 rounded-full overflow-hidden mr-4">
-                    <img 
-                      src="https://randomuser.me/api/portraits/women/22.jpg" 
-                      alt="Priya K." 
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <h4 className="font-medium">Priya K.</h4>
-                    <div className="flex text-yellow-400">
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                    </div>
-                  </div>
-                </div>
-                <p className="text-gray-600 text-sm">
-                  "Fast delivery and fantastic quality! The customer support team was quick to resolve my query. Perfect for a retail experience."
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 rounded-full overflow-hidden mr-4">
-                    <img 
-                      src="https://randomuser.me/api/portraits/men/52.jpg" 
-                      alt="David H." 
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <h4 className="font-medium">David H.</h4>
-                    <div className="flex text-yellow-400">
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                      <Star className="h-4 w-4 fill-yellow-400" />
-                    </div>
-                  </div>
-                </div>
-                <p className="text-gray-600 text-sm">
-                  "Very impressed with the fantastic quality! The customer support team was quick to resolve my query. Perfect for a retail experience."
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-          
-          <div className="text-center mt-10">
-            <Button className="bg-green-500 hover:bg-green-600 text-white px-8 py-2">
-              Get Started
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default Landing;
+            <div className="bg-gray-10

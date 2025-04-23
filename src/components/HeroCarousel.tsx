@@ -71,17 +71,23 @@ const HeroCarousel = () => {
   };
 
   return (
-    <div className="relative bg-gradient-to-r from-teal-900 to-teal-700 h-80 overflow-hidden">
+    <div className="relative bg-gradient-to-r from-black/70 to-black/50 h-[500px] overflow-hidden">
       {carouselItems.map((item, index) => (
         <div 
           key={item.id} 
-          className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${currentSlide === index ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
+          className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+            currentSlide === index ? 'opacity-100 z-10' : 'opacity-0 z-0'
+          }`}
         >
           <div className="container mx-auto px-4 h-full flex items-center relative z-10">
             <div className="max-w-xl text-white">
-              <h1 className="text-3xl md:text-4xl font-bold mb-3">{item.title}</h1>
-              <p className="text-xl md:text-2xl font-semibold mb-6">{item.subtitle}</p>
-              <Button className="bg-white text-teal-800 hover:bg-gray-100 px-6 rounded">
+              <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
+                {item.title}
+              </h1>
+              <p className="text-xl md:text-2xl font-medium mb-8 text-white/90">
+                {item.subtitle}
+              </p>
+              <Button className="bg-white text-gray-800 hover:bg-gray-100 px-8 py-6 text-lg rounded-md shadow-lg">
                 <Link to={item.buttonLink}>{item.buttonText}</Link>
               </Button>
             </div>
@@ -89,8 +95,8 @@ const HeroCarousel = () => {
           <div className="absolute inset-0 z-0">
             <img 
               src={item.image}
-              alt="Shop collection" 
-              className="w-full h-full object-cover opacity-20"
+              alt={item.title}
+              className="w-full h-full object-cover opacity-50"
             />
           </div>
         </div>
@@ -99,29 +105,29 @@ const HeroCarousel = () => {
       {/* Carousel Controls */}
       <Button 
         variant="outline" 
-        size="sm" 
+        size="icon" 
         onClick={prevSlide}
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white rounded-full w-8 h-8 p-0 z-20"
+        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white rounded-full w-12 h-12 z-20"
       >
-        <ChevronLeft className="h-4 w-4" />
+        <ChevronLeft className="h-6 w-6" />
       </Button>
       <Button 
         variant="outline" 
-        size="sm" 
+        size="icon" 
         onClick={nextSlide}
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white rounded-full w-8 h-8 p-0 z-20"
+        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white rounded-full w-12 h-12 z-20"
       >
-        <ChevronRight className="h-4 w-4" />
+        <ChevronRight className="h-6 w-6" />
       </Button>
 
       {/* Indicators */}
-      <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2 z-20">
+      <div className="absolute bottom-6 left-0 right-0 flex justify-center space-x-2 z-20">
         {carouselItems.map((_, index) => (
           <button
             key={index}
             onClick={() => goToSlide(index)}
             className={`w-2 h-2 rounded-full transition-all ${
-              currentSlide === index ? 'bg-white w-6' : 'bg-white/50'
+              currentSlide === index ? 'bg-white w-8' : 'bg-white/50'
             }`}
           />
         ))}
