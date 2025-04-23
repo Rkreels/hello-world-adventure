@@ -12,7 +12,7 @@ import Dashboard from './pages/admin/Dashboard';
 import AdminProfile from './pages/admin/AdminProfile';
 import AddProduct from './pages/admin/AddProduct';
 import Transactions from './pages/admin/Transactions';
-import Categories from './pages/admin/Categories';
+import AdminCategories from './pages/admin/Categories';
 import Customers from './pages/admin/Customers';
 import OrderManagement from './pages/admin/OrderManagement';
 import SearchResults from './pages/admin/SearchResults';
@@ -34,7 +34,7 @@ import Privacy from './pages/shop/Privacy';
 import CookiePolicy from './pages/shop/CookiePolicy';
 import Returns from './pages/shop/Returns';
 import ShippingInformation from './pages/shop/ShippingInformation';
-import Categories as ShopCategories from './pages/shop/Categories';
+import ShopCategories from './pages/shop/Categories';
 import Deals from './pages/shop/Deals';
 import NewArrivals from './pages/shop/NewArrivals';
 import Accessibility from './pages/shop/Accessibility';
@@ -57,7 +57,7 @@ const routes: RouteObject[] = [
           { path: 'role', element: <AdminProfile /> },
           { path: 'products/add', element: <AddProduct /> },
           { path: 'transactions', element: <Transactions /> },
-          { path: 'categories', element: <Categories /> },
+          { path: 'categories', element: <AdminCategories /> },
           { path: 'customers', element: <Customers /> },
           { path: 'orders', element: <OrderManagement /> },
           { path: 'search', element: <SearchResults /> },
