@@ -1,7 +1,7 @@
 
 import { Outlet } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { Search, ShoppingCart, Menu, MapPin, User } from 'lucide-react';
+import { Search, ShoppingCart, Menu, MapPin, User, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const ShopLayout = () => {
@@ -10,104 +10,88 @@ const ShopLayout = () => {
       <header className="bg-white border-b border-gray-100">
         <div className="container mx-auto px-4">
           {/* Top bar */}
-          <div className="flex items-center justify-between py-2 text-sm">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center">
-                <MapPin className="h-4 w-4 mr-1" />
-                <span>Deliver to</span>
-              </div>
-              <span>EN</span>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link to="/login" className="flex items-center">
-                <User className="h-4 w-4 mr-1" />
-                <span>Sign in</span>
-              </Link>
-              <Link to="/cart" className="flex items-center">
-                <ShoppingCart className="h-4 w-4 mr-1" />
-                <span>Cart</span>
-              </Link>
-            </div>
-          </div>
-          
-          {/* Main header */}
-          <div className="flex items-center justify-between py-4">
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="sm" className="lg:hidden">
-                <Menu className="h-5 w-5" />
-              </Button>
+          <div className="flex items-center justify-between py-3">
+            <div className="flex items-center space-x-6">
               <Link to="/" className="flex items-center">
                 <span className="text-xl font-bold text-green-600">DEALPORT</span>
               </Link>
-            </div>
-            
-            <div className="flex-1 max-w-2xl mx-4 hidden md:block">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="What're you looking for?"
-                  className="w-full pl-4 pr-10 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-primary"
-                />
-                <Button size="sm" className="absolute right-0 top-0 h-full rounded-l-none">
-                  <Search className="h-4 w-4" />
-                </Button>
+              <div className="flex items-center space-x-1 text-sm">
+                <MapPin className="h-4 w-4" />
+                <span>Deliver to</span>
+                <span className="font-medium">United States</span>
+                <ChevronDown className="h-3 w-3" />
               </div>
             </div>
             
-            <div className="hidden lg:flex items-center space-x-6">
-              <Link to="/" className="text-sm font-medium">Home</Link>
-              <Link to="/products" className="text-sm font-medium">Product</Link>
-              <Link to="/about" className="text-sm font-medium">About Us</Link>
-              <Link to="/contact" className="text-sm font-medium">Contact</Link>
+            <div className="flex-1 max-w-2xl mx-6">
+              <div className="relative">
+                <div className="flex">
+                  <div className="relative z-10">
+                    <Button variant="outline" size="sm" className="flex items-center h-10 rounded-r-none border-r-0">
+                      <span className="mr-1">All</span>
+                      <ChevronDown className="h-3 w-3" />
+                    </Button>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Search DEALPORT"
+                    className="w-full pl-4 pr-10 py-2 h-10 border border-gray-200 focus:outline-none focus:ring-1 focus:ring-primary rounded-l-none rounded-r-none"
+                  />
+                  <Button size="sm" className="h-10 rounded-l-none bg-green-600 hover:bg-green-700">
+                    <Search className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
             </div>
-          </div>
-          
-          {/* Category nav - visible on smaller screens */}
-          <div className="md:hidden py-3">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="What're you looking for?"
-                className="w-full pl-4 pr-10 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-primary"
-              />
-              <Button size="sm" className="absolute right-0 top-0 h-full rounded-l-none">
-                <Search className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-          
-          {/* Category nav */}
-          <nav className="flex justify-between items-center overflow-x-auto py-3 text-sm border-t border-gray-100">
-            <button className="flex items-center px-3 py-1">
-              <Menu className="h-4 w-4 mr-1" />
-              <span>Menu</span>
-            </button>
-            <Link to="/category/explore" className="px-3 py-1 whitespace-nowrap">Explore</Link>
-            <Link to="/category/deals" className="px-3 py-1 whitespace-nowrap">Deals</Link>
-            <Link to="/category/saved" className="px-3 py-1 whitespace-nowrap">Saved</Link>
             
-            <div className="flex items-center space-x-6">
-              <Link to="/" className="font-medium text-green-600">Home</Link>
-              <Link to="/products" className="font-medium">Product</Link>
-              <Link to="/about" className="font-medium">About Us</Link>
-              <Link to="/contact" className="font-medium">Contact</Link>
-              <Link to="/see-all-categories" className="font-medium text-green-600">See more</Link>
+            <div className="flex items-center space-x-5">
+              <div className="flex items-center space-x-1 text-sm">
+                <div className="flex items-center">
+                  <div className="w-5 h-4 bg-blue-900 relative mr-1">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="text-white text-[6px]">US</div>
+                    </div>
+                  </div>
+                  <span>EN</span>
+                  <ChevronDown className="h-3 w-3 ml-1" />
+                </div>
+              </div>
+              
+              <Link to="/login" className="flex flex-col items-center text-sm">
+                <span className="text-xs text-gray-500">Hello, Sign in</span>
+                <div className="flex items-center font-medium">
+                  <span>Account</span>
+                  <ChevronDown className="h-3 w-3 ml-1" />
+                </div>
+              </Link>
+              
+              <Link to="/cart" className="flex flex-col items-center">
+                <div className="relative">
+                  <ShoppingCart className="h-6 w-6" />
+                  <span className="absolute -top-2 -right-2 bg-green-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                    0
+                  </span>
+                </div>
+                <span className="text-xs font-medium mt-1">Cart</span>
+              </Link>
             </div>
-          </nav>
+          </div>
           
-          {/* Subcategories */}
-          <div className="overflow-x-auto py-2 text-xs border-t border-gray-100">
-            <div className="flex space-x-5">
-              <Link to="/category/price" className="whitespace-nowrap">Price</Link>
-              <Link to="/category/deliver" className="whitespace-nowrap">Deliver</Link>
-              <Link to="/category/rating" className="whitespace-nowrap">Rating</Link>
-              <Link to="/category/grocery" className="whitespace-nowrap">Grocery & Fresh Foods</Link>
-              <Link to="/category/electronics" className="whitespace-nowrap">Electronics</Link>
-              <Link to="/category/shoes" className="whitespace-nowrap">Shoes</Link>
-              <Link to="/category/account" className="whitespace-nowrap">Account Sales</Link>
-              <Link to="/category/health" className="whitespace-nowrap">Health</Link>
-              <Link to="/category/fashionable" className="whitespace-nowrap">Fashionable accessories</Link>
-            </div>
+          {/* Main navigation */}
+          <div className="flex items-center py-2 bg-gray-100 text-sm">
+            <Button variant="ghost" size="sm" className="flex items-center mr-4 font-medium">
+              <Menu className="h-5 w-5 mr-2" />
+              <span>All Categories</span>
+            </Button>
+            
+            <nav className="flex items-center space-x-6">
+              <Link to="/" className="font-medium hover:text-green-600">Home</Link>
+              <Link to="/deals" className="hover:text-green-600">Today's Deals</Link>
+              <Link to="/new-arrivals" className="hover:text-green-600">New Arrivals</Link>
+              <Link to="/best-selling" className="hover:text-green-600">Best Sellers</Link>
+              <Link to="/trending" className="hover:text-green-600">Trending</Link>
+              <Link to="/customer-service" className="hover:text-green-600">Customer Service</Link>
+            </nav>
           </div>
         </div>
       </header>
