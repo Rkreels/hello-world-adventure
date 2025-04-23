@@ -6,6 +6,8 @@ import CategoryBanners from '@/components/shop/CategoryBanners';
 import TrendingProducts from '@/components/shop/TrendingProducts';
 import BestSellingProducts from '@/components/shop/BestSellingProducts';
 import CategoryExplorer from '@/components/shop/CategoryExplorer';
+import LimitedTimeDeals from '@/components/shop/LimitedTimeDeals';
+import CustomerReviews from '@/components/shop/CustomerReviews';
 
 const Landing = () => {
   return (
@@ -21,11 +23,17 @@ const Landing = () => {
       {/* Category Banners */}
       <CategoryBanners />
       
+      {/* Limited Time Deals */}
+      <LimitedTimeDeals />
+      
       {/* Trending Products */}
       <TrendingProducts />
       
       {/* Best Selling Products */}
       <BestSellingProducts />
+
+      {/* Customer Reviews */}
+      <CustomerReviews />
 
       {/* Categories Explorer Section */}
       <CategoryExplorer />

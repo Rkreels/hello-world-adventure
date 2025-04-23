@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 const FeaturedCategories = () => {
   return (
     <div className="container mx-auto px-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 -mt-16 relative z-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 -mt-16 relative z-10">
         {/* New Year! New Fashion - Overlapping Card */}
         <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow bg-white">
           <CardContent className="p-0">
@@ -90,57 +90,46 @@ const FeaturedCategories = () => {
           </CardContent>
         </Card>
         
-        {/* Winner & Phone Promotions */}
-        <div className="col-span-1 sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow bg-white h-64">
-            <CardContent className="p-0 h-full">
-              <Link to="/category/electronics" className="block h-full">
-                <div className="bg-gradient-to-br from-red-600 to-red-800 h-full relative p-4 flex flex-col justify-between">
+        {/* Combined Electronics Promotion Section (3rd and 4th combined as requested) */}
+        <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow bg-white h-64">
+          <CardContent className="p-0 h-full">
+            <Link to="/category/electronics" className="block h-full">
+              <div className="bg-gradient-to-br from-blue-600 to-purple-700 h-full relative p-4 flex flex-col justify-between">
+                <div>
                   <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-bold text-xl text-white">WINNER</h3>
-                      <p className="text-sm text-white/90">Best Phone 2023</p>
-                    </div>
-                    <span className="bg-red-500 px-2 py-1 text-xs font-bold rounded text-white">SALE</span>
+                    <h3 className="font-bold text-lg text-white">Electronics Showcase</h3>
+                    <span className="bg-blue-500 px-2 py-1 text-xs font-bold rounded text-white">NEW</span>
                   </div>
-                  <div className="flex justify-end items-end mt-4">
+                  <p className="text-sm text-white/90 mt-1">Latest gadgets and top tech</p>
+                </div>
+                <div className="flex flex-wrap justify-between items-end mt-2">
+                  <div className="mb-2">
+                    <img 
+                      src="https://images.unsplash.com/photo-1593784991095-a205069470b6?q=80&w=2070&auto=format&fit=crop" 
+                      alt="Electronics" 
+                      className="max-h-20 object-contain transform hover:scale-105 transition-transform duration-300"
+                    />
+                    <span className="text-xs text-white">Smart TV</span>
+                  </div>
+                  <div className="mb-2">
                     <img 
                       src="https://images.unsplash.com/photo-1544866092-1935c5ef2a8f?q=80&w=2069&auto=format&fit=crop" 
                       alt="Phone" 
-                      className="max-h-32 object-contain transform hover:scale-105 transition-transform duration-300"
+                      className="max-h-20 object-contain transform hover:scale-105 transition-transform duration-300"
                     />
+                    <span className="text-xs text-white">Smartphones</span>
                   </div>
+                  <Button 
+                    size="sm" 
+                    className="mt-2 border border-white text-white bg-transparent hover:bg-white/20 w-full"
+                  >
+                    Explore Collection
+                  </Button>
                 </div>
-              </Link>
-            </CardContent>
-          </Card>
-          
-          <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow bg-white h-64">
-            <CardContent className="p-0 h-full">
-              <Link to="/category/electronics" className="block h-full">
-                <div className="bg-gradient-to-br from-blue-600 to-purple-700 h-full relative p-4 flex flex-col justify-between">
-                  <div>
-                    <h3 className="font-bold text-lg text-white">Home 4K Android TV</h3>
-                    <p className="text-sm text-white/90">Starting at $399.99</p>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <img 
-                      src="https://images.unsplash.com/photo-1593784991095-a205069470b6?q=80&w=2070&auto=format&fit=crop" 
-                      alt="TV" 
-                      className="max-h-32 object-contain transform hover:scale-105 transition-transform duration-300"
-                    />
-                    <Button 
-                      size="sm" 
-                      className="mt-2 border border-white text-white bg-transparent hover:bg-white/20 w-max"
-                    >
-                      Shop Now
-                    </Button>
-                  </div>
-                </div>
-              </Link>
-            </CardContent>
-          </Card>
-        </div>
+              </div>
+            </Link>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
