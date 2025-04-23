@@ -3,6 +3,13 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { 
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext
+} from "@/components/ui/carousel";
 
 interface CarouselItem {
   id: number;
@@ -71,7 +78,7 @@ const HeroCarousel = () => {
   };
 
   return (
-    <div className="relative bg-gradient-to-r from-black/70 to-black/50 h-[500px] overflow-hidden">
+    <div className="relative bg-gradient-to-r from-black/70 to-black/50 h-[500px] md:h-[550px] overflow-hidden">
       {carouselItems.map((item, index) => (
         <div 
           key={item.id} 

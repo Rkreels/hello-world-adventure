@@ -1,32 +1,45 @@
 
-import { Outlet } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { Outlet, Link, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { Search, ShoppingCart, Menu, MapPin, User, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const ShopLayout = () => {
+  const location = useLocation();
+  const [cartCount, setCartCount] = useState(0);
+  
+  // Reset scroll position when navigating to a new page
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="bg-white border-b border-gray-100">
+      <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
         <div className="container mx-auto px-4">
           {/* Top bar */}
-          <div className="flex items-center justify-between py-3">
-            <div className="flex items-center space-x-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between py-3">
+            <div className="flex items-center justify-between md:justify-start md:space-x-6">
               <Link to="/" className="flex items-center">
                 <span className="text-xl font-bold text-green-600">DEALPORT</span>
               </Link>
-              <div className="flex items-center space-x-1 text-sm">
+              <div className="hidden md:flex md:items-center md:space-x-1 text-sm">
                 <MapPin className="h-4 w-4" />
                 <span>Deliver to</span>
                 <span className="font-medium">United States</span>
                 <ChevronDown className="h-3 w-3" />
               </div>
+              <div className="md:hidden">
+                <Button variant="ghost" size="sm">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </div>
             </div>
             
-            <div className="flex-1 max-w-2xl mx-6">
+            <div className="flex-1 max-w-2xl mx-0 md:mx-6 mt-3 md:mt-0">
               <div className="relative">
                 <div className="flex">
-                  <div className="relative z-10">
+                  <div className="relative z-10 hidden sm:block">
                     <Button variant="outline" size="sm" className="flex items-center h-10 rounded-r-none border-r-0">
                       <span className="mr-1">All</span>
                       <ChevronDown className="h-3 w-3" />
@@ -35,7 +48,7 @@ const ShopLayout = () => {
                   <input
                     type="text"
                     placeholder="Search DEALPORT"
-                    className="w-full pl-4 pr-10 py-2 h-10 border border-gray-200 focus:outline-none focus:ring-1 focus:ring-primary rounded-l-none rounded-r-none"
+                    className="w-full pl-4 pr-10 py-2 h-10 border border-gray-200 focus:outline-none focus:ring-1 focus:ring-primary rounded-l-md sm:rounded-l-none rounded-r-none"
                   />
                   <Button size="sm" className="h-10 rounded-l-none bg-green-600 hover:bg-green-700">
                     <Search className="h-4 w-4" />
@@ -44,7 +57,7 @@ const ShopLayout = () => {
               </div>
             </div>
             
-            <div className="flex items-center space-x-5">
+            <div className="hidden md:flex items-center space-x-5">
               <div className="flex items-center space-x-1 text-sm">
                 <div className="flex items-center">
                   <div className="w-5 h-4 bg-blue-900 relative mr-1">
@@ -69,7 +82,7 @@ const ShopLayout = () => {
                 <div className="relative">
                   <ShoppingCart className="h-6 w-6" />
                   <span className="absolute -top-2 -right-2 bg-green-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                    0
+                    {cartCount}
                   </span>
                 </div>
                 <span className="text-xs font-medium mt-1">Cart</span>
@@ -78,19 +91,19 @@ const ShopLayout = () => {
           </div>
           
           {/* Main navigation */}
-          <div className="flex items-center py-2 bg-gray-100 text-sm">
-            <Button variant="ghost" size="sm" className="flex items-center mr-4 font-medium">
+          <div className="flex items-center overflow-x-auto py-2 bg-gray-100 text-sm">
+            <Button variant="ghost" size="sm" className="flex items-center mr-4 font-medium min-w-max">
               <Menu className="h-5 w-5 mr-2" />
               <span>All Categories</span>
             </Button>
             
-            <nav className="flex items-center space-x-6">
+            <nav className="flex items-center space-x-6 min-w-max">
               <Link to="/" className="font-medium hover:text-green-600">Home</Link>
               <Link to="/deals" className="hover:text-green-600">Today's Deals</Link>
               <Link to="/new-arrivals" className="hover:text-green-600">New Arrivals</Link>
               <Link to="/best-selling" className="hover:text-green-600">Best Sellers</Link>
-              <Link to="/trending" className="hover:text-green-600">Trending</Link>
-              <Link to="/customer-service" className="hover:text-green-600">Customer Service</Link>
+              <Link to="/shop" className="hover:text-green-600">Shop All</Link>
+              <Link to="/contact" className="hover:text-green-600">Customer Service</Link>
             </nav>
           </div>
         </div>
@@ -162,7 +175,7 @@ const ShopLayout = () => {
           </div>
           
           <div className="py-4 text-sm text-center text-gray-600 border-t border-gray-200">
-            © 2023 Dealport. All rights reserved.
+            © {new Date().getFullYear()} Dealport. All rights reserved.
           </div>
         </div>
       </footer>
