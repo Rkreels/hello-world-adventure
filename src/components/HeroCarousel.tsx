@@ -127,8 +127,8 @@ const HeroCarousel = () => {
         <ChevronRight className="h-6 w-6" />
       </Button>
 
-      {/* Indicators - moved up to avoid overlapping */}
-      <div className="absolute bottom-12 left-0 right-0 flex justify-center space-x-2 z-20">
+      {/* Indicators - moved up significantly */}
+      <div className="absolute bottom-24 left-0 right-0 flex justify-center space-x-2 z-20">
         {carouselItems.map((_, index) => (
           <button
             key={index}
