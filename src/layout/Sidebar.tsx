@@ -1,5 +1,5 @@
 
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { 
   Home, 
   ShoppingCart, 
@@ -21,6 +21,8 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ collapsed = false }: SidebarProps) => {
+  const location = useLocation();
+  
   const menuItems = [
     { section: 'Main menu', items: [
       { name: 'Dashboard', icon: Home, path: '/admin/dashboard' },
@@ -48,6 +50,10 @@ const Sidebar = ({ collapsed = false }: SidebarProps) => {
     email: 'Mark@thedesigner.com'
   };
 
+  const isActiveLink = (path: string) => {
+    return location.pathname === path;
+  };
+
   return (
     <div className={cn(
       "flex flex-col h-screen bg-white border-r border-gray-100",
@@ -70,9 +76,15 @@ const Sidebar = ({ collapsed = false }: SidebarProps) => {
                 <li key={itemIdx}>
                   <Link
                     to={item.path}
-                    className="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-50"
+                    className={cn(
+                      "flex items-center px-4 py-2 text-gray-600 hover:bg-gray-50",
+                      isActiveLink(item.path) && "bg-gray-50 text-emerald-600 font-medium"
+                    )}
                   >
-                    <item.icon className="w-5 h-5 mr-3" />
+                    <item.icon className={cn(
+                      "w-5 h-5 mr-3",
+                      isActiveLink(item.path) && "text-emerald-600"
+                    )} />
                     {!collapsed && <span>{item.name}</span>}
                   </Link>
                 </li>

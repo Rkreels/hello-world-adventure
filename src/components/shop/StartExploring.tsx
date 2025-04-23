@@ -14,9 +14,9 @@ const StartExploring = () => {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold">Start exploring now</h2>
+    <div className="container mx-auto px-4 py-12 bg-gray-50 rounded-lg">
+      <div className="flex items-center justify-between mb-6 px-4">
+        <h2 className="text-2xl font-bold text-gray-800">Start exploring now</h2>
         <Button variant="ghost" size="sm" className="text-primary">
           View All
           <ArrowRight className="ml-2 h-4 w-4" />
@@ -28,10 +28,10 @@ const StartExploring = () => {
           <Link 
             key={category.name}
             to={category.path}
-            className="flex flex-col items-center p-4 hover:bg-gray-50 rounded-lg transition-colors border border-gray-100 shadow-sm"
+            className="flex flex-col items-center p-6 bg-white hover:bg-gray-50 rounded-lg transition-colors border border-gray-100 shadow-sm"
           >
             <span className="text-4xl mb-3">{category.icon}</span>
-            <span className="text-sm font-medium">{category.name}</span>
+            <span className="text-sm font-medium text-gray-800">{category.name}</span>
           </Link>
         ))}
       </div>

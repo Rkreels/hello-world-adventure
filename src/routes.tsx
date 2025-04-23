@@ -21,6 +21,8 @@ import ProductMedia from './pages/admin/ProductMedia';
 import ProductReviews from './pages/admin/ProductReviews';
 import AdminRole from './pages/admin/AdminRole';
 import AdminAuthority from './pages/admin/AdminAuthority';
+import Coupons from './pages/admin/Coupons';
+import Brands from './pages/admin/Brands';
 
 // Shop pages
 import Landing from './pages/shop/Landing';
@@ -69,6 +71,8 @@ const routes: RouteObject[] = [
           { path: 'categories', element: <AdminCategories /> },
           { path: 'customers', element: <Customers /> },
           { path: 'orders', element: <OrderManagement /> },
+          { path: 'coupons', element: <Coupons /> },
+          { path: 'brands', element: <Brands /> },
           { path: 'search', element: <SearchResults /> },
           { path: 'profile', element: <AdminProfile /> },
         ],

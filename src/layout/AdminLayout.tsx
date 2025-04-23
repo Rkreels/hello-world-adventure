@@ -1,10 +1,12 @@
 
 import { useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { Search, Bell, Sun, ChevronLeft, LogOut } from 'lucide-react';
+import { Search, Sun, ChevronLeft, LogOut } from 'lucide-react';
 import Sidebar from './Sidebar';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
+import NotificationsDropdown from '@/components/admin/NotificationsDropdown';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -22,9 +24,9 @@ const AdminLayout = () => {
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Searching for:', searchQuery);
-    // Implement search functionality
+    
     if (searchQuery.trim()) {
+      toast.info(`Searching for: ${searchQuery}`);
       // Navigate to search results
       navigate(`/admin/search?q=${encodeURIComponent(searchQuery)}`);
     }
@@ -61,10 +63,7 @@ const AdminLayout = () => {
           </div>
           
           <div className="flex items-center space-x-3">
-            <Button variant="ghost" size="sm" className="relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-            </Button>
+            <NotificationsDropdown />
             <Button variant="ghost" size="sm">
               <Sun className="h-5 w-5" />
             </Button>
