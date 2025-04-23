@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,6 +13,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const { login, demoLogin } = useAuth();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,45 +28,11 @@ const Login = () => {
       return;
     }
 
-    // Store login info in localStorage
-    localStorage.setItem('user', JSON.stringify({
-      email,
-      role: email.includes('admin') ? 'admin' : 'customer',
-      name: email.includes('admin') ? 'Admin User' : 'Customer User',
-    }));
-    
-    toast({
-      title: "Success",
-      description: "Logged in successfully",
-    });
-    
-    // Redirect based on role
-    if (email.includes('admin')) {
-      navigate('/admin/dashboard');
-    } else {
-      navigate('/');
-    }
+    login(email, password);
   };
 
   const handleDemoLogin = (role: 'admin' | 'customer') => {
-    const demoUser = {
-      email: role === 'admin' ? 'admin@example.com' : 'customer@example.com',
-      role: role,
-      name: role === 'admin' ? 'Admin Demo' : 'Customer Demo',
-    };
-    
-    localStorage.setItem('user', JSON.stringify(demoUser));
-    
-    toast({
-      title: "Demo Login",
-      description: `Logged in as ${role}`,
-    });
-    
-    if (role === 'admin') {
-      navigate('/admin/dashboard');
-    } else {
-      navigate('/');
-    }
+    demoLogin(role);
   };
 
   return (

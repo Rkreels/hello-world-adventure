@@ -1,4 +1,5 @@
 
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import HeroCarousel from '@/components/HeroCarousel';
 import FeaturedCategories from '@/components/shop/FeaturedCategories';
@@ -7,10 +8,16 @@ import TrendingProducts from '@/components/shop/TrendingProducts';
 import BestSellingProducts from '@/components/shop/BestSellingProducts';
 import LimitedTimeDeals from '@/components/shop/LimitedTimeDeals';
 import CustomerReviews from '@/components/shop/CustomerReviews';
+import StartExploring from '@/components/shop/StartExploring';
 
 const Landing = () => {
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
-    <div className="relative space-y-12">
+    <div className="relative space-y-16">
       {/* Hero Banner with Carousel */}
       <div className="relative">
         <HeroCarousel />
@@ -29,6 +36,9 @@ const Landing = () => {
       
       {/* Best Selling Products */}
       <BestSellingProducts />
+
+      {/* Start Exploring Now */}
+      <StartExploring />
 
       {/* Limited Time Deals */}
       <LimitedTimeDeals />

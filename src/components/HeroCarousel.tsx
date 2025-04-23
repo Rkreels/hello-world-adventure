@@ -3,13 +3,6 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { 
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselPrevious,
-  CarouselNext
-} from "@/components/ui/carousel";
 
 interface CarouselItem {
   id: number;
@@ -128,7 +121,7 @@ const HeroCarousel = () => {
       </Button>
 
       {/* Indicators - moved up significantly */}
-      <div className="absolute bottom-24 left-0 right-0 flex justify-center space-x-2 z-20">
+      <div className="absolute bottom-32 left-0 right-0 flex justify-center space-x-2 z-20">
         {carouselItems.map((_, index) => (
           <button
             key={index}
