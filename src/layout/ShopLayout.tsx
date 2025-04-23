@@ -19,7 +19,7 @@ const ShopLayout = () => {
               <span>EN</span>
             </div>
             <div className="flex items-center space-x-4">
-              <Link to="/account" className="flex items-center">
+              <Link to="/login" className="flex items-center">
                 <User className="h-4 w-4 mr-1" />
                 <span>Sign in</span>
               </Link>
@@ -37,7 +37,7 @@ const ShopLayout = () => {
                 <Menu className="h-5 w-5" />
               </Button>
               <Link to="/" className="flex items-center">
-                <img src="/logo.svg" alt="Dealport" className="h-7" />
+                <span className="text-xl font-bold text-green-600">DEALPORT</span>
               </Link>
             </div>
             
@@ -55,7 +55,7 @@ const ShopLayout = () => {
             </div>
             
             <div className="hidden lg:flex items-center space-x-6">
-              <Link to="/shop" className="text-sm font-medium">Shop</Link>
+              <Link to="/" className="text-sm font-medium">Home</Link>
               <Link to="/products" className="text-sm font-medium">Product</Link>
               <Link to="/about" className="text-sm font-medium">About Us</Link>
               <Link to="/contact" className="text-sm font-medium">Contact</Link>
@@ -77,21 +77,38 @@ const ShopLayout = () => {
           </div>
           
           {/* Category nav */}
-          <nav className="flex items-center justify-between overflow-x-auto py-2 text-sm hidden md:flex">
-            <Link to="/category/all" className="px-3 py-1 whitespace-nowrap">All</Link>
-            <Link to="/category/fashion" className="px-3 py-1 whitespace-nowrap">Fashion</Link>
+          <nav className="flex justify-between items-center overflow-x-auto py-3 text-sm border-t border-gray-100">
+            <button className="flex items-center px-3 py-1">
+              <Menu className="h-4 w-4 mr-1" />
+              <span>Menu</span>
+            </button>
+            <Link to="/category/explore" className="px-3 py-1 whitespace-nowrap">Explore</Link>
             <Link to="/category/deals" className="px-3 py-1 whitespace-nowrap">Deals</Link>
-            <Link to="/category/beauty" className="px-3 py-1 whitespace-nowrap">Beauty & Personal Care</Link>
-            <Link to="/category/electronics" className="px-3 py-1 whitespace-nowrap">Electronics</Link>
-            <Link to="/category/home" className="px-3 py-1 whitespace-nowrap">Home</Link>
-            <Link to="/category/kitchen" className="px-3 py-1 whitespace-nowrap">Kitchen</Link>
-            <Link to="/category/books" className="px-3 py-1 whitespace-nowrap">Books</Link>
-            <Link to="/category/toys" className="px-3 py-1 whitespace-nowrap">Toys</Link>
-            <Link to="/category/furniture" className="px-3 py-1 whitespace-nowrap">Furniture</Link>
-            <Link to="/category/sports" className="px-3 py-1 whitespace-nowrap">Sports</Link>
-            <Link to="/category/automotive" className="px-3 py-1 whitespace-nowrap">Automotive</Link>
-            <Link to="/category/see-all" className="px-3 py-1 whitespace-nowrap text-emerald-600">See All</Link>
+            <Link to="/category/saved" className="px-3 py-1 whitespace-nowrap">Saved</Link>
+            
+            <div className="flex items-center space-x-6">
+              <Link to="/" className="font-medium text-green-600">Home</Link>
+              <Link to="/products" className="font-medium">Product</Link>
+              <Link to="/about" className="font-medium">About Us</Link>
+              <Link to="/contact" className="font-medium">Contact</Link>
+              <Link to="/see-all-categories" className="font-medium text-green-600">See more</Link>
+            </div>
           </nav>
+          
+          {/* Subcategories */}
+          <div className="overflow-x-auto py-2 text-xs border-t border-gray-100">
+            <div className="flex space-x-5">
+              <Link to="/category/price" className="whitespace-nowrap">Price</Link>
+              <Link to="/category/deliver" className="whitespace-nowrap">Deliver</Link>
+              <Link to="/category/rating" className="whitespace-nowrap">Rating</Link>
+              <Link to="/category/grocery" className="whitespace-nowrap">Grocery & Fresh Foods</Link>
+              <Link to="/category/electronics" className="whitespace-nowrap">Electronics</Link>
+              <Link to="/category/shoes" className="whitespace-nowrap">Shoes</Link>
+              <Link to="/category/account" className="whitespace-nowrap">Account Sales</Link>
+              <Link to="/category/health" className="whitespace-nowrap">Health</Link>
+              <Link to="/category/fashionable" className="whitespace-nowrap">Fashionable accessories</Link>
+            </div>
+          </div>
         </div>
       </header>
       
@@ -116,6 +133,7 @@ const ShopLayout = () => {
                 <li><Link to="/contact" className="text-sm text-gray-600 hover:text-gray-900">Contact Us</Link></li>
                 <li><Link to="/faq" className="text-sm text-gray-600 hover:text-gray-900">Help Center (FAQ)</Link></li>
                 <li><Link to="/returns" className="text-sm text-gray-600 hover:text-gray-900">Returns & Refunds</Link></li>
+                <li><Link to="/shipping-information" className="text-sm text-gray-600 hover:text-gray-900">Shipping Information</Link></li>
               </ul>
             </div>
             <div>
@@ -132,6 +150,7 @@ const ShopLayout = () => {
                 <li><Link to="/terms" className="text-sm text-gray-600 hover:text-gray-900">Terms & Conditions</Link></li>
                 <li><Link to="/privacy" className="text-sm text-gray-600 hover:text-gray-900">Privacy Policy</Link></li>
                 <li><Link to="/cookie" className="text-sm text-gray-600 hover:text-gray-900">Cookie Policy</Link></li>
+                <li><Link to="/accessibility" className="text-sm text-gray-600 hover:text-gray-900">Accessibility Statement</Link></li>
               </ul>
             </div>
           </div>
@@ -139,7 +158,7 @@ const ShopLayout = () => {
           <div className="py-6 border-t border-gray-200">
             <div className="flex flex-col md:flex-row justify-between items-center">
               <div className="mb-4 md:mb-0">
-                <img src="/logo.svg" alt="Dealport" className="h-6" />
+                <span className="text-xl font-bold text-green-600">DEALPORT</span>
               </div>
               <div className="flex items-center space-x-4">
                 <Link to="#" className="text-gray-600 hover:text-gray-900">

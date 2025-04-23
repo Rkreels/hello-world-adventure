@@ -32,6 +32,12 @@ import FAQ from './pages/shop/FAQ';
 import Terms from './pages/shop/Terms';
 import Privacy from './pages/shop/Privacy';
 import CookiePolicy from './pages/shop/CookiePolicy';
+import Returns from './pages/shop/Returns';
+import ShippingInformation from './pages/shop/ShippingInformation';
+import Categories as ShopCategories from './pages/shop/Categories';
+import Deals from './pages/shop/Deals';
+import NewArrivals from './pages/shop/NewArrivals';
+import Accessibility from './pages/shop/Accessibility';
 
 const routes: RouteObject[] = [
   {
@@ -71,7 +77,8 @@ const routes: RouteObject[] = [
       { path: 'category/:categoryId', element: <CategoryPage /> },
       { path: 'category/:categoryId/:subcategoryId', element: <CategoryPage /> },
       { path: 'login', element: <Login /> },
-      // Footer pages
+      
+      // Footer and informational pages
       { path: 'about', element: <About /> },
       { path: 'blog', element: <Blog /> },
       { path: 'careers', element: <Careers /> },
@@ -80,6 +87,19 @@ const routes: RouteObject[] = [
       { path: 'terms', element: <Terms /> },
       { path: 'privacy', element: <Privacy /> },
       { path: 'cookie', element: <CookiePolicy /> },
+      { path: 'returns', element: <Returns /> },
+      { path: 'shipping-information', element: <ShippingInformation /> },
+      { path: 'categories', element: <ShopCategories /> },
+      { path: 'deals', element: <Deals /> },
+      { path: 'new-arrivals', element: <NewArrivals /> },
+      { path: 'accessibility', element: <Accessibility /> },
+      
+      // Aliases for SEO purposes
+      { path: 'returns-and-refunds', element: <Returns /> },
+      { path: 'shipping', element: <ShippingInformation /> },
+      { path: 'all-categories', element: <ShopCategories /> },
+      { path: 'promotions', element: <Deals /> },
+      { path: 'new', element: <NewArrivals /> },
     ],
   },
 ];

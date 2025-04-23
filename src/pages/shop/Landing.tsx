@@ -1,20 +1,20 @@
+
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Star, ChevronLeft, ChevronRight, Heart, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 const Landing = () => {
   return (
     <div>
       {/* Hero Banner */}
-      <div className="relative bg-gradient-to-r from-emerald-800 to-emerald-600 h-80 overflow-hidden">
+      <div className="relative bg-gradient-to-r from-teal-900 to-teal-700 h-80 overflow-hidden">
         <div className="container mx-auto px-4 h-full flex items-center relative z-10">
           <div className="max-w-xl text-white">
             <h1 className="text-3xl md:text-4xl font-bold mb-4">Discover the Latest Deals -</h1>
             <p className="text-xl md:text-2xl font-semibold mb-6">Up to 50% Off!</p>
-            <Button className="bg-white text-emerald-700 hover:bg-gray-100 px-6">
+            <Button className="bg-white text-teal-800 hover:bg-gray-100 px-6 rounded">
               <Link to="/shop">Shop Now</Link>
             </Button>
           </div>
@@ -23,7 +23,7 @@ const Landing = () => {
           <img 
             src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=2070&auto=format&fit=crop"
             alt="Shop collection" 
-            className="w-full h-full object-cover opacity-30"
+            className="w-full h-full object-cover opacity-20"
           />
         </div>
         
@@ -31,28 +31,29 @@ const Landing = () => {
         <Button 
           variant="outline" 
           size="sm" 
-          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 rounded-full w-8 h-8 p-0 z-20"
+          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white rounded-full w-8 h-8 p-0 z-20"
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
         <Button 
           variant="outline" 
           size="sm" 
-          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 rounded-full w-8 h-8 p-0 z-20"
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white rounded-full w-8 h-8 p-0 z-20"
         >
           <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
       
-      {/* Featured Categories */}
+      {/* Featured Categories - Match exactly with the reference */}
       <div className="container mx-auto px-4 py-10">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {/* New Year! New Fashion */}
           <Card className="overflow-hidden">
             <CardContent className="p-0">
               <Link to="/category/fashion" className="block">
                 <div className="relative h-64 bg-gray-100">
                   <img 
-                    src="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop" 
+                    src="/lovable-uploads/01c6fb91-b0da-4976-81df-07a0dacddee3.png"
                     alt="New Year! New Fashion" 
                     className="w-full h-full object-cover"
                   />
@@ -60,11 +61,10 @@ const Landing = () => {
                   <div className="absolute bottom-0 left-0 p-4 text-white">
                     <h3 className="font-semibold text-lg">New Year! New Fashion</h3>
                     <Button 
-                      variant="outline" 
                       size="sm" 
-                      className="mt-2 bg-white/20 backdrop-blur-sm hover:bg-white/40 text-white"
+                      className="mt-2 border border-white text-white bg-transparent hover:bg-white/20"
                     >
-                      <Link to="/category/fashion">Shop Now</Link>
+                      Shop Now
                     </Button>
                   </div>
                 </div>
@@ -72,16 +72,17 @@ const Landing = () => {
             </CardContent>
           </Card>
           
+          {/* Gaming accessories */}
           <Card className="overflow-hidden">
             <CardContent className="p-0">
               <Link to="/category/accessories" className="block">
                 <div className="relative h-64 bg-gray-100">
                   <div className="p-4 text-center">
                     <h3 className="font-semibold text-lg mb-4">Gaming accessories</h3>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-2 gap-3">
                       <div>
                         <img 
-                          src="https://images.unsplash.com/photo-1615655114865-4cc1bda5901e?q=80&w=2070&auto=format&fit=crop" 
+                          src="https://images.unsplash.com/photo-1615655406736-b37c4fabf923?q=80&w=2070&auto=format&fit=crop" 
                           alt="Headset" 
                           className="w-full h-20 object-contain mb-1"
                         />
@@ -89,7 +90,7 @@ const Landing = () => {
                       </div>
                       <div>
                         <img 
-                          src="https://images.unsplash.com/photo-1615655114658-e308f5805efe?q=80&w=2026&auto=format&fit=crop" 
+                          src="https://images.unsplash.com/photo-1623820919239-0d0ff10797a1?q=80&w=2070&auto=format&fit=crop" 
                           alt="Mouse" 
                           className="w-full h-20 object-contain mb-1"
                         />
@@ -97,7 +98,7 @@ const Landing = () => {
                       </div>
                       <div>
                         <img 
-                          src="https://images.unsplash.com/photo-1592840496694-26d035b52b48?q=80&w=1974&auto=format&fit=crop" 
+                          src="https://images.unsplash.com/photo-1606318801954-d46d46d3360a?q=80&w=2070&auto=format&fit=crop" 
                           alt="Controller" 
                           className="w-full h-20 object-contain mb-1"
                         />
@@ -105,31 +106,28 @@ const Landing = () => {
                       </div>
                       <div>
                         <img 
-                          src="https://images.unsplash.com/photo-1603665270146-bbdf9858ea55?q=80&w=1780&auto=format&fit=crop" 
+                          src="https://images.unsplash.com/photo-1598550476439-6847785fcea6?q=80&w=2070&auto=format&fit=crop" 
                           alt="Chair" 
                           className="w-full h-20 object-contain mb-1"
                         />
                         <span className="text-xs">Chair</span>
                       </div>
                     </div>
-                    <Button 
-                      variant="link" 
-                      size="sm" 
-                      className="mt-2 text-blue-600"
-                    >
-                      <Link to="/category/accessories">See more</Link>
-                    </Button>
+                    <Link to="/category/accessories" className="text-blue-600 text-sm mt-3 inline-block">
+                      See more
+                    </Link>
                   </div>
                 </div>
               </Link>
             </CardContent>
           </Card>
           
-          <div className="col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card className="overflow-hidden">
-              <CardContent className="p-0">
-                <Link to="/category/electronics" className="block">
-                  <div className="aspect-[4/3] bg-gradient-to-br from-blue-600 to-purple-700 relative">
+          {/* Winner & Phone Promotions */}
+          <div className="col-span-2 grid grid-cols-2 gap-4">
+            <Card className="overflow-hidden h-64">
+              <CardContent className="p-0 h-full">
+                <Link to="/category/electronics" className="block h-full">
+                  <div className="bg-gradient-to-br from-red-600 to-red-800 h-full relative">
                     <div className="p-4 text-white h-full flex flex-col justify-between">
                       <div className="flex justify-between items-start">
                         <div>
@@ -138,17 +136,14 @@ const Landing = () => {
                         </div>
                         <span className="bg-red-500 px-2 py-1 text-xs font-bold rounded">SALE</span>
                       </div>
-                      <div className="mt-auto flex gap-2">
-                        <img 
-                          src="https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=2127&auto=format&fit=crop" 
-                          alt="Phone" 
-                          className="w-1/2 object-contain"
-                        />
-                        <img 
-                          src="https://images.unsplash.com/photo-1605236453806-6ff36851218e?q=80&w=2064&auto=format&fit=crop" 
-                          alt="Phone" 
-                          className="w-1/2 object-contain"
-                        />
+                      <div className="flex justify-between items-end">
+                        <div className="flex items-end justify-end w-full">
+                          <img 
+                            src="https://images.unsplash.com/photo-1544866092-1935c5ef2a8f?q=80&w=2069&auto=format&fit=crop" 
+                            alt="Phone" 
+                            className="max-h-32 object-contain"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -156,29 +151,28 @@ const Landing = () => {
               </CardContent>
             </Card>
             
-            <Card className="overflow-hidden">
-              <CardContent className="p-0">
-                <Link to="/category/electronics" className="block">
-                  <div className="aspect-[4/3] bg-gradient-to-br from-pink-500 to-orange-400 relative">
+            <Card className="overflow-hidden h-64">
+              <CardContent className="p-0 h-full">
+                <Link to="/category/electronics" className="block h-full">
+                  <div className="bg-gradient-to-br from-blue-600 to-purple-700 h-full relative">
                     <div className="p-4 text-white h-full flex flex-col justify-between">
                       <div>
-                        <h3 className="font-bold text-xl">Home 4K Android TV</h3>
-                        <p className="text-sm">Starting at $399.99</p>
+                        <h3 className="font-bold text-lg">Home 4K Android TV</h3>
+                        <p className="text-sm text-white/90">Starting at $399.99</p>
                       </div>
-                      <div className="mt-auto">
+                      <div className="flex items-end justify-center w-full">
                         <img 
                           src="https://images.unsplash.com/photo-1593784991095-a205069470b6?q=80&w=2070&auto=format&fit=crop" 
                           alt="TV" 
-                          className="w-full object-contain max-h-32"
+                          className="max-h-32 object-contain"
                         />
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="mt-2 bg-white/20 backdrop-blur-sm hover:bg-white/40 text-white"
-                        >
-                          <Link to="/category/electronics">Shop Now</Link>
-                        </Button>
                       </div>
+                      <Button 
+                        size="sm" 
+                        className="mt-2 border border-white text-white bg-transparent hover:bg-white/20 w-max"
+                      >
+                        Shop Now
+                      </Button>
                     </div>
                   </div>
                 </Link>
@@ -187,8 +181,8 @@ const Landing = () => {
           </div>
         </div>
         
-        {/* Category Banners */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+        {/* Category Banners exactly as reference */}
+        <div className="grid grid-cols-4 gap-4 mt-6">
           <Link to="/category/clothing" className="relative h-32 rounded-md overflow-hidden group">
             <img 
               src="https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?q=80&w=2070&auto=format&fit=crop" 
@@ -196,13 +190,13 @@ const Landing = () => {
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
             <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-              <span className="text-white font-medium text-lg">Clothing</span>
+              <span className="text-white font-medium text-lg">CLOTHING</span>
             </div>
           </Link>
           
           <Link to="/category/watches" className="relative h-32 rounded-md overflow-hidden group">
             <img 
-              src="https://images.unsplash.com/photo-1557531365-e8b22d93dbd0?q=80&w=1964&auto=format&fit=crop" 
+              src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=2099&auto=format&fit=crop" 
               alt="Men's Fashion" 
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
@@ -224,7 +218,7 @@ const Landing = () => {
           
           <Link to="/category/appliances" className="relative h-32 rounded-md overflow-hidden group">
             <img 
-              src="https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?q=80&w=2071&auto=format&fit=crop" 
+              src="https://images.unsplash.com/photo-1563245738-1a179bb42db4?q=80&w=1932&auto=format&fit=crop" 
               alt="Philips Appliances" 
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
@@ -235,25 +229,28 @@ const Landing = () => {
         </div>
       </div>
       
-      {/* Trending Products */}
+      {/* Trending Products - Exactly matching the reference */}
       <div className="bg-gray-50 py-10">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-semibold">Trending Product</h2>
-            <Button variant="outline" size="sm">
-              <Link to="/shop">View All</Link>
-            </Button>
+            <Link to="/shop" className="text-sm border border-gray-300 rounded px-4 py-1 hover:bg-gray-50">
+              View All
+            </Link>
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            <Card>
+            {/* Radiant Glow Hydrating Serum */}
+            <Card className="h-full">
               <CardContent className="p-4">
                 <div className="relative mb-4">
-                  <img 
-                    src="https://images.unsplash.com/photo-1615900119312-2acd3a71f3aa?q=80&w=1964&auto=format&fit=crop" 
-                    alt="Radiant Glow Hydrating Serum" 
-                    className="w-full h-48 object-cover rounded"
-                  />
+                  <Link to="/products/1">
+                    <img 
+                      src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1974&auto=format&fit=crop" 
+                      alt="Radiant Glow Hydrating Serum" 
+                      className="w-full h-48 object-cover rounded"
+                    />
+                  </Link>
                   <Button 
                     variant="outline" 
                     size="sm" 
@@ -267,16 +264,20 @@ const Landing = () => {
                 </div>
                 
                 <div className="mb-2">
+                  <Link to="/category/skincare" className="text-xs text-gray-500">
+                    Dermalogical Certified by SaltForm
+                  </Link>
                   <div className="flex text-yellow-400 mb-1">
                     <Star className="h-4 w-4 fill-yellow-400" />
                     <Star className="h-4 w-4 fill-yellow-400" />
                     <Star className="h-4 w-4 fill-yellow-400" />
                     <Star className="h-4 w-4 fill-yellow-400" />
                     <Star className="h-4 w-4 fill-yellow-400" />
-                    <span className="text-xs text-gray-500 ml-1">(287 reviews)</span>
+                    <span className="text-xs text-gray-500 ml-1">(287)</span>
                   </div>
-                  <h3 className="font-medium">Radiant Glow Hydrating Serum</h3>
-                  <p className="text-sm text-gray-500">Dermalogical Certified by SaltForm</p>
+                  <Link to="/products/1" className="font-medium block">
+                    Radiant Glow Hydrating Serum
+                  </Link>
                 </div>
                 
                 <div className="flex items-center mb-3">
@@ -290,20 +291,23 @@ const Landing = () => {
                     <Link to="/products/1">View Details</Link>
                   </Button>
                   <Button className="bg-green-500 hover:bg-green-600">
-                    <Link to="/cart">Add to cart</Link>
+                    Add to cart
                   </Button>
                 </div>
               </CardContent>
             </Card>
             
-            <Card>
+            {/* Modern Minimalist Vase */}
+            <Card className="h-full">
               <CardContent className="p-4">
                 <div className="relative mb-4">
-                  <img 
-                    src="https://images.unsplash.com/photo-1602746588630-8ce6147c406c?q=80&w=1964&auto=format&fit=crop" 
-                    alt="Modern Minimalist Vase" 
-                    className="w-full h-48 object-cover rounded"
-                  />
+                  <Link to="/products/2">
+                    <img 
+                      src="https://images.unsplash.com/photo-1602746588630-8ce6147c406c?q=80&w=1964&auto=format&fit=crop" 
+                      alt="Modern Minimalist Vase" 
+                      className="w-full h-48 object-cover rounded"
+                    />
+                  </Link>
                   <Button 
                     variant="outline" 
                     size="sm" 
@@ -314,16 +318,20 @@ const Landing = () => {
                 </div>
                 
                 <div className="mb-2">
+                  <Link to="/category/home-decor" className="text-xs text-gray-500">
+                    Design in Denmark, Minted in Germany
+                  </Link>
                   <div className="flex text-yellow-400 mb-1">
                     <Star className="h-4 w-4 fill-yellow-400" />
                     <Star className="h-4 w-4 fill-yellow-400" />
                     <Star className="h-4 w-4 fill-yellow-400" />
                     <Star className="h-4 w-4 fill-yellow-400" />
                     <Star className="h-4 w-4" />
-                    <span className="text-xs text-gray-500 ml-1">(186 reviews)</span>
+                    <span className="text-xs text-gray-500 ml-1">(186)</span>
                   </div>
-                  <h3 className="font-medium">Modern Minimalist Vase</h3>
-                  <p className="text-sm text-gray-500">Design in Denmark, Minted in Germany</p>
+                  <Link to="/products/2" className="font-medium block">
+                    Modern Minimalist Vase
+                  </Link>
                 </div>
                 
                 <div className="flex items-center mb-3">
@@ -337,20 +345,23 @@ const Landing = () => {
                     <Link to="/products/2">View Details</Link>
                   </Button>
                   <Button className="bg-green-500 hover:bg-green-600">
-                    <Link to="/cart">Add to cart</Link>
+                    Add to cart
                   </Button>
                 </div>
               </CardContent>
             </Card>
             
-            <Card>
+            {/* FitPro Smartwatch */}
+            <Card className="h-full">
               <CardContent className="p-4">
                 <div className="relative mb-4">
-                  <img 
-                    src="https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?q=80&w=2044&auto=format&fit=crop" 
-                    alt="FitPro 3000 Smartwatch" 
-                    className="w-full h-48 object-cover rounded"
-                  />
+                  <Link to="/products/3">
+                    <img 
+                      src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1999&auto=format&fit=crop" 
+                      alt="FitPro 3000 Smartwatch" 
+                      className="w-full h-48 object-cover rounded"
+                    />
+                  </Link>
                   <Button 
                     variant="outline" 
                     size="sm" 
@@ -364,16 +375,20 @@ const Landing = () => {
                 </div>
                 
                 <div className="mb-2">
+                  <Link to="/category/wearables" className="text-xs text-gray-500">
+                    Leading Fitness Tech by GadgetPro
+                  </Link>
                   <div className="flex text-yellow-400 mb-1">
                     <Star className="h-4 w-4 fill-yellow-400" />
                     <Star className="h-4 w-4 fill-yellow-400" />
                     <Star className="h-4 w-4 fill-yellow-400" />
                     <Star className="h-4 w-4 fill-yellow-400" />
                     <Star className="h-4 w-4 fill-yellow-400" />
-                    <span className="text-xs text-gray-500 ml-1">(152 reviews)</span>
+                    <span className="text-xs text-gray-500 ml-1">(152)</span>
                   </div>
-                  <h3 className="font-medium">FitPro 3000 Smartwatch</h3>
-                  <p className="text-sm text-gray-500">Leading Fitness Tech by GadgetPro</p>
+                  <Link to="/products/3" className="font-medium block">
+                    FitPro 3000 Smartwatch
+                  </Link>
                 </div>
                 
                 <div className="flex items-center mb-3">
@@ -387,20 +402,21 @@ const Landing = () => {
                     <Link to="/products/3">View Details</Link>
                   </Button>
                   <Button className="bg-green-500 hover:bg-green-600">
-                    <Link to="/cart">Add to cart</Link>
+                    Add to cart
                   </Button>
                 </div>
               </CardContent>
             </Card>
             
-            <Card className="hidden md:block">
+            {/* Trend collection for men */}
+            <Card className="h-full">
               <CardContent className="p-4">
                 <div className="h-full flex flex-col">
                   <h3 className="font-medium mb-3">Trend collection for men</h3>
                   <div className="grid grid-cols-2 gap-2 flex-1">
                     <div>
                       <img 
-                        src="https://images.unsplash.com/photo-1542272604-787c3835535d?q=80&w=2026&auto=format&fit=crop" 
+                        src="https://images.unsplash.com/photo-1582552938357-32b906df40cb?q=80&w=1974&auto=format&fit=crop" 
                         alt="Pants" 
                         className="w-full h-24 object-cover rounded mb-2"
                       />
@@ -442,7 +458,7 @@ const Landing = () => {
                     </div>
                     <div>
                       <img 
-                        src="https://images.unsplash.com/photo-1460353581641-37baddab0fa2?q=80&w=2071&auto=format&fit=crop" 
+                        src="https://images.unsplash.com/photo-1491553895911-0055eca6402d?q=80&w=2080&auto=format&fit=crop" 
                         alt="Shoes" 
                         className="w-full h-24 object-cover rounded mb-2"
                       />
@@ -469,20 +485,20 @@ const Landing = () => {
         </div>
       </div>
       
-      {/* Categories Section */}
+      {/* Categories Section - Matching reference exactly */}
       <div className="container mx-auto px-4 py-10">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold">Start exploring now</h2>
-          <Button variant="outline" size="sm">
+          <Link to="/categories" className="text-sm border border-gray-300 rounded px-4 py-1 hover:bg-gray-50">
             View All
-          </Button>
+          </Link>
         </div>
         
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
           <Link to="/category/grocery" className="text-center">
             <div className="bg-gray-100 rounded-md p-4 mb-2 mx-auto w-20 h-20 flex items-center justify-center">
               <img 
-                src="/icons/grocery.png" 
+                src="https://cdn-icons-png.flaticon.com/512/2203/2203236.png" 
                 alt="Grocery" 
                 className="w-12 h-12 object-contain"
               />
@@ -493,7 +509,7 @@ const Landing = () => {
           <Link to="/category/home" className="text-center">
             <div className="bg-gray-100 rounded-md p-4 mb-2 mx-auto w-20 h-20 flex items-center justify-center">
               <img 
-                src="/icons/home.png" 
+                src="https://cdn-icons-png.flaticon.com/512/1670/1670080.png" 
                 alt="Home" 
                 className="w-12 h-12 object-contain"
               />
@@ -504,7 +520,7 @@ const Landing = () => {
           <Link to="/category/fashion" className="text-center">
             <div className="bg-gray-100 rounded-md p-4 mb-2 mx-auto w-20 h-20 flex items-center justify-center">
               <img 
-                src="/icons/fashion.png" 
+                src="https://cdn-icons-png.flaticon.com/512/3626/3626932.png" 
                 alt="Fashion" 
                 className="w-12 h-12 object-contain"
               />
@@ -515,7 +531,7 @@ const Landing = () => {
           <Link to="/category/electronics" className="text-center">
             <div className="bg-gray-100 rounded-md p-4 mb-2 mx-auto w-20 h-20 flex items-center justify-center">
               <img 
-                src="/icons/electronics.png" 
+                src="https://cdn-icons-png.flaticon.com/512/3659/3659899.png" 
                 alt="Electronics" 
                 className="w-12 h-12 object-contain"
               />
@@ -526,7 +542,7 @@ const Landing = () => {
           <Link to="/category/toys" className="text-center">
             <div className="bg-gray-100 rounded-md p-4 mb-2 mx-auto w-20 h-20 flex items-center justify-center">
               <img 
-                src="/icons/toys.png" 
+                src="https://cdn-icons-png.flaticon.com/512/3655/3655930.png" 
                 alt="Toys" 
                 className="w-12 h-12 object-contain"
               />
@@ -537,7 +553,7 @@ const Landing = () => {
           <Link to="/category/more" className="text-center">
             <div className="bg-gray-100 rounded-md p-4 mb-2 mx-auto w-20 h-20 flex items-center justify-center">
               <img 
-                src="/icons/more.png" 
+                src="https://cdn-icons-png.flaticon.com/512/512/512142.png" 
                 alt="More" 
                 className="w-12 h-12 object-contain"
               />
@@ -547,14 +563,14 @@ const Landing = () => {
         </div>
       </div>
       
-      {/* Best Selling Products */}
+      {/* Best Selling Products - Matches reference exactly */}
       <div className="bg-gray-50 py-10">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-semibold">Best selling product</h2>
-            <Button variant="outline" size="sm">
+            <Link to="/best-selling" className="text-sm border border-gray-300 rounded px-4 py-1 hover:bg-gray-50">
               View All
-            </Button>
+            </Link>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -563,7 +579,7 @@ const Landing = () => {
                 Hot Deal
               </div>
               <img 
-                src="/products/computer-accessories.jpg" 
+                src="https://images.unsplash.com/photo-1593640408182-31c70c8268f5?q=80&w=2042&auto=format&fit=crop" 
                 alt="Computer Accessories" 
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
@@ -594,7 +610,7 @@ const Landing = () => {
             
             <div className="relative rounded-md overflow-hidden bg-black group">
               <img 
-                src="/products/mens-fashion.jpg" 
+                src="https://images.unsplash.com/photo-1617137968427-85924c800a22?q=80&w=1974&auto=format&fit=crop" 
                 alt="Men's Fashion" 
                 className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-300"
               />
@@ -617,7 +633,7 @@ const Landing = () => {
                 Deal
               </div>
               <img 
-                src="/products/dog-food.jpg" 
+                src="https://images.unsplash.com/photo-1589924691995-400dc9ecc119?q=80&w=1971&auto=format&fit=crop" 
                 alt="Dog Food" 
                 className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-300"
               />
@@ -631,7 +647,7 @@ const Landing = () => {
             
             <div className="relative rounded-md overflow-hidden h-48 bg-blue-500 group">
               <img 
-                src="/products/cameras.jpg" 
+                src="https://images.unsplash.com/photo-1502920917128-1aa500764cbd?q=80&w=2070&auto=format&fit=crop" 
                 alt="Cameras" 
                 className="w-full h-full object-cover opacity-70 group-hover:scale-105 transition-transform duration-300"
               />
@@ -644,7 +660,7 @@ const Landing = () => {
             
             <div className="relative rounded-md overflow-hidden h-48 bg-blue-600 group md:col-span-2">
               <img 
-                src="/products/dogs.jpg" 
+                src="https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=80&w=2064&auto=format&fit=crop" 
                 alt="We Love Dogs" 
                 className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-300"
               />
@@ -662,24 +678,26 @@ const Landing = () => {
         </div>
       </div>
       
-      {/* Limited Time Deals */}
+      {/* Limited Time Deals - Exactly matching reference */}
       <div className="container mx-auto px-4 py-10">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold">Limited-Time Deal</h2>
-          <Button variant="outline" size="sm">
+          <Link to="/deals" className="text-sm border border-gray-300 rounded px-4 py-1 hover:bg-gray-50">
             View All
-          </Button>
+          </Link>
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
           <Card>
             <CardContent className="p-4">
               <div className="relative mb-4">
-                <img 
-                  src="/products/samsung.jpg" 
-                  alt="Samsung Galaxy S24" 
-                  className="w-full h-48 object-contain rounded"
-                />
+                <Link to="/products/samsung-galaxy">
+                  <img 
+                    src="https://images.unsplash.com/photo-1610945264803-c22b62d2a7b3?q=80&w=1974&auto=format&fit=crop" 
+                    alt="Samsung Galaxy S24" 
+                    className="w-full h-48 object-contain rounded"
+                  />
+                </Link>
                 <Button 
                   variant="outline" 
                   size="sm" 
@@ -702,7 +720,7 @@ const Landing = () => {
                     <Star className="h-4 w-4 fill-yellow-400" />
                     <span className="text-xs text-gray-500 ml-1">(24)</span>
                   </div>
-                  <span className="text-xs text-gray-500">Sanding Furniture...</span>
+                  <span className="text-xs text-gray-500">Samsung...</span>
                 </div>
                 <h3 className="font-medium">Samsung Galaxy S24</h3>
                 <p className="text-xs text-gray-500">
@@ -732,11 +750,13 @@ const Landing = () => {
           <Card>
             <CardContent className="p-4">
               <div className="relative mb-4">
-                <img 
-                  src="/products/earbuds.jpg" 
-                  alt="UT Pro TWS Earbuds" 
-                  className="w-full h-48 object-contain rounded"
-                />
+                <Link to="/products/ut-earbuds">
+                  <img 
+                    src="https://images.unsplash.com/photo-1590658268037-6bf12165a8df?q=80&w=1972&auto=format&fit=crop" 
+                    alt="UT Pro TWS Earbuds" 
+                    className="w-full h-48 object-contain rounded"
+                  />
+                </Link>
                 <Button 
                   variant="outline" 
                   size="sm" 
@@ -759,7 +779,7 @@ const Landing = () => {
                     <Star className="h-4 w-4" />
                     <span className="text-xs text-gray-500 ml-1">(18)</span>
                   </div>
-                  <span className="text-xs text-gray-500">Auditory Dynamic...</span>
+                  <span className="text-xs text-gray-500">Auditory...</span>
                 </div>
                 <h3 className="font-medium">UT Pro TWS Earbuds</h3>
                 <p className="text-xs text-gray-500">
@@ -790,11 +810,13 @@ const Landing = () => {
           <Card>
             <CardContent className="p-4">
               <div className="relative mb-4">
-                <img 
-                  src="/products/jacket.jpg" 
-                  alt="Winter Fashion Jacket" 
-                  className="w-full h-48 object-contain rounded"
-                />
+                <Link to="/products/winter-jacket">
+                  <img 
+                    src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=1936&auto=format&fit=crop" 
+                    alt="Winter Fashion Jacket" 
+                    className="w-full h-48 object-contain rounded"
+                  />
+                </Link>
                 <Button 
                   variant="outline" 
                   size="sm" 
@@ -817,7 +839,7 @@ const Landing = () => {
                     <Star className="h-4 w-4" />
                     <span className="text-xs text-gray-500 ml-1">(32)</span>
                   </div>
-                  <span className="text-xs text-gray-500">Sporting Fashion...</span>
+                  <span className="text-xs text-gray-500">Sporting...</span>
                 </div>
                 <h3 className="font-medium">Winter Fashion Jacket</h3>
                 <p className="text-xs text-gray-500">
@@ -848,11 +870,13 @@ const Landing = () => {
           <Card>
             <CardContent className="p-4">
               <div className="relative mb-4">
-                <img 
-                  src="/products/sneakers.jpg" 
-                  alt="New Balance 574 Sneakers" 
-                  className="w-full h-48 object-contain rounded"
-                />
+                <Link to="/products/sneakers">
+                  <img 
+                    src="https://images.unsplash.com/photo-1597248881519-db089d3744a5?q=80&w=2080&auto=format&fit=crop" 
+                    alt="New Balance 574 Sneakers" 
+                    className="w-full h-48 object-contain rounded"
+                  />
+                </Link>
                 <Button 
                   variant="outline" 
                   size="sm" 
@@ -875,7 +899,7 @@ const Landing = () => {
                     <Star className="h-4 w-4 fill-yellow-400" />
                     <span className="text-xs text-gray-500 ml-1">(87)</span>
                   </div>
-                  <span className="text-xs text-gray-500">Comfy for exercise...</span>
+                  <span className="text-xs text-gray-500">Comfy...</span>
                 </div>
                 <h3 className="font-medium">New Balance 574 Sneakers</h3>
                 <p className="text-xs text-gray-500">
@@ -906,11 +930,13 @@ const Landing = () => {
           <Card className="hidden lg:block">
             <CardContent className="p-4">
               <div className="relative mb-4">
-                <img 
-                  src="/products/earbuds2.jpg" 
-                  alt="UT Pro TWS Earbuds" 
-                  className="w-full h-48 object-contain rounded"
-                />
+                <Link to="/products/ut-pro-700z">
+                  <img 
+                    src="https://images.unsplash.com/photo-1606400082777-ef05f3c5252b?q=80&w=1936&auto=format&fit=crop" 
+                    alt="UT Pro 700Z Earbuds" 
+                    className="w-full h-48 object-contain rounded"
+                  />
+                </Link>
                 <Button 
                   variant="outline" 
                   size="sm" 
@@ -933,7 +959,7 @@ const Landing = () => {
                     <Star className="h-4 w-4" />
                     <span className="text-xs text-gray-500 ml-1">(42)</span>
                   </div>
-                  <span className="text-xs text-gray-500">Gaming Headset...</span>
+                  <span className="text-xs text-gray-500">Gaming...</span>
                 </div>
                 <h3 className="font-medium">UT Pro 700Z Earbuds</h3>
                 <p className="text-xs text-gray-500">
@@ -963,7 +989,7 @@ const Landing = () => {
         </div>
       </div>
       
-      {/* Testimonials */}
+      {/* Testimonials - Exactly matching reference */}
       <div className="bg-green-50 py-10">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl font-semibold text-center mb-8">Our Happy Customers</h2>
@@ -977,7 +1003,7 @@ const Landing = () => {
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 rounded-full overflow-hidden mr-4">
                     <img 
-                      src="/customers/emily.jpg" 
+                      src="https://randomuser.me/api/portraits/women/44.jpg" 
                       alt="Emily R." 
                       className="w-full h-full object-cover"
                     />
@@ -994,7 +1020,7 @@ const Landing = () => {
                   </div>
                 </div>
                 <p className="text-gray-600 text-sm">
-                  "Excellent and fantastic quality! The customer support team was quick to resolve my query. Perfect for a retail experience."
+                  "Excellent service and fantastic quality! The customer support team was quick to resolve my query. Perfect for a retail experience."
                 </p>
               </CardContent>
             </Card>
@@ -1004,7 +1030,7 @@ const Landing = () => {
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 rounded-full overflow-hidden mr-4">
                     <img 
-                      src="/customers/john.jpg" 
+                      src="https://randomuser.me/api/portraits/men/32.jpg" 
                       alt="John D." 
                       className="w-full h-full object-cover"
                     />
@@ -1031,7 +1057,7 @@ const Landing = () => {
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 rounded-full overflow-hidden mr-4">
                     <img 
-                      src="/customers/ahmed.jpg" 
+                      src="https://randomuser.me/api/portraits/men/42.jpg" 
                       alt="Ahmed M." 
                       className="w-full h-full object-cover"
                     />
@@ -1060,7 +1086,7 @@ const Landing = () => {
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 rounded-full overflow-hidden mr-4">
                     <img 
-                      src="/customers/alex.jpg" 
+                      src="https://randomuser.me/api/portraits/men/22.jpg" 
                       alt="Alex T." 
                       className="w-full h-full object-cover"
                     />
@@ -1087,7 +1113,7 @@ const Landing = () => {
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 rounded-full overflow-hidden mr-4">
                     <img 
-                      src="/customers/priya.jpg" 
+                      src="https://randomuser.me/api/portraits/women/22.jpg" 
                       alt="Priya K." 
                       className="w-full h-full object-cover"
                     />
@@ -1114,7 +1140,7 @@ const Landing = () => {
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 rounded-full overflow-hidden mr-4">
                     <img 
-                      src="/customers/david.jpg" 
+                      src="https://randomuser.me/api/portraits/men/52.jpg" 
                       alt="David H." 
                       className="w-full h-full object-cover"
                     />
@@ -1138,7 +1164,7 @@ const Landing = () => {
           </div>
           
           <div className="text-center mt-10">
-            <Button className="bg-emerald-500 hover:bg-emerald-600 text-white px-6">
+            <Button className="bg-green-500 hover:bg-green-600 text-white px-8 py-2">
               Get Started
             </Button>
           </div>
