@@ -15,8 +15,8 @@ const StartExploring = () => {
   ];
 
   return (
-    <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
-      <div className="flex items-center justify-between mb-6 p-6">
+    <div className="bg-white rounded-lg shadow hover:shadow-md transition-all duration-300">
+      <div className="flex items-center justify-between mb-6 p-6 pl-8">
         <h2 className="text-2xl font-bold text-gray-800">Start exploring now</h2>
         <Button variant="ghost" size="sm" className="text-primary flex items-center group">
           View All
@@ -26,14 +26,19 @@ const StartExploring = () => {
       
       <div className="grid grid-cols-3 md:grid-cols-6 gap-4 p-6">
         {categories.map((category) => (
-          <Link 
+          <motion.div
             key={category.name}
-            to={category.path}
-            className="flex flex-col items-center p-4 bg-white hover:bg-gray-50 rounded-lg transition-all duration-300 border border-gray-100 shadow-sm hover:shadow-md transform hover:-translate-y-1"
+            whileHover={{ y: -5 }}
+            transition={{ type: 'spring', stiffness: 300 }}
           >
-            <span className="text-4xl mb-3">{category.icon}</span>
-            <span className="text-sm font-medium text-gray-800 text-center">{category.name}</span>
-          </Link>
+            <Link 
+              to={category.path}
+              className="flex flex-col items-center p-4 bg-white hover:bg-gray-50 rounded-lg transition-all duration-300 border border-gray-100 shadow hover:shadow-md"
+            >
+              <span className="text-4xl mb-3">{category.icon}</span>
+              <span className="text-sm font-medium text-gray-800 text-center">{category.name}</span>
+            </Link>
+          </motion.div>
         ))}
       </div>
     </div>

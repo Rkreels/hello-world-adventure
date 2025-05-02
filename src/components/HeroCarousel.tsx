@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface CarouselItem {
   id: number;
@@ -71,36 +72,48 @@ const HeroCarousel = () => {
   };
 
   return (
-    <div className="relative bg-gradient-to-r from-black/70 to-black/50 h-[500px] md:h-[550px] overflow-hidden">
-      {carouselItems.map((item, index) => (
-        <div 
-          key={item.id} 
-          className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-            currentSlide === index ? 'opacity-100 z-10' : 'opacity-0 z-0'
-          }`}
-        >
-          <div className="container mx-auto px-4 h-full flex items-center relative z-10">
-            <div className="max-w-xl text-white">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
-                {item.title}
-              </h1>
-              <p className="text-xl md:text-2xl font-medium mb-8 text-white/90">
-                {item.subtitle}
-              </p>
-              <Button className="bg-white text-gray-800 hover:bg-gray-100 px-8 py-6 text-lg rounded-md shadow-lg">
-                <Link to={item.buttonLink}>{item.buttonText}</Link>
-              </Button>
+    <div className="relative bg-gradient-to-r from-black/70 to-black/50 h-[425px] md:h-[475px] overflow-hidden">
+      <AnimatePresence mode="wait">
+        {carouselItems.map((item, index) => (
+          <motion.div 
+            key={item.id} 
+            initial={{ opacity: 0 }}
+            animate={{ 
+              opacity: currentSlide === index ? 1 : 0,
+              zIndex: currentSlide === index ? 10 : 0
+            }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.7 }}
+            className="absolute inset-0"
+          >
+            <div className="container mx-auto px-6 h-full flex items-center relative z-10">
+              <motion.div 
+                className="max-w-xl text-white pl-4"
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.5 }}
+              >
+                <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
+                  {item.title}
+                </h1>
+                <p className="text-xl md:text-2xl font-medium mb-8 text-white/90">
+                  {item.subtitle}
+                </p>
+                <Button className="bg-white text-gray-800 hover:bg-gray-100 px-8 py-6 text-lg rounded-md shadow-lg">
+                  <Link to={item.buttonLink}>{item.buttonText}</Link>
+                </Button>
+              </motion.div>
             </div>
-          </div>
-          <div className="absolute inset-0 z-0">
-            <img 
-              src={item.image}
-              alt={item.title}
-              className="w-full h-full object-cover opacity-50"
-            />
-          </div>
-        </div>
-      ))}
+            <div className="absolute inset-0 z-0">
+              <img 
+                src={item.image}
+                alt={item.title}
+                className="w-full h-full object-cover opacity-50"
+              />
+            </div>
+          </motion.div>
+        ))}
+      </AnimatePresence>
       
       {/* Carousel Controls */}
       <Button 
@@ -121,7 +134,7 @@ const HeroCarousel = () => {
       </Button>
 
       {/* Indicators - moved up significantly */}
-      <div className="absolute bottom-32 left-0 right-0 flex justify-center space-x-2 z-20">
+      <div className="absolute bottom-24 left-0 right-0 flex justify-center space-x-2 z-20">
         {carouselItems.map((_, index) => (
           <button
             key={index}
