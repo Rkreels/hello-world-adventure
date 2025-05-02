@@ -1,15 +1,25 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Edit, Plus, Search, Trash } from 'lucide-react';
+import { Search, Plus } from 'lucide-react';
+import CategoryCard from '@/components/admin/categories/CategoryCard';
+import CategoryTable from '@/components/admin/categories/CategoryTable';
+import CategoryForm from '@/components/admin/categories/CategoryForm';
+
+interface Category {
+  id: number;
+  name: string;
+  description: string;
+  image: string;
+  createdAt: string;
+  products: number;
+}
 
 const Categories = () => {
-  const [categories, setCategories] = useState([
+  const [categories, setCategories] = useState<Category[]>([
     { 
       id: 1, 
       name: 'Electronics', 
@@ -55,7 +65,7 @@ const Categories = () => {
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [currentCategory, setCurrentCategory] = useState(null);
+  const [currentCategory, setCurrentCategory] = useState<Category | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   
   const [formData, setFormData] = useState({
@@ -64,7 +74,7 @@ const Categories = () => {
     image: ''
   });
   
-  const handleSearch = (e) => {
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
   
@@ -88,7 +98,7 @@ const Categories = () => {
     setOpenAddDialog(false);
   };
   
-  const handleEditClick = (category) => {
+  const handleEditClick = (category: Category) => {
     setCurrentCategory(category);
     setFormData({
       name: category.name,
@@ -99,6 +109,8 @@ const Categories = () => {
   };
   
   const handleEditCategory = () => {
+    if (!currentCategory) return;
+    
     const updatedCategories = categories.map(cat => 
       cat.id === currentCategory.id 
         ? { 
@@ -115,12 +127,14 @@ const Categories = () => {
     setOpenEditDialog(false);
   };
   
-  const handleDeleteClick = (category) => {
+  const handleDeleteClick = (category: Category) => {
     setCurrentCategory(category);
     setOpenDeleteDialog(true);
   };
   
   const handleDeleteCategory = () => {
+    if (!currentCategory) return;
+    
     const updatedCategories = categories.filter(cat => cat.id !== currentCategory.id);
     setCategories(updatedCategories);
     setOpenDeleteDialog(false);
@@ -157,42 +171,13 @@ const Categories = () => {
                 </DialogDescription>
               </DialogHeader>
               
-              <div className="space-y-4 py-4">
-                <div className="grid w-full items-center gap-2">
-                  <Label htmlFor="name">Category Name</Label>
-                  <Input 
-                    id="name" 
-                    placeholder="E.g., Electronics, Fashion" 
-                    value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  />
-                </div>
-                
-                <div className="grid w-full items-center gap-2">
-                  <Label htmlFor="description">Description</Label>
-                  <Input 
-                    id="description" 
-                    placeholder="Brief description of the category" 
-                    value={formData.description}
-                    onChange={(e) => setFormData({...formData, description: e.target.value})}
-                  />
-                </div>
-                
-                <div className="grid w-full items-center gap-2">
-                  <Label htmlFor="image">Image URL</Label>
-                  <Input 
-                    id="image" 
-                    placeholder="https://example.com/image.jpg" 
-                    value={formData.image}
-                    onChange={(e) => setFormData({...formData, image: e.target.value})}
-                  />
-                </div>
-              </div>
-              
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setOpenAddDialog(false)}>Cancel</Button>
-                <Button onClick={handleAddCategory}>Add Category</Button>
-              </DialogFooter>
+              <CategoryForm 
+                formData={formData}
+                setFormData={setFormData}
+                onSave={handleAddCategory}
+                onCancel={() => setOpenAddDialog(false)}
+                submitLabel="Add Category"
+              />
             </DialogContent>
           </Dialog>
         </div>
@@ -200,45 +185,12 @@ const Categories = () => {
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
         {filteredCategories.map((category) => (
-          <Card key={category.id}>
-            <CardContent className="p-0">
-              <div className="h-40 overflow-hidden">
-                <img 
-                  src={category.image} 
-                  alt={category.name} 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </CardContent>
-            <CardHeader>
-              <CardTitle>{category.name}</CardTitle>
-              <CardDescription>{category.description}</CardDescription>
-            </CardHeader>
-            <CardFooter className="flex justify-between">
-              <div className="text-sm text-gray-500">
-                {category.products} products
-              </div>
-              <div className="flex space-x-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => handleEditClick(category)}
-                >
-                  <Edit className="h-4 w-4 mr-1" />
-                  Edit
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="text-red-500"
-                  onClick={() => handleDeleteClick(category)}
-                >
-                  <Trash className="h-4 w-4 mr-1" />
-                  Delete
-                </Button>
-              </div>
-            </CardFooter>
-          </Card>
+          <CategoryCard 
+            key={category.id}
+            category={category}
+            onEdit={handleEditClick}
+            onDelete={handleDeleteClick}
+          />
         ))}
       </div>
       
@@ -250,48 +202,11 @@ const Categories = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>ID</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Products</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredCategories.map((category) => (
-                <TableRow key={category.id}>
-                  <TableCell>{category.id}</TableCell>
-                  <TableCell className="font-medium">{category.name}</TableCell>
-                  <TableCell>{category.description}</TableCell>
-                  <TableCell>{category.products}</TableCell>
-                  <TableCell>{category.createdAt}</TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={() => handleEditClick(category)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="text-red-500"
-                        onClick={() => handleDeleteClick(category)}
-                      >
-                        <Trash className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <CategoryTable 
+            categories={filteredCategories}
+            onEdit={handleEditClick}
+            onDelete={handleDeleteClick}
+          />
         </CardContent>
       </Card>
       
@@ -305,39 +220,13 @@ const Categories = () => {
             </DialogDescription>
           </DialogHeader>
           
-          <div className="space-y-4 py-4">
-            <div className="grid w-full items-center gap-2">
-              <Label htmlFor="edit-name">Category Name</Label>
-              <Input 
-                id="edit-name" 
-                value={formData.name}
-                onChange={(e) => setFormData({...formData, name: e.target.value})}
-              />
-            </div>
-            
-            <div className="grid w-full items-center gap-2">
-              <Label htmlFor="edit-description">Description</Label>
-              <Input 
-                id="edit-description" 
-                value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
-              />
-            </div>
-            
-            <div className="grid w-full items-center gap-2">
-              <Label htmlFor="edit-image">Image URL</Label>
-              <Input 
-                id="edit-image" 
-                value={formData.image}
-                onChange={(e) => setFormData({...formData, image: e.target.value})}
-              />
-            </div>
-          </div>
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setOpenEditDialog(false)}>Cancel</Button>
-            <Button onClick={handleEditCategory}>Save Changes</Button>
-          </DialogFooter>
+          <CategoryForm 
+            formData={formData}
+            setFormData={setFormData}
+            onSave={handleEditCategory}
+            onCancel={() => setOpenEditDialog(false)}
+            submitLabel="Save Changes"
+          />
         </DialogContent>
       </Dialog>
       
@@ -351,10 +240,10 @@ const Categories = () => {
             </DialogDescription>
           </DialogHeader>
           
-          <DialogFooter>
+          <div className="flex justify-end space-x-2 mt-4">
             <Button variant="outline" onClick={() => setOpenDeleteDialog(false)}>Cancel</Button>
             <Button variant="destructive" onClick={handleDeleteCategory}>Delete</Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

@@ -2,13 +2,26 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ChevronLeft, ChevronRight, Filter, Search, Star, Check, X } from 'lucide-react';
+import { Filter, Search } from 'lucide-react';
+import ReviewsTable from '@/components/admin/reviews/ReviewsTable';
+import ReviewPagination from '@/components/admin/reviews/ReviewPagination';
+
+interface Review {
+  id: number;
+  customer: string;
+  product: string;
+  review: string;
+  rating: number;
+  date: string;
+  status: string;
+}
 
 const ProductReviews = () => {
   const [activeTab, setActiveTab] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
   
-  const reviews = [
+  const reviews: Review[] = [
     { 
       id: 1, 
       customer: 'John Doe', 
@@ -64,15 +77,24 @@ const ProductReviews = () => {
       status: 'Pending'
     },
   ];
+  
+  // Filter reviews based on active tab
+  const filteredReviews = activeTab === 'all' 
+    ? reviews
+    : reviews.filter(review => review.status.toLowerCase() === activeTab);
 
-  // Render stars based on rating
-  const renderStars = (rating) => {
-    return Array(5).fill(0).map((_, index) => (
-      <Star 
-        key={index} 
-        className={`h-4 w-4 ${index < rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} 
-      />
-    ));
+  const handleApproveReview = (reviewId: number) => {
+    // In a real application, this would update the review status
+    console.log(`Approving review ${reviewId}`);
+  };
+  
+  const handleRejectReview = (reviewId: number) => {
+    // In a real application, this would update the review status
+    console.log(`Rejecting review ${reviewId}`);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
   return (
@@ -117,6 +139,8 @@ const ProductReviews = () => {
                 type="text"
                 placeholder="Search reviews"
                 className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-primary"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
             <Button variant="ghost" size="sm">
@@ -126,81 +150,18 @@ const ProductReviews = () => {
           </div>
           
           {/* Table */}
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Customer</TableHead>
-                <TableHead>Product</TableHead>
-                <TableHead>Review</TableHead>
-                <TableHead>Rating</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {reviews.map((review) => (
-                <TableRow key={review.id}>
-                  <TableCell className="font-medium">{review.customer}</TableCell>
-                  <TableCell>{review.product}</TableCell>
-                  <TableCell>
-                    <div className="max-w-xs truncate">{review.review}</div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex">{renderStars(review.rating)}</div>
-                  </TableCell>
-                  <TableCell>{review.date}</TableCell>
-                  <TableCell>
-                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${
-                      review.status === 'Published' 
-                        ? 'bg-green-100 text-green-800' 
-                        : review.status === 'Pending'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-red-100 text-red-800'
-                    }`}>
-                      <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
-                        review.status === 'Published' 
-                          ? 'bg-green-600' 
-                          : review.status === 'Pending'
-                            ? 'bg-yellow-600'
-                            : 'bg-red-600'
-                      }`}></span>
-                      {review.status}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="sm" className="text-green-500">
-                      <Check className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm" className="text-red-500">
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <ReviewsTable 
+            reviews={filteredReviews}
+            onApprove={handleApproveReview}
+            onReject={handleRejectReview}
+          />
           
           {/* Pagination */}
-          <div className="flex items-center justify-between mt-6">
-            <Button variant="outline" size="sm" className="flex items-center">
-              <ChevronLeft className="h-4 w-4 mr-1" />
-              Previous
-            </Button>
-            <div className="flex items-center space-x-1">
-              <Button variant="outline" size="sm" className="bg-emerald-50 text-emerald-600 border-emerald-200">1</Button>
-              <Button variant="ghost" size="sm">2</Button>
-              <Button variant="ghost" size="sm">3</Button>
-              <Button variant="ghost" size="sm">4</Button>
-              <Button variant="ghost" size="sm">5</Button>
-              <span>.....</span>
-              <Button variant="ghost" size="sm">24</Button>
-            </div>
-            <Button variant="outline" size="sm" className="flex items-center">
-              Next
-              <ChevronRight className="h-4 w-4 ml-1" />
-            </Button>
-          </div>
+          <ReviewPagination 
+            currentPage={currentPage} 
+            totalPages={24} 
+            onPageChange={handlePageChange} 
+          />
         </CardContent>
       </Card>
     </div>

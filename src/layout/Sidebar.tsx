@@ -1,4 +1,5 @@
 
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   Home, 
@@ -12,7 +13,8 @@ import {
   List, 
   FileText,
   Settings, 
-  Shield
+  Shield,
+  ChevronDown
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -20,10 +22,23 @@ interface SidebarProps {
   collapsed?: boolean;
 }
 
+interface MenuItem {
+  name: string;
+  icon: React.ElementType;
+  path: string;
+  submenu?: MenuItem[];
+}
+
+interface MenuSection {
+  section: string;
+  items: MenuItem[];
+}
+
 const Sidebar = ({ collapsed = false }: SidebarProps) => {
   const location = useLocation();
+  const [expandedSections, setExpandedSections] = useState<string[]>(['Main menu', 'Product']);
   
-  const menuItems = [
+  const menuItems: MenuSection[] = [
     { section: 'Main menu', items: [
       { name: 'Dashboard', icon: Home, path: '/admin/dashboard' },
       { name: 'Order Management', icon: ShoppingCart, path: '/admin/orders' },
@@ -53,6 +68,18 @@ const Sidebar = ({ collapsed = false }: SidebarProps) => {
   const isActiveLink = (path: string) => {
     return location.pathname === path;
   };
+  
+  const toggleSection = (section: string) => {
+    setExpandedSections(prev => 
+      prev.includes(section) 
+        ? prev.filter(s => s !== section) 
+        : [...prev, section]
+    );
+  };
+  
+  const isSectionExpanded = (section: string) => {
+    return expandedSections.includes(section);
+  };
 
   return (
     <div className={cn(
@@ -69,27 +96,41 @@ const Sidebar = ({ collapsed = false }: SidebarProps) => {
         {menuItems.map((section, idx) => (
           <div key={idx} className="mt-4">
             {!collapsed && (
-              <h2 className="px-4 text-xs font-semibold text-gray-500">{section.section}</h2>
+              <div 
+                className="px-4 py-1 flex justify-between items-center cursor-pointer group"
+                onClick={() => toggleSection(section.section)}
+              >
+                <h2 className="text-xs font-semibold text-gray-500">{section.section}</h2>
+                <ChevronDown className={cn(
+                  "h-4 w-4 text-gray-400 transition-transform duration-200",
+                  isSectionExpanded(section.section) ? "transform rotate-180" : ""
+                )} />
+              </div>
             )}
-            <ul className="mt-2">
-              {section.items.map((item, itemIdx) => (
-                <li key={itemIdx}>
-                  <Link
-                    to={item.path}
-                    className={cn(
-                      "flex items-center px-4 py-2 text-gray-600 hover:bg-gray-50",
-                      isActiveLink(item.path) && "bg-gray-50 text-emerald-600 font-medium"
-                    )}
-                  >
-                    <item.icon className={cn(
-                      "w-5 h-5 mr-3",
-                      isActiveLink(item.path) && "text-emerald-600"
-                    )} />
-                    {!collapsed && <span>{item.name}</span>}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            {(collapsed || isSectionExpanded(section.section)) && (
+              <ul className={cn(
+                "mt-1",
+                collapsed ? "" : "animate-accordion-down transition-all duration-300"
+              )}>
+                {section.items.map((item, itemIdx) => (
+                  <li key={itemIdx}>
+                    <Link
+                      to={item.path}
+                      className={cn(
+                        "flex items-center px-4 py-2 text-gray-600 hover:bg-gray-50",
+                        isActiveLink(item.path) && "bg-gray-50 text-emerald-600 font-medium"
+                      )}
+                    >
+                      <item.icon className={cn(
+                        "w-5 h-5 mr-3",
+                        isActiveLink(item.path) && "text-emerald-600"
+                      )} />
+                      {!collapsed && <span>{item.name}</span>}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         ))}
       </div>

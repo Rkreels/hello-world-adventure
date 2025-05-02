@@ -1,6 +1,6 @@
 
-import { useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { Search, Sun, ChevronLeft, LogOut } from 'lucide-react';
 import Sidebar from './Sidebar';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,21 @@ const AdminLayout = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Persist sidebar state in localStorage
+  useEffect(() => {
+    const savedState = localStorage.getItem('sidebarCollapsed');
+    if (savedState) {
+      setSidebarCollapsed(JSON.parse(savedState));
+    }
+  }, []);
+
+  const toggleSidebar = () => {
+    const newState = !sidebarCollapsed;
+    setSidebarCollapsed(newState);
+    localStorage.setItem('sidebarCollapsed', JSON.stringify(newState));
+  };
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,6 +46,27 @@ const AdminLayout = () => {
       navigate(`/admin/search?q=${encodeURIComponent(searchQuery)}`);
     }
   };
+
+  // Update document title based on current route
+  useEffect(() => {
+    const path = location.pathname;
+    let title = "Dashboard";
+    
+    if (path.includes('/admin/orders')) title = "Order Management";
+    else if (path.includes('/admin/customers')) title = "Customers";
+    else if (path.includes('/admin/coupons')) title = "Coupon Code";
+    else if (path.includes('/admin/categories')) title = "Categories";
+    else if (path.includes('/admin/transactions')) title = "Transactions";
+    else if (path.includes('/admin/brands')) title = "Brands";
+    else if (path.includes('/admin/products/add')) title = "Add Products";
+    else if (path.includes('/admin/products/media')) title = "Product Media";
+    else if (path.includes('/admin/products/list')) title = "Product List";
+    else if (path.includes('/admin/products/reviews')) title = "Product Reviews";
+    else if (path.includes('/admin/role')) title = "Admin Role";
+    else if (path.includes('/admin/authority')) title = "Control Authority";
+    
+    document.title = `Admin | ${title}`;
+  }, [location]);
   
   return (
     <div className="flex h-screen">
@@ -43,7 +79,7 @@ const AdminLayout = () => {
               variant="ghost" 
               size="sm" 
               className="mr-2 text-gray-500"
-              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              onClick={toggleSidebar}
             >
               <ChevronLeft className={`h-5 w-5 transition-transform ${sidebarCollapsed ? 'rotate-180' : ''}`} />
             </Button>
@@ -64,7 +100,14 @@ const AdminLayout = () => {
           
           <div className="flex items-center space-x-3">
             <NotificationsDropdown />
-            <Button variant="ghost" size="sm">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => {
+                document.documentElement.classList.toggle('dark');
+                toast.success('Theme toggled');
+              }}
+            >
               <Sun className="h-5 w-5" />
             </Button>
             
