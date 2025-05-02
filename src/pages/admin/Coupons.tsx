@@ -1,37 +1,110 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, Plus, Edit, Trash } from 'lucide-react';
+import { Search, Plus, Edit, Trash, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { Coupon } from '@/types/coupon';
+import { couponService } from '@/services/couponService';
+import CouponDialog from '@/components/admin/coupons/CouponDialog';
+import DeleteCouponConfirm from '@/components/admin/coupons/DeleteCouponConfirm';
 
 const Coupons = () => {
+  const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedCoupon, setSelectedCoupon] = useState<Coupon | undefined>(undefined);
+  const [filteredCoupons, setFilteredCoupons] = useState<Coupon[]>([]);
   
-  const coupons = [
-    { id: 1, code: 'SUMMER25', discount: '25%', type: 'Percentage', validity: '2025-06-30', status: 'Active' },
-    { id: 2, code: 'FREESHIP', discount: '$15', type: 'Fixed Amount', validity: '2025-05-15', status: 'Active' },
-    { id: 3, code: 'WELCOME10', discount: '10%', type: 'Percentage', validity: '2025-12-31', status: 'Active' },
-    { id: 4, code: 'FLASH50', discount: '50%', type: 'Percentage', validity: '2025-04-30', status: 'Expired' },
-    { id: 5, code: 'LOYALTY20', discount: '20%', type: 'Percentage', validity: '2025-08-15', status: 'Active' },
-  ];
+  // Fetch coupons on load
+  useEffect(() => {
+    fetchCoupons();
+  }, []);
   
-  const handleEdit = (id: number) => {
-    toast.success(`Edit coupon with ID: ${id}`);
-  };
+  // Apply search filter
+  useEffect(() => {
+    if (searchQuery.trim() === '') {
+      setFilteredCoupons(coupons);
+    } else {
+      const filtered = coupons.filter(coupon => 
+        coupon.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        coupon.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        coupon.status.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredCoupons(filtered);
+    }
+  }, [searchQuery, coupons]);
   
-  const handleDelete = (id: number) => {
-    toast.error(`Delete coupon with ID: ${id}`);
+  const fetchCoupons = async () => {
+    setIsLoading(true);
+    try {
+      const data = await couponService.getAllCoupons();
+      setCoupons(data);
+      setFilteredCoupons(data);
+    } catch (error) {
+      console.error('Failed to fetch coupons:', error);
+      toast.error('Failed to load coupons');
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   const handleAddCoupon = () => {
-    toast.success("Add new coupon clicked");
+    setSelectedCoupon(undefined);
+    setIsDialogOpen(true);
+  };
+  
+  const handleEditCoupon = (coupon: Coupon) => {
+    setSelectedCoupon(coupon);
+    setIsDialogOpen(true);
+  };
+  
+  const handleDeleteCoupon = (coupon: Coupon) => {
+    setSelectedCoupon(coupon);
+    setIsDeleteDialogOpen(true);
+  };
+  
+  const handleSubmitCoupon = async (data: any) => {
+    try {
+      if (selectedCoupon) {
+        // Update existing coupon
+        await couponService.updateCoupon(selectedCoupon.id, data);
+        toast.success(`Coupon ${data.code} updated successfully`);
+      } else {
+        // Create new coupon
+        await couponService.createCoupon(data);
+        toast.success(`Coupon ${data.code} created successfully`);
+      }
+      setIsDialogOpen(false);
+      fetchCoupons();
+    } catch (error) {
+      console.error('Error saving coupon:', error);
+      toast.error(`Failed to ${selectedCoupon ? 'update' : 'create'} coupon`);
+    }
+  };
+  
+  const confirmDelete = async () => {
+    if (!selectedCoupon) return;
+    
+    try {
+      await couponService.deleteCoupon(selectedCoupon.id);
+      toast.success(`Coupon ${selectedCoupon.code} deleted successfully`);
+      setIsDeleteDialogOpen(false);
+      fetchCoupons();
+    } catch (error) {
+      console.error('Error deleting coupon:', error);
+      toast.error('Failed to delete coupon');
+    }
   };
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    toast.info(`Searching for: ${searchQuery}`);
+    if (searchQuery.trim()) {
+      // Could implement additional search logic here if needed
+    }
   };
 
   return (
@@ -64,58 +137,96 @@ const Coupons = () => {
             </form>
           </div>
           
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Coupon Code</TableHead>
-                <TableHead>Discount</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Valid Until</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {coupons.map((coupon) => (
-                <TableRow key={coupon.id}>
-                  <TableCell className="font-medium">{coupon.code}</TableCell>
-                  <TableCell>{coupon.discount}</TableCell>
-                  <TableCell>{coupon.type}</TableCell>
-                  <TableCell>{coupon.validity}</TableCell>
-                  <TableCell>
-                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${
-                      coupon.status === 'Active' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
-                        coupon.status === 'Active' ? 'bg-green-600' : 'bg-red-600'
-                      }`}></span>
-                      {coupon.status}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => handleEdit(coupon.id)}
-                    >
-                      <Edit className="h-4 w-4 text-blue-500" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => handleDelete(coupon.id)}
-                    >
-                      <Trash className="h-4 w-4 text-red-500" />
-                    </Button>
-                  </TableCell>
+          {isLoading ? (
+            <div className="flex justify-center items-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Coupon Code</TableHead>
+                  <TableHead>Discount</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Valid Until</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredCoupons.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+                      {searchQuery ? 'No coupons match your search' : 'No coupons available'}
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredCoupons.map((coupon) => (
+                    <TableRow key={coupon.id}>
+                      <TableCell className="font-medium">{coupon.code}</TableCell>
+                      <TableCell>{coupon.discount}</TableCell>
+                      <TableCell>{coupon.type}</TableCell>
+                      <TableCell>{coupon.validity}</TableCell>
+                      <TableCell>
+                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${
+                          coupon.status === 'Active' 
+                            ? 'bg-green-100 text-green-800' 
+                            : coupon.status === 'Upcoming'
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'bg-red-100 text-red-800'
+                        }`}>
+                          <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
+                            coupon.status === 'Active' 
+                              ? 'bg-green-600' 
+                              : coupon.status === 'Upcoming'
+                                ? 'bg-blue-600'
+                                : 'bg-red-600'
+                          }`}></span>
+                          {coupon.status}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => handleEditCoupon(coupon)}
+                        >
+                          <Edit className="h-4 w-4 text-blue-500" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => handleDeleteCoupon(coupon)}
+                        >
+                          <Trash className="h-4 w-4 text-red-500" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
+      
+      {/* Add/Edit Coupon Dialog */}
+      <CouponDialog 
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        onSubmit={handleSubmitCoupon}
+        coupon={selectedCoupon}
+      />
+      
+      {/* Delete Confirmation Dialog */}
+      {selectedCoupon && (
+        <DeleteCouponConfirm 
+          isOpen={isDeleteDialogOpen}
+          onClose={() => setIsDeleteDialogOpen(false)}
+          onConfirm={confirmDelete}
+          couponCode={selectedCoupon.code}
+        />
+      )}
     </div>
   );
 };
