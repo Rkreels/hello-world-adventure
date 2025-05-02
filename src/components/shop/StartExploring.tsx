@@ -1,45 +1,67 @@
 
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const StartExploring = () => {
-  const categories = [
-    { name: 'Grocery', icon: '🛒', path: '/category/grocery' },
-    { name: 'Home', icon: '🏠', path: '/category/home' },
-    { name: 'Fashion', icon: '👔', path: '/category/fashion' },
-    { name: 'Electronics', icon: '📱', path: '/category/electronics' },
-    { name: 'Toys', icon: '🧸', path: '/category/toys' },
-    { name: 'Gifts', icon: '🎁', path: '/category/gifts' },
-  ];
-
   return (
-    <div className="bg-white rounded-lg shadow hover:shadow-md transition-all duration-300">
-      <div className="flex items-center justify-between mb-6 p-6 pl-8">
-        <h2 className="text-2xl font-bold text-gray-800">Start exploring now</h2>
-        <Button variant="ghost" size="sm" className="text-primary flex items-center group">
-          View All
-          <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-        </Button>
+    <div className="bg-white rounded-md shadow hover:shadow-md transition-all duration-300">
+      <div className="flex items-center justify-between mb-2 p-4">
+        <h2 className="text-lg font-medium text-gray-800">Gaming accessories</h2>
+        <Link to="/category/accessories" className="text-blue-600 text-sm hover:underline">
+          See more
+        </Link>
       </div>
       
-      <div className="grid grid-cols-3 md:grid-cols-6 gap-4 p-6">
-        {categories.map((category) => (
-          <motion.div
-            key={category.name}
-            whileHover={{ y: -5 }}
-            transition={{ type: 'spring', stiffness: 300 }}
-          >
-            <Link 
-              to={category.path}
-              className="flex flex-col items-center p-4 bg-white hover:bg-gray-50 rounded-lg transition-all duration-300 border border-gray-100 shadow hover:shadow-md"
-            >
-              <span className="text-4xl mb-3">{category.icon}</span>
-              <span className="text-sm font-medium text-gray-800 text-center">{category.name}</span>
-            </Link>
-          </motion.div>
-        ))}
+      <div className="grid grid-cols-2 gap-4 p-4">
+        <div className="group">
+          <div className="bg-gray-50 p-2 rounded-md flex flex-col items-center">
+            <div className="h-32 mb-1 overflow-hidden flex items-center justify-center">
+              <img 
+                src="https://images.unsplash.com/photo-1615655406736-b37c4fabf923?q=80&w=2070&auto=format&fit=crop" 
+                alt="Headset" 
+                className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+            <span className="text-xs font-medium text-gray-800">Headsets</span>
+          </div>
+        </div>
+        <div className="group">
+          <div className="bg-gray-50 p-2 rounded-md flex flex-col items-center">
+            <div className="h-32 mb-1 overflow-hidden flex items-center justify-center">
+              <img 
+                src="https://images.unsplash.com/photo-1623820919239-0d0ff10797a1?q=80&w=2070&auto=format&fit=crop" 
+                alt="Mouse" 
+                className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+            <span className="text-xs font-medium text-gray-800">Mouse</span>
+          </div>
+        </div>
+        <div className="group">
+          <div className="bg-gray-50 p-2 rounded-md flex flex-col items-center">
+            <div className="h-32 mb-1 overflow-hidden flex items-center justify-center">
+              <img 
+                src="https://images.unsplash.com/photo-1606318801954-d46d46d3360a?q=80&w=2070&auto=format&fit=crop" 
+                alt="Controller" 
+                className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+            <span className="text-xs font-medium text-gray-800">Controller</span>
+          </div>
+        </div>
+        <div className="group">
+          <div className="bg-gray-50 p-2 rounded-md flex flex-col items-center">
+            <div className="h-32 mb-1 overflow-hidden flex items-center justify-center">
+              <img 
+                src="https://images.unsplash.com/photo-1598550476439-6847785fcea6?q=80&w=2070&auto=format&fit=crop" 
+                alt="Chair" 
+                className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+            <span className="text-xs font-medium text-gray-800">Chair</span>
+          </div>
+        </div>
       </div>
     </div>
   );

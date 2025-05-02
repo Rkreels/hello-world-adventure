@@ -4,24 +4,20 @@ import { motion } from 'framer-motion';
 
 const CategoryBanners = () => {
   return (
-    <div className="container mx-auto px-6 py-4">
-      <div className="pl-2 mb-6">
-        <h2 className="text-2xl font-semibold text-gray-800">Popular Categories</h2>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+    <div className="container mx-auto px-6 max-w-7xl">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
         <motion.div
           whileHover={{ scale: 1.02 }}
           transition={{ duration: 0.3 }}
         >
-          <Link to="/category/clothing" className="relative h-32 rounded-md overflow-hidden group block shadow hover:shadow-md">
+          <Link to="/category/trousers" className="relative h-32 rounded-md overflow-hidden group block shadow hover:shadow-md">
             <img 
-              src="https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?q=80&w=2070&auto=format&fit=crop" 
-              alt="Clothing" 
+              src="https://images.unsplash.com/photo-1566207474742-de921626a54d?q=80&w=2070&auto=format&fit=crop" 
+              alt="Trousers" 
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
             <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-              <span className="text-white font-medium text-lg">CLOTHING</span>
+              <span className="text-white font-medium text-lg">TROUSERS FASHION</span>
             </div>
           </Link>
         </motion.div>
@@ -30,7 +26,7 @@ const CategoryBanners = () => {
           whileHover={{ scale: 1.02 }}
           transition={{ duration: 0.3 }}
         >
-          <Link to="/category/watches" className="relative h-32 rounded-md overflow-hidden group block shadow hover:shadow-md">
+          <Link to="/category/mens" className="relative h-32 rounded-md overflow-hidden group block shadow hover:shadow-md">
             <img 
               src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=2099&auto=format&fit=crop" 
               alt="Men's Fashion" 

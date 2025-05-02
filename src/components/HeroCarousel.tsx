@@ -17,7 +17,7 @@ interface CarouselItem {
 const carouselItems: CarouselItem[] = [
   {
     id: 1,
-    title: "Discover the Latest Deals",
+    title: "Discover the Latest Deals –",
     subtitle: "Up to 50% Off!",
     image: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=2070&auto=format&fit=crop",
     buttonText: "Shop Now",
@@ -72,7 +72,7 @@ const HeroCarousel = () => {
   };
 
   return (
-    <div className="relative bg-gradient-to-r from-black/70 to-black/50 h-[425px] md:h-[475px] overflow-hidden">
+    <div className="relative bg-[#003742] h-[400px] md:h-[450px] overflow-hidden">
       <AnimatePresence mode="wait">
         {carouselItems.map((item, index) => (
           <motion.div 
@@ -86,20 +86,20 @@ const HeroCarousel = () => {
             transition={{ duration: 0.7 }}
             className="absolute inset-0"
           >
-            <div className="container mx-auto px-6 h-full flex items-center relative z-10">
+            <div className="container mx-auto px-6 h-full flex items-center relative z-10 max-w-7xl">
               <motion.div 
-                className="max-w-xl text-white pl-4"
+                className="max-w-lg text-white pl-12"
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.3, duration: 0.5 }}
               >
-                <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
+                <h1 className="text-3xl md:text-4xl font-medium mb-2 leading-tight">
                   {item.title}
                 </h1>
-                <p className="text-xl md:text-2xl font-medium mb-8 text-white/90">
+                <p className="text-3xl md:text-5xl font-bold mb-8 text-white">
                   {item.subtitle}
                 </p>
-                <Button className="bg-white text-gray-800 hover:bg-gray-100 px-8 py-6 text-lg rounded-md shadow-lg">
+                <Button className="bg-white text-gray-800 hover:bg-gray-100 px-8 py-5 text-base rounded-md">
                   <Link to={item.buttonLink}>{item.buttonText}</Link>
                 </Button>
               </motion.div>
@@ -120,31 +120,18 @@ const HeroCarousel = () => {
         variant="outline" 
         size="icon" 
         onClick={prevSlide}
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white rounded-full w-12 h-12 z-20"
+        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white rounded-full w-10 h-10 z-20 flex items-center justify-center p-0"
       >
-        <ChevronLeft className="h-6 w-6" />
+        <ChevronLeft className="h-5 w-5" />
       </Button>
       <Button 
         variant="outline" 
         size="icon" 
         onClick={nextSlide}
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white rounded-full w-12 h-12 z-20"
+        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white rounded-full w-10 h-10 z-20 flex items-center justify-center p-0"
       >
-        <ChevronRight className="h-6 w-6" />
+        <ChevronRight className="h-5 w-5" />
       </Button>
-
-      {/* Indicators - moved up significantly */}
-      <div className="absolute bottom-24 left-0 right-0 flex justify-center space-x-2 z-20">
-        {carouselItems.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => goToSlide(index)}
-            className={`w-2 h-2 rounded-full transition-all ${
-              currentSlide === index ? 'bg-white w-8' : 'bg-white/50'
-            }`}
-          />
-        ))}
-      </div>
     </div>
   );
 };
