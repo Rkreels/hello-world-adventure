@@ -87,10 +87,10 @@ const routes: RouteObject[] = [
     path: '/',
     element: <ShopLayout />,
     children: [
-      { path: '', element: <Index /> },
+      { path: '', element: <Landing /> },
       { path: 'shop', element: <Shop /> },
-      { path: 'explore', element: <Shop /> }, // New route
-      { path: 'saved', element: <Shop /> }, // New route
+      { path: 'explore', element: <Shop /> },
+      { path: 'saved', element: <Shop /> },
       { path: 'products/:id', element: <ProductDetail /> },
       { path: 'cart', element: <Cart /> },
       { path: 'checkout', element: <Checkout /> },
