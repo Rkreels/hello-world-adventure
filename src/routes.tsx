@@ -26,6 +26,7 @@ import Brands from './pages/admin/Brands';
 
 // Shop pages
 import Landing from './pages/shop/Landing';
+import Index from './pages/Index';
 import Shop from './pages/shop/Shop';
 import ProductDetail from './pages/shop/ProductDetail';
 import Cart from './pages/shop/Cart';
@@ -86,8 +87,10 @@ const routes: RouteObject[] = [
     path: '/',
     element: <ShopLayout />,
     children: [
-      { path: '', element: <Landing /> },
+      { path: '', element: <Index /> },
       { path: 'shop', element: <Shop /> },
+      { path: 'explore', element: <Shop /> }, // New route
+      { path: 'saved', element: <Shop /> }, // New route
       { path: 'products/:id', element: <ProductDetail /> },
       { path: 'cart', element: <Cart /> },
       { path: 'checkout', element: <Checkout /> },

@@ -2,74 +2,187 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ShoppingBag, ChevronRight } from 'lucide-react';
+import { ChevronRight, ChevronLeft } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 
 const Index = () => {
   return (
-    <div className="min-h-[85vh] flex items-center justify-center bg-gradient-to-b from-gray-50 to-white">
-      <div className="text-center px-4 max-w-3xl mx-auto">
-        <div className="flex justify-center mb-6">
-          <div className="flex items-center justify-center h-16 w-16 bg-green-600 rounded-full shadow-lg">
-            <ShoppingBag className="h-8 w-8 text-white" />
-          </div>
-        </div>
-        
-        <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gray-800">Welcome to Dealport Shopping</h1>
-        <p className="text-xl text-gray-600 mb-8">
-          Your one-stop destination for all your shopping needs with amazing deals and exclusive products.
-        </p>
-        
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button asChild size="lg" className="bg-green-600 hover:bg-green-700">
-            <Link to="/shop">Start Shopping</Link>
-          </Button>
-          <Button asChild variant="outline" size="lg" className="gap-1">
-            <Link to="/about">
-              Learn More
-              <ChevronRight className="h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
-        
-        <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6">
-          <div className="flex flex-col items-center">
-            <div className="bg-green-50 rounded-full p-3 mb-3">
-              <svg className="h-6 w-6 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <span className="text-sm font-medium">Fast Delivery</span>
+    <>
+      {/* Hero Banner */}
+      <div className="relative bg-teal-900 text-white">
+        <div className="container mx-auto px-4 py-16 relative">
+          <div className="max-w-xl">
+            <h1 className="text-4xl font-bold mb-4">
+              Discover the Latest Deals – <br />
+              <span className="text-5xl">Up to 50% Off!</span>
+            </h1>
+            <Button asChild className="mt-4 bg-white text-teal-900 hover:bg-gray-100">
+              <Link to="/shop">Shop Now</Link>
+            </Button>
           </div>
           
-          <div className="flex flex-col items-center">
-            <div className="bg-green-50 rounded-full p-3 mb-3">
-              <svg className="h-6 w-6 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <span className="text-sm font-medium">Quality Products</span>
-          </div>
-          
-          <div className="flex flex-col items-center">
-            <div className="bg-green-50 rounded-full p-3 mb-3">
-              <svg className="h-6 w-6 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            </div>
-            <span className="text-sm font-medium">Customer Support</span>
-          </div>
-          
-          <div className="flex flex-col items-center">
-            <div className="bg-green-50 rounded-full p-3 mb-3">
-              <svg className="h-6 w-6 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-              </svg>
-            </div>
-            <span className="text-sm font-medium">Secure Payment</span>
-          </div>
+          {/* Navigation buttons */}
+          <button className="absolute left-4 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 text-black">
+            <ChevronLeft size={24} />
+          </button>
+          <button className="absolute right-4 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 text-black">
+            <ChevronRight size={24} />
+          </button>
         </div>
       </div>
-    </div>
+      
+      {/* Category Cards */}
+      <div className="container mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Fashion Card */}
+        <Card className="overflow-hidden">
+          <CardContent className="p-0">
+            <div className="p-4">
+              <h2 className="text-xl font-bold">New Year! New Fashion</h2>
+            </div>
+            <div className="relative h-64 bg-gray-100">
+              <img 
+                src="/lovable-uploads/01c6fb91-b0da-4976-81df-07a0dacddee3.png"
+                alt="Fashion collection" 
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute bottom-4 left-4">
+                <Button variant="secondary" size="sm" className="bg-white">
+                  Shop Now
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* Gaming Accessories */}
+        <Card className="overflow-hidden md:col-span-2">
+          <CardContent className="p-0">
+            <div className="p-4 flex justify-between items-center">
+              <h2 className="text-xl font-bold">Gaming accessories</h2>
+              <Link to="/category/gaming" className="text-purple-600 text-sm">
+                See more
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 gap-4 p-4">
+              <div className="bg-gray-50 rounded p-4 text-center">
+                <img 
+                  src="https://m.media-amazon.com/images/I/61CGHv6kmWL._AC_UY218_.jpg"
+                  alt="Headsets" 
+                  className="w-full h-32 object-contain mb-2"
+                />
+                <span className="text-sm">Headsets</span>
+              </div>
+              <div className="bg-gray-50 rounded p-4 text-center">
+                <img 
+                  src="https://m.media-amazon.com/images/I/61zpVYX+L9L._AC_UY218_.jpg"
+                  alt="Mouse" 
+                  className="w-full h-32 object-contain mb-2"
+                />
+                <span className="text-sm">Mouse</span>
+              </div>
+              <div className="bg-gray-50 rounded p-4 text-center">
+                <img 
+                  src="https://m.media-amazon.com/images/I/71o8Q5XJS5L._AC_UY218_.jpg"
+                  alt="Controller" 
+                  className="w-full h-32 object-contain mb-2"
+                />
+                <span className="text-sm">Controller</span>
+              </div>
+              <div className="bg-gray-50 rounded p-4 text-center">
+                <img 
+                  src="https://m.media-amazon.com/images/I/71-NXGWfYML._AC_UY218_.jpg"
+                  alt="Chair" 
+                  className="w-full h-32 object-contain mb-2"
+                />
+                <span className="text-sm">Chair</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* Electronics Deals Cards */}
+        <Card className="overflow-hidden">
+          <CardContent className="p-0">
+            <div className="p-4 bg-red-50 relative">
+              <div className="absolute top-0 right-0 bg-red-600 text-white text-xs px-2 py-1 rounded-bl">
+                SAVE $$$
+              </div>
+              <h3 className="font-bold">WIN THE WIFI</h3>
+              <p className="text-red-600 font-semibold mt-1">$1599</p>
+              <p className="text-xs mt-1">Gaming Laptop Deal</p>
+              <Button variant="link" size="sm" className="text-xs mt-1 p-0">
+                More details
+              </Button>
+            </div>
+            <div className="h-32 bg-red-50 flex justify-center">
+              <img 
+                src="https://m.media-amazon.com/images/I/71lPDuOqgKL._AC_UY218_.jpg"
+                alt="Gaming Laptop" 
+                className="h-full object-contain"
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      
+      {/* Product Showcase */}
+      <div className="container mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="md:col-span-1 bg-gray-100 rounded-lg p-6 flex flex-col justify-between">
+          <div>
+            <h3 className="font-bold text-lg">Trousers</h3>
+            <h2 className="text-2xl font-bold mt-1">Fashion!</h2>
+          </div>
+          <img 
+            src="https://images.unsplash.com/photo-1473966968600-fa801b869a1a"
+            alt="Trousers" 
+            className="mt-4 w-full h-48 object-cover rounded"
+          />
+        </div>
+        
+        <div className="md:col-span-1 bg-gray-100 rounded-lg p-6 flex flex-col justify-between">
+          <div>
+            <h2 className="text-xl font-bold">MEN'S FASHION</h2>
+          </div>
+          <img 
+            src="https://images.unsplash.com/photo-1509228627152-72ae9ae6848d"
+            alt="Men's Watch" 
+            className="mt-4 w-full h-48 object-cover rounded"
+          />
+          <Button className="mt-4 bg-gray-800 text-white hover:bg-gray-700 w-full">
+            Shop Now
+          </Button>
+        </div>
+        
+        <div className="md:col-span-1 bg-gray-100 rounded-lg p-6 flex flex-col justify-between">
+          <div>
+            <h2 className="text-2xl font-bold">DENIM</h2>
+          </div>
+          <img 
+            src="https://images.unsplash.com/photo-1542272604-787c3835535d"
+            alt="Denim collection" 
+            className="mt-4 w-full h-48 object-cover rounded"
+          />
+          <Button variant="link" className="mt-4 text-blue-800">
+            See more
+          </Button>
+        </div>
+        
+        <div className="md:col-span-1 bg-gray-100 rounded-lg p-6 flex flex-col justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-700">PHILIPS</h2>
+            <p className="text-gray-600">Domestic Appliances</p>
+          </div>
+          <img 
+            src="https://images.unsplash.com/photo-1574269909862-7e1d70bb8078"
+            alt="Philips appliances" 
+            className="mt-4 w-full h-48 object-cover rounded"
+          />
+          <Button className="mt-4 bg-gray-800 text-white hover:bg-gray-700">
+            Shop Now
+          </Button>
+        </div>
+      </div>
+    </>
   );
 };
 
