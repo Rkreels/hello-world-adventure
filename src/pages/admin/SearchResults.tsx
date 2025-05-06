@@ -1,443 +1,320 @@
 
-import { useEffect, useState } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Search, Loader2, Filter } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, ChevronLeft, ShoppingCart, Users, Tag, FileText } from 'lucide-react';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+
+interface SearchResult {
+  id: string;
+  title: string;
+  type: 'product' | 'order' | 'customer' | 'coupon';
+  description?: string;
+  status?: string;
+  date?: string;
+  value?: string;
+  image?: string;
+}
 
 const SearchResults = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
+  
+  const [loading, setLoading] = useState(true);
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [filteredResults, setFilteredResults] = useState<SearchResult[]>([]);
   const [activeTab, setActiveTab] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchInput, setSearchInput] = useState(query);
   
-  const [results, setResults] = useState({
-    products: [],
-    customers: [],
-    orders: [],
-    transactions: []
-  });
+  // Number of items to display per page
+  const itemsPerPage = 10;
   
-  const [isLoading, setIsLoading] = useState(true);
-  
+  // Fetch search results when query or active tab changes
   useEffect(() => {
-    // Simulate API search
-    setIsLoading(true);
+    const fetchResults = async () => {
+      setLoading(true);
+      
+      try {
+        // In a real app, this would be an API call
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Generate mock search results
+        const mockResults: SearchResult[] = [];
+        
+        // Products
+        for (let i = 0; i < 15; i++) {
+          mockResults.push({
+            id: `prod-${i + 1}`,
+            title: `Product matching "${query}" - ${i + 1}`,
+            type: 'product',
+            description: `This is a product description for item ${i + 1}`,
+            status: i % 5 === 0 ? 'Out of stock' : 'In stock',
+            value: `$${(Math.random() * 100 + 10).toFixed(2)}`,
+            image: 'https://placehold.co/60x60'
+          });
+        }
+        
+        // Orders
+        for (let i = 0; i < 8; i++) {
+          mockResults.push({
+            id: `ord-${1000 + i}`,
+            title: `Order #${1000 + i}`,
+            type: 'order',
+            status: ['Processing', 'Shipped', 'Delivered', 'Cancelled'][i % 4],
+            date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toLocaleDateString(),
+            value: `$${(Math.random() * 300 + 50).toFixed(2)}`
+          });
+        }
+        
+        // Customers
+        for (let i = 0; i < 6; i++) {
+          mockResults.push({
+            id: `cust-${i + 1}`,
+            title: `Customer ${i + 1}`,
+            type: 'customer',
+            description: `customer${i + 1}@example.com`,
+            date: new Date(Date.now() - i * 7 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+            status: ['Active', 'Inactive'][i % 2]
+          });
+        }
+        
+        // Coupons
+        for (let i = 0; i < 4; i++) {
+          mockResults.push({
+            id: `coup-${i + 1}`,
+            title: `COUPON${i + 1}`,
+            type: 'coupon',
+            description: `${(i + 1) * 10}% off`,
+            status: ['Active', 'Expired', 'Upcoming'][i % 3],
+            date: new Date(Date.now() - i * 30 * 24 * 60 * 60 * 1000).toLocaleDateString()
+          });
+        }
+        
+        setResults(mockResults);
+      } catch (error) {
+        console.error('Error fetching search results:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
     
-    // Mock data
-    const mockProducts = [
-      { id: 1, name: 'iPhone 13', price: '$999', category: 'Electronics', stock: 42 },
-      { id: 2, name: 'MacBook Pro', price: '$1,299', category: 'Electronics', stock: 23 },
-      { id: 3, name: 'AirPods Pro', price: '$249', category: 'Electronics', stock: 78 }
-    ];
-    
-    const mockCustomers = [
-      { id: 1, name: 'John Smith', email: 'john@example.com', orders: 7, spent: '$1,245' },
-      { id: 2, name: 'Sarah Johnson', email: 'sarah@example.com', orders: 12, spent: '$3,478' }
-    ];
-    
-    const mockOrders = [
-      { id: 'ORD-2345', customer: 'John Smith', date: '2023-05-12', status: 'Delivered', total: '$799' },
-      { id: 'ORD-2341', customer: 'Sarah Johnson', date: '2023-05-10', status: 'Processing', total: '$142' }
-    ];
-    
-    const mockTransactions = [
-      { id: 'TRX-4567', date: '2023-05-12', amount: '$799', status: 'Completed', method: 'Credit Card' },
-      { id: 'TRX-4562', date: '2023-05-10', amount: '$142', status: 'Completed', method: 'PayPal' }
-    ];
-    
-    // Simple filter based on query
-    const filteredProducts = mockProducts.filter(p => 
-      p.name.toLowerCase().includes(query.toLowerCase()) ||
-      p.category.toLowerCase().includes(query.toLowerCase())
-    );
-    
-    const filteredCustomers = mockCustomers.filter(c => 
-      c.name.toLowerCase().includes(query.toLowerCase()) ||
-      c.email.toLowerCase().includes(query.toLowerCase())
-    );
-    
-    const filteredOrders = mockOrders.filter(o => 
-      o.id.toLowerCase().includes(query.toLowerCase()) ||
-      o.customer.toLowerCase().includes(query.toLowerCase()) ||
-      o.status.toLowerCase().includes(query.toLowerCase())
-    );
-    
-    const filteredTransactions = mockTransactions.filter(t => 
-      t.id.toLowerCase().includes(query.toLowerCase()) ||
-      t.status.toLowerCase().includes(query.toLowerCase()) ||
-      t.method.toLowerCase().includes(query.toLowerCase())
-    );
-    
-    // Simulate API delay
-    setTimeout(() => {
-      setResults({
-        products: filteredProducts,
-        customers: filteredCustomers,
-        orders: filteredOrders,
-        transactions: filteredTransactions
-      });
-      setIsLoading(false);
-    }, 500);
+    if (query) {
+      fetchResults();
+    } else {
+      setResults([]);
+      setLoading(false);
+    }
   }, [query]);
   
-  const totalResults = 
-    results.products.length + 
-    results.customers.length + 
-    results.orders.length + 
-    results.transactions.length;
+  // Filter results based on active tab
+  useEffect(() => {
+    if (activeTab === 'all') {
+      setFilteredResults(results);
+    } else {
+      const filtered = results.filter(result => result.type === activeTab);
+      setFilteredResults(filtered);
+    }
+    
+    // Reset to first page when changing tabs
+    setCurrentPage(1);
+  }, [activeTab, results]);
+  
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchInput.trim()) {
+      setSearchParams({ q: searchInput.trim() });
+    }
+  };
+  
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredResults.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredResults.slice(indexOfFirstItem, indexOfLastItem);
+  
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
   
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <Button variant="ghost" asChild className="mb-4">
-          <Link to="/admin/dashboard">
-            <ChevronLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
-          </Link>
-        </Button>
-        
-        <h1 className="text-2xl font-semibold mb-2">Search Results</h1>
-        <p className="text-gray-500">
-          {isLoading 
-            ? 'Searching...' 
-            : `Found ${totalResults} results for "${query}"`
-          }
-        </p>
-      </div>
-      
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="mb-6">
-          <TabsTrigger value="all">
-            All Results ({totalResults})
-          </TabsTrigger>
-          <TabsTrigger value="products">
-            <ShoppingCart className="h-4 w-4 mr-2" />
-            Products ({results.products.length})
-          </TabsTrigger>
-          <TabsTrigger value="customers">
-            <Users className="h-4 w-4 mr-2" />
-            Customers ({results.customers.length})
-          </TabsTrigger>
-          <TabsTrigger value="orders">
-            <Tag className="h-4 w-4 mr-2" />
-            Orders ({results.orders.length})
-          </TabsTrigger>
-          <TabsTrigger value="transactions">
-            <FileText className="h-4 w-4 mr-2" />
-            Transactions ({results.transactions.length})
-          </TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="all">
-          <div className="grid grid-cols-1 gap-6">
-            {results.products.length > 0 && (
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle>Products</CardTitle>
-                  {results.products.length > 3 && (
-                    <Button variant="ghost" asChild>
-                      <Link to={`/admin/products/list?q=${query}`}>
-                        View All
-                      </Link>
-                    </Button>
-                  )}
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Price</TableHead>
-                        <TableHead>Category</TableHead>
-                        <TableHead>Stock</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {results.products.slice(0, 3).map((product) => (
-                        <TableRow key={product.id}>
-                          <TableCell className="font-medium">{product.name}</TableCell>
-                          <TableCell>{product.price}</TableCell>
-                          <TableCell>{product.category}</TableCell>
-                          <TableCell>{product.stock}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-            )}
-            
-            {results.customers.length > 0 && (
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle>Customers</CardTitle>
-                  {results.customers.length > 3 && (
-                    <Button variant="ghost" asChild>
-                      <Link to={`/admin/customers?q=${query}`}>
-                        View All
-                      </Link>
-                    </Button>
-                  )}
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Orders</TableHead>
-                        <TableHead>Total Spent</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {results.customers.slice(0, 3).map((customer) => (
-                        <TableRow key={customer.id}>
-                          <TableCell className="font-medium">{customer.name}</TableCell>
-                          <TableCell>{customer.email}</TableCell>
-                          <TableCell>{customer.orders}</TableCell>
-                          <TableCell>{customer.spent}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-            )}
-            
-            {results.orders.length > 0 && (
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle>Orders</CardTitle>
-                  {results.orders.length > 3 && (
-                    <Button variant="ghost" asChild>
-                      <Link to={`/admin/orders?q=${query}`}>
-                        View All
-                      </Link>
-                    </Button>
-                  )}
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Order ID</TableHead>
-                        <TableHead>Customer</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Total</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {results.orders.slice(0, 3).map((order) => (
-                        <TableRow key={order.id}>
-                          <TableCell className="font-medium">{order.id}</TableCell>
-                          <TableCell>{order.customer}</TableCell>
-                          <TableCell>{order.date}</TableCell>
-                          <TableCell>{order.status}</TableCell>
-                          <TableCell>{order.total}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-            )}
-            
-            {results.transactions.length > 0 && (
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle>Transactions</CardTitle>
-                  {results.transactions.length > 3 && (
-                    <Button variant="ghost" asChild>
-                      <Link to={`/admin/transactions?q=${query}`}>
-                        View All
-                      </Link>
-                    </Button>
-                  )}
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Transaction ID</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Amount</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Method</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {results.transactions.slice(0, 3).map((transaction) => (
-                        <TableRow key={transaction.id}>
-                          <TableCell className="font-medium">{transaction.id}</TableCell>
-                          <TableCell>{transaction.date}</TableCell>
-                          <TableCell>{transaction.amount}</TableCell>
-                          <TableCell>{transaction.status}</TableCell>
-                          <TableCell>{transaction.method}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-            )}
-            
-            {totalResults === 0 && !isLoading && (
-              <div className="text-center py-12">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
-                  <Search className="h-8 w-8 text-gray-400" />
-                </div>
-                <h2 className="text-xl font-semibold mb-2">No results found</h2>
-                <p className="text-gray-500 mb-4">
-                  We couldn't find anything matching "{query}". Try different keywords.
-                </p>
+    <div className="space-y-6">
+      <Card>
+        <CardContent className="p-6">
+          <form onSubmit={handleSearch} className="flex items-center mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                type="search"
+                placeholder="Search..."
+                className="pl-10"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+              />
+            </div>
+            <Button type="submit" className="ml-2 bg-emerald-600 hover:bg-emerald-700">
+              Search
+            </Button>
+          </form>
+          
+          {query && (
+            <div className="mb-6">
+              <h2 className="text-xl font-semibold mb-1">Search Results</h2>
+              <p className="text-gray-600">
+                Showing results for "{query}" {filteredResults.length > 0 && `(${filteredResults.length} results)`}
+              </p>
+            </div>
+          )}
+          
+          {loading ? (
+            <div className="flex justify-center items-center py-20">
+              <Loader2 className="h-10 w-10 animate-spin text-emerald-600" />
+            </div>
+          ) : filteredResults.length === 0 ? (
+            <div className="text-center py-20">
+              <p className="text-xl font-medium">No results found</p>
+              <p className="text-gray-600 mt-2">Try searching for something else</p>
+            </div>
+          ) : (
+            <>
+              <div className="mb-6">
+                <Tabs value={activeTab} onValueChange={setActiveTab}>
+                  <TabsList className="w-full md:w-auto">
+                    <TabsTrigger value="all" className="flex-1 md:flex-none">
+                      All ({results.length})
+                    </TabsTrigger>
+                    <TabsTrigger value="product" className="flex-1 md:flex-none">
+                      Products ({results.filter(r => r.type === 'product').length})
+                    </TabsTrigger>
+                    <TabsTrigger value="order" className="flex-1 md:flex-none">
+                      Orders ({results.filter(r => r.type === 'order').length})
+                    </TabsTrigger>
+                    <TabsTrigger value="customer" className="flex-1 md:flex-none">
+                      Customers ({results.filter(r => r.type === 'customer').length})
+                    </TabsTrigger>
+                    <TabsTrigger value="coupon" className="flex-1 md:flex-none">
+                      Coupons ({results.filter(r => r.type === 'coupon').length})
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
               </div>
-            )}
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="products">
-          <Card>
-            <CardContent className="pt-6">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Stock</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {results.products.map((product) => (
-                    <TableRow key={product.id}>
-                      <TableCell className="font-medium">{product.name}</TableCell>
-                      <TableCell>{product.price}</TableCell>
-                      <TableCell>{product.category}</TableCell>
-                      <TableCell>{product.stock}</TableCell>
-                    </TableRow>
-                  ))}
-                  {results.products.length === 0 && !isLoading && (
+              
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
                     <TableRow>
-                      <TableCell colSpan={4} className="text-center py-8 text-gray-500">
-                        No products found matching "{query}"
-                      </TableCell>
+                      <TableHead className="w-[250px]">Name/Title</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Details</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="customers">
-          <Card>
-            <CardContent className="pt-6">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Orders</TableHead>
-                    <TableHead>Total Spent</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {results.customers.map((customer) => (
-                    <TableRow key={customer.id}>
-                      <TableCell className="font-medium">{customer.name}</TableCell>
-                      <TableCell>{customer.email}</TableCell>
-                      <TableCell>{customer.orders}</TableCell>
-                      <TableCell>{customer.spent}</TableCell>
-                    </TableRow>
-                  ))}
-                  {results.customers.length === 0 && !isLoading && (
-                    <TableRow>
-                      <TableCell colSpan={4} className="text-center py-8 text-gray-500">
-                        No customers found matching "{query}"
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="orders">
-          <Card>
-            <CardContent className="pt-6">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Order ID</TableHead>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Total</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {results.orders.map((order) => (
-                    <TableRow key={order.id}>
-                      <TableCell className="font-medium">{order.id}</TableCell>
-                      <TableCell>{order.customer}</TableCell>
-                      <TableCell>{order.date}</TableCell>
-                      <TableCell>{order.status}</TableCell>
-                      <TableCell>{order.total}</TableCell>
-                    </TableRow>
-                  ))}
-                  {results.orders.length === 0 && !isLoading && (
-                    <TableRow>
-                      <TableCell colSpan={5} className="text-center py-8 text-gray-500">
-                        No orders found matching "{query}"
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="transactions">
-          <Card>
-            <CardContent className="pt-6">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Transaction ID</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Method</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {results.transactions.map((transaction) => (
-                    <TableRow key={transaction.id}>
-                      <TableCell className="font-medium">{transaction.id}</TableCell>
-                      <TableCell>{transaction.date}</TableCell>
-                      <TableCell>{transaction.amount}</TableCell>
-                      <TableCell>{transaction.status}</TableCell>
-                      <TableCell>{transaction.method}</TableCell>
-                    </TableRow>
-                  ))}
-                  {results.transactions.length === 0 && !isLoading && (
-                    <TableRow>
-                      <TableCell colSpan={5} className="text-center py-8 text-gray-500">
-                        No transactions found matching "{query}"
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+                  </TableHeader>
+                  <TableBody>
+                    {currentItems.map((result) => (
+                      <TableRow key={result.id}>
+                        <TableCell className="font-medium">
+                          <div className="flex items-center space-x-3">
+                            {result.image && (
+                              <img src={result.image} alt={result.title} className="w-10 h-10 rounded object-cover" />
+                            )}
+                            <span>{result.title}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <span className="capitalize">{result.type}</span>
+                        </TableCell>
+                        <TableCell>
+                          {result.description || result.value || '-'}
+                        </TableCell>
+                        <TableCell>
+                          {result.status ? (
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              result.status.includes('stock') ? (
+                                result.status === 'In stock' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                              ) : result.status === 'Active' ? 'bg-green-100 text-green-800'
+                              : result.status === 'Shipped' ? 'bg-blue-100 text-blue-800'
+                              : result.status === 'Processing' ? 'bg-yellow-100 text-yellow-800'
+                              : result.status === 'Delivered' ? 'bg-green-100 text-green-800'
+                              : result.status === 'Cancelled' ? 'bg-red-100 text-red-800'
+                              : result.status === 'Upcoming' ? 'bg-purple-100 text-purple-800'
+                              : 'bg-gray-100 text-gray-800'
+                            }`}>
+                              {result.status}
+                            </span>
+                          ) : '-'}
+                        </TableCell>
+                        <TableCell>{result.date || '-'}</TableCell>
+                        <TableCell className="text-right space-x-2">
+                          <Button variant="ghost" size="sm">View</Button>
+                          <Button variant="ghost" size="sm">Edit</Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+              
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="mt-6 flex justify-center">
+                  <Pagination>
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious 
+                          onClick={() => paginate(Math.max(1, currentPage - 1))}
+                          className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
+                        />
+                      </PaginationItem>
+                      
+                      {Array.from({ length: totalPages }).map((_, index) => {
+                        // Display first page, last page, and pages around current page
+                        if (
+                          index === 0 ||
+                          index === totalPages - 1 ||
+                          (index >= currentPage - 2 && index <= currentPage + 2)
+                        ) {
+                          return (
+                            <PaginationItem key={index}>
+                              <PaginationLink
+                                isActive={currentPage === index + 1}
+                                onClick={() => paginate(index + 1)}
+                              >
+                                {index + 1}
+                              </PaginationLink>
+                            </PaginationItem>
+                          );
+                        }
+                        
+                        // Add ellipsis if there's a gap
+                        if (index === 1 || index === totalPages - 2) {
+                          return (
+                            <PaginationItem key={index}>
+                              <span className="flex h-9 w-9 items-center justify-center">...</span>
+                            </PaginationItem>
+                          );
+                        }
+                        
+                        return null;
+                      })}
+                      
+                      <PaginationItem>
+                        <PaginationNext 
+                          onClick={() => paginate(Math.min(totalPages, currentPage + 1))}
+                          className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                </div>
+              )}
+            </>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };

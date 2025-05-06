@@ -45,6 +45,9 @@ import ShopCategories from './pages/shop/Categories';
 import Deals from './pages/shop/Deals';
 import NewArrivals from './pages/shop/NewArrivals';
 import Accessibility from './pages/shop/Accessibility';
+import Profile from './pages/shop/Profile';
+import OrderDetails from './pages/shop/OrderDetails';
+import SearchPage from './pages/shop/SearchPage';
 
 const routes: RouteObject[] = [
   {
@@ -91,6 +94,9 @@ const routes: RouteObject[] = [
       { path: 'category/:categoryId', element: <CategoryPage /> },
       { path: 'category/:categoryId/:subcategoryId', element: <CategoryPage /> },
       { path: 'login', element: <Login /> },
+      { path: 'profile', element: <Profile /> },
+      { path: 'orders', element: <OrderDetails /> },
+      { path: 'search', element: <SearchPage /> },
       
       // Footer and informational pages
       { path: 'about', element: <About /> },

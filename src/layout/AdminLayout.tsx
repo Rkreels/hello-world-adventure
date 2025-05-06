@@ -1,146 +1,192 @@
 
 import { useState, useEffect } from 'react';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { Search, Sun, ChevronLeft, LogOut } from 'lucide-react';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
-import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { toast } from 'sonner';
-import NotificationsDropdown from '@/components/admin/NotificationsDropdown';
-import { 
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
+import { Menu, Search, Bell, User, LogOut, Moon, Sun } from 'lucide-react';
+import NotificationsDropdown from '@/components/admin/NotificationsDropdown';
+import { toast } from 'sonner';
 
 const AdminLayout = () => {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const { user, logout } = useAuth();
-  const navigate = useNavigate();
   const location = useLocation();
-
-  // Persist sidebar state in localStorage
-  useEffect(() => {
-    const savedState = localStorage.getItem('sidebarCollapsed');
-    if (savedState) {
-      setSidebarCollapsed(JSON.parse(savedState));
-    }
-  }, []);
-
-  const toggleSidebar = () => {
-    const newState = !sidebarCollapsed;
-    setSidebarCollapsed(newState);
-    localStorage.setItem('sidebarCollapsed', JSON.stringify(newState));
-  };
+  const navigate = useNavigate();
   
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (searchQuery.trim()) {
-      toast.info(`Searching for: ${searchQuery}`);
-      // Navigate to search results
-      navigate(`/admin/search?q=${encodeURIComponent(searchQuery)}`);
-    }
-  };
-
-  // Update document title based on current route
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [pageTitle, setPageTitle] = useState('Dashboard');
+  const [darkMode, setDarkMode] = useState(() => {
+    // Check if user has dark mode preference saved
+    const savedPreference = localStorage.getItem('darkMode');
+    // Return true if preference exists and is 'true', otherwise check system preference
+    return savedPreference 
+      ? savedPreference === 'true'
+      : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
+  
+  // Set page title based on route
   useEffect(() => {
-    const path = location.pathname;
-    let title = "Dashboard";
-    
-    if (path.includes('/admin/orders')) title = "Order Management";
-    else if (path.includes('/admin/customers')) title = "Customers";
-    else if (path.includes('/admin/coupons')) title = "Coupon Code";
-    else if (path.includes('/admin/categories')) title = "Categories";
-    else if (path.includes('/admin/transactions')) title = "Transactions";
-    else if (path.includes('/admin/brands')) title = "Brands";
-    else if (path.includes('/admin/products/add')) title = "Add Products";
-    else if (path.includes('/admin/products/media')) title = "Product Media";
-    else if (path.includes('/admin/products/list')) title = "Product List";
-    else if (path.includes('/admin/products/reviews')) title = "Product Reviews";
-    else if (path.includes('/admin/role')) title = "Admin Role";
-    else if (path.includes('/admin/authority')) title = "Control Authority";
-    
+    const path = location.pathname.split('/').pop() || 'dashboard';
+    const title = path.charAt(0).toUpperCase() + path.slice(1).replace('-', ' ');
+    setPageTitle(title);
     document.title = `Admin | ${title}`;
   }, [location]);
   
+  // Apply dark mode
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('darkMode', darkMode.toString());
+  }, [darkMode]);
+
+  const toggleDarkMode = () => {
+    setDarkMode(prev => !prev);
+  };
+  
+  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/admin/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery('');
+    }
+  };
+  
+  const getInitials = (name?: string) => {
+    if (!name) return 'U';
+    return name
+      .split(' ')
+      .map(part => part[0])
+      .join('')
+      .toUpperCase();
+  };
+  
   return (
-    <div className="flex h-screen">
-      <Sidebar collapsed={sidebarCollapsed} />
-      
-      <div className="flex flex-col flex-1 overflow-hidden">
-        <header className="bg-white border-b border-gray-100 h-16 flex items-center justify-between px-4">
+    <div className="min-h-screen bg-gray-100 flex flex-col">
+      {/* Top Navigation */}
+      <header className="bg-white shadow-sm z-20 relative">
+        <div className="flex items-center justify-between px-4 h-16">
           <div className="flex items-center">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="mr-2 text-gray-500"
-              onClick={toggleSidebar}
-            >
-              <ChevronLeft className={`h-5 w-5 transition-transform ${sidebarCollapsed ? 'rotate-180' : ''}`} />
+            <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsMobileSidebarOpen(true)}>
+              <Menu className="h-5 w-5" />
             </Button>
+            <Link to="/admin/dashboard" className="hidden md:flex items-center space-x-2">
+              <svg className="h-8 w-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              <span className="font-bold text-lg hidden lg:inline">Admin Dashboard</span>
+            </Link>
           </div>
           
-          <div className="flex-1 max-w-lg mx-4">
-            <form onSubmit={handleSearch} className="relative">
+          <form onSubmit={handleSearch} className="hidden md:flex items-center max-w-md flex-1 mx-4">
+            <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <input
-                type="text"
-                placeholder="Search data, users, or reports"
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-primary"
+              <Input
+                type="search"
+                placeholder="Search..."
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-            </form>
-          </div>
+            </div>
+          </form>
           
-          <div className="flex items-center space-x-3">
-            <NotificationsDropdown />
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => {
-                document.documentElement.classList.toggle('dark');
-                toast.success('Theme toggled');
-              }}
+          <div className="flex items-center space-x-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleDarkMode}
+              className="hidden md:flex"
+              title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
-              <Sun className="h-5 w-5" />
+              {darkMode ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
             </Button>
+            
+            <NotificationsDropdown />
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden cursor-pointer">
-                  <img src="/avatar.png" alt="User" className="w-full h-full object-cover" />
-                </div>
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={user?.photoURL} alt={user?.name || "User"} />
+                    <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>
+                  </Avatar>
+                </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>{user?.name || 'Admin'}</DropdownMenuLabel>
-                <DropdownMenuLabel className="text-xs text-gray-500">
-                  {user?.email || 'admin@example.com'}
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">{user?.name}</p>
+                    <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
+                  </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate('/admin/role')}>
-                  Profile
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/admin/settings')}>
-                  Settings
+                <DropdownMenuItem asChild>
+                  <Link to="/admin/profile" className="cursor-pointer">
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={logout} className="text-red-600">
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Logout
+                <DropdownMenuItem onClick={() => logout()} className="cursor-pointer">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-        </header>
+        </div>
+      </header>
+      
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar */}
+        <Sidebar
+          isMobile={true}
+          isOpen={isMobileSidebarOpen}
+          onClose={() => setIsMobileSidebarOpen(false)}
+        />
         
-        <main className="flex-1 overflow-auto bg-gray-50">
-          <Outlet />
+        <Sidebar isMobile={false} isOpen={true} />
+        
+        {/* Main Content */}
+        <main className="flex-1 overflow-y-auto bg-gray-100">
+          <div className="py-4 px-6">
+            <div className="flex items-center mb-6">
+              <h1 className="text-2xl font-semibold">{pageTitle}</h1>
+            </div>
+            
+            <div className="md:hidden mb-4">
+              <form onSubmit={handleSearch} className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  type="search"
+                  placeholder="Search..."
+                  className="pl-10 w-full"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </form>
+            </div>
+            
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>
