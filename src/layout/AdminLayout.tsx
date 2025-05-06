@@ -156,14 +156,19 @@ const AdminLayout = () => {
       </header>
       
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
-        <Sidebar
-          isMobile={true}
-          isOpen={isMobileSidebarOpen}
-          onClose={() => setIsMobileSidebarOpen(false)}
-        />
+        {/* Mobile Sidebar */}
+        {isMobileSidebarOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onClick={() => setIsMobileSidebarOpen(false)}>
+            <div className="h-full w-64 bg-white" onClick={(e) => e.stopPropagation()}>
+              <Sidebar collapsed={false} />
+            </div>
+          </div>
+        )}
         
-        <Sidebar isMobile={false} isOpen={true} />
+        {/* Desktop Sidebar */}
+        <div className="hidden md:block">
+          <Sidebar collapsed={false} />
+        </div>
         
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto bg-gray-100">
