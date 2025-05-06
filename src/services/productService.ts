@@ -7,13 +7,16 @@ export interface Product {
   name: string;
   description: string;
   price: number;
-  discountedPrice?: number;
+  discountPrice?: number;
+  discountedPrice?: number; // Added for compatibility
   images: string[];
-  categoryId: string | number;
+  category: string;
+  categoryId: string | number; // Added this field
   categoryName: string;
   tags: string[];
   status: 'active' | 'inactive' | 'draft';
-  featured: boolean;
+  featured: boolean; // Added this field
+  isFeatured?: boolean; // For compatibility with existing code
   stock: number;
   ratings: number;
   reviewCount: number;
@@ -62,13 +65,13 @@ export const productService = {
       
       if (filters?.minPrice !== undefined) {
         filteredData = filteredData.filter(product => 
-          (product.discountedPrice || product.price) >= filters.minPrice!
+          (product.discountedPrice || product.discountPrice || product.price) >= filters.minPrice!
         );
       }
       
       if (filters?.maxPrice !== undefined) {
         filteredData = filteredData.filter(product => 
-          (product.discountedPrice || product.price) <= filters.maxPrice!
+          (product.discountedPrice || product.discountPrice || product.price) <= filters.maxPrice!
         );
       }
       
@@ -79,7 +82,7 @@ export const productService = {
         filteredData.sort((a, b) => {
           switch (filters.sortBy) {
             case 'price':
-              return ((a.discountedPrice || a.price) - (b.discountedPrice || b.price)) * sortOrder;
+              return ((a.discountedPrice || a.discountPrice || a.price) - (b.discountedPrice || b.discountPrice || b.price)) * sortOrder;
             case 'name':
               return a.name.localeCompare(b.name) * sortOrder;
             case 'date':

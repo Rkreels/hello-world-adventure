@@ -9,7 +9,7 @@ export interface Category {
   image: string;
   createdAt: string;
   products: number;
-  status?: 'active' | 'inactive';
+  status: 'active' | 'inactive';
 }
 
 export const categoryService = {

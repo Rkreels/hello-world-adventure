@@ -29,3 +29,12 @@ export interface PermissionModule {
   edit: boolean;
   delete: boolean;
 }
+
+export interface Brand {
+  id: number | string;
+  name: string;
+  products: number;
+  featured: boolean;
+  logo: string;
+  status: 'active' | 'inactive';
+}
