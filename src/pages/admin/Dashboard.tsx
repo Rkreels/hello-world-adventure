@@ -4,9 +4,15 @@ import { DollarSign, ShoppingBag, Users, Activity } from 'lucide-react';
 import StatsCard from '@/components/admin/dashboard/StatsCard';
 import RecentOrders from '@/components/admin/dashboard/RecentOrders';
 import TopSellingProducts from '@/components/admin/dashboard/TopSellingProducts';
+import SalesChart from '@/components/admin/dashboard/SalesChart';
+import LowStockAlerts from '@/components/admin/dashboard/LowStockAlerts';
+import QuickActions from '@/components/admin/dashboard/QuickActions';
+import { useAdminStore } from '@/stores/adminStore';
 
 const Dashboard = () => {
-  // Sample data for dashboard
+  const { stats } = useAdminStore();
+  
+  // Sample data for recent orders and top products
   const recentOrders = [
     { id: '8531', customer: 'John Doe', amount: '125.00', date: '2 mins ago', avatar: 'https://ui-avatars.com/api/?name=John+Doe' },
     { id: '8530', customer: 'Sarah Smith', amount: '89.50', date: '24 mins ago', avatar: 'https://ui-avatars.com/api/?name=Sarah+Smith' },
@@ -21,44 +27,60 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-semibold mb-6">Dashboard</h1>
+    <div className="p-6 space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <div className="text-sm text-gray-500">
+          Last updated: {new Date().toLocaleString()}
+        </div>
+      </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
           title="Total Revenue"
-          value="$48,574"
-          change={{ value: "12.5%", positive: true }}
+          value={`$${stats.totalRevenue.toLocaleString()}`}
+          change={{ value: `${stats.revenueGrowth}%`, positive: stats.revenueGrowth > 0 }}
           icon={<DollarSign className="h-6 w-6 text-white" />}
           colorClass="bg-green-500 text-white"
         />
         
         <StatsCard
           title="Total Orders"
-          value="3,652"
-          change={{ value: "8.2%", positive: true }}
+          value={stats.totalOrders.toLocaleString()}
+          change={{ value: `${stats.ordersGrowth}%`, positive: stats.ordersGrowth > 0 }}
           icon={<ShoppingBag className="h-6 w-6 text-white" />}
           colorClass="bg-blue-500 text-white"
         />
         
         <StatsCard
           title="Total Customers"
-          value="12,938"
-          change={{ value: "5.3%", positive: true }}
+          value={stats.totalCustomers.toLocaleString()}
+          change={{ value: `${stats.customersGrowth}%`, positive: stats.customersGrowth > 0 }}
           icon={<Users className="h-6 w-6 text-white" />}
           colorClass="bg-purple-500 text-white"
         />
         
         <StatsCard
-          title="Conversion Rate"
-          value="3.24%"
-          change={{ value: "1.2%", positive: false }}
+          title="Active Products"
+          value={stats.totalProducts.toString()}
+          change={{ value: `${stats.productsGrowth}%`, positive: stats.productsGrowth > 0 }}
           icon={<Activity className="h-6 w-6 text-white" />}
           colorClass="bg-orange-500 text-white"
         />
       </div>
       
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Charts and Analytics */}
+      <div className="grid grid-cols-1 lg:grid-cols-6 gap-6">
+        <SalesChart />
+        <div className="lg:col-span-2 space-y-6">
+          <LowStockAlerts />
+          <QuickActions />
+        </div>
+      </div>
+      
+      {/* Recent Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <RecentOrders orders={recentOrders} />
         <TopSellingProducts products={topProducts} />
       </div>
