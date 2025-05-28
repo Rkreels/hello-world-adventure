@@ -16,10 +16,10 @@ const QuickActions = () => {
       color: 'bg-green-500 hover:bg-green-600'
     },
     {
-      label: 'Export Data',
-      icon: Download,
-      action: () => toast.info('Export functionality coming soon'),
-      color: 'bg-blue-500 hover:bg-blue-600'
+      label: 'View Reports',
+      icon: BarChart3,
+      action: () => navigate('/admin/reports'),
+      color: 'bg-orange-500 hover:bg-orange-600'
     },
     {
       label: 'Import Products',
@@ -28,21 +28,21 @@ const QuickActions = () => {
       color: 'bg-purple-500 hover:bg-purple-600'
     },
     {
-      label: 'Reports',
-      icon: BarChart3,
-      action: () => toast.info('Reports section coming soon'),
-      color: 'bg-orange-500 hover:bg-orange-600'
+      label: 'Export Data',
+      icon: Download,
+      action: () => toast.info('Export functionality coming soon'),
+      color: 'bg-blue-500 hover:bg-blue-600'
     },
     {
-      label: 'Manage Users',
+      label: 'Manage Customers',
       icon: Users,
-      action: () => navigate('/admin/admin-authority'),
+      action: () => navigate('/admin/customer-management'),
       color: 'bg-indigo-500 hover:bg-indigo-600'
     },
     {
       label: 'Settings',
       icon: Settings,
-      action: () => toast.info('Settings panel coming soon'),
+      action: () => navigate('/admin/settings'),
       color: 'bg-gray-500 hover:bg-gray-600'
     }
   ];
