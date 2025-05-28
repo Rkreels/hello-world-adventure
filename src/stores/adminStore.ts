@@ -1,16 +1,46 @@
 
 import { create } from 'zustand';
-import { Product, Customer, Order, Category, Brand } from '@/types';
 
-interface AdminStats {
-  totalRevenue: number;
+interface Product {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  stock: number;
+  status: 'active' | 'inactive';
+  image?: string;
+  description?: string;
+}
+
+interface Category {
+  id: number;
+  name: string;
+  description: string;
+  image: string;
+  createdAt: string;
+  products: number;
+}
+
+interface Order {
+  id: string;
+  customer: string;
+  amount: string;
+  date: string;
+  status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
+  items?: string[];
+  trackingNumber?: string;
+}
+
+interface Customer {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  address?: string;
+  registeredAt: string;
   totalOrders: number;
-  totalCustomers: number;
-  totalProducts: number;
-  revenueGrowth: number;
-  ordersGrowth: number;
-  customersGrowth: number;
-  productsGrowth: number;
+  totalSpent: number;
+  status: 'active' | 'inactive';
 }
 
 interface InventoryItem {
@@ -22,180 +52,355 @@ interface InventoryItem {
   lastRestocked: string;
 }
 
-interface OrderStatusUpdate {
-  orderId: string;
-  status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
-  trackingNumber?: string;
-  notes?: string;
-  updatedAt: string;
+interface Coupon {
+  id: string;
+  code: string;
+  type: 'percentage' | 'fixed';
+  value: number;
+  minOrder: number;
+  usage: number;
+  maxUsage: number;
+  status: 'active' | 'inactive' | 'expired';
+  expiryDate: string;
 }
 
-interface NotificationSettings {
-  orderNotifications: boolean;
-  lowStockAlerts: boolean;
-  customerSignups: boolean;
-  reviewNotifications: boolean;
-  emailReports: boolean;
-}
+interface AdminStore {
+  // Stats
+  stats: {
+    totalRevenue: number;
+    totalOrders: number;
+    totalCustomers: number;
+    totalProducts: number;
+    revenueGrowth: number;
+    ordersGrowth: number;
+    customersGrowth: number;
+    productsGrowth: number;
+  };
 
-interface AdminState {
-  // Dashboard Stats
-  stats: AdminStats;
-  salesData: Array<{ date: string; revenue: number; orders: number }>;
-  topProducts: Product[];
-  recentOrders: Order[];
-  
-  // Inventory Management
+  // Data
+  products: Product[];
+  categories: Category[];
+  orders: Order[];
+  customers: Customer[];
   inventory: InventoryItem[];
-  lowStockAlerts: InventoryItem[];
-  
-  // Order Management
-  orderUpdates: OrderStatusUpdate[];
-  
-  // Customer Analytics
-  customerSegments: Array<{
-    segment: string;
-    count: number;
-    value: number;
-  }>;
-  
-  // Settings
-  notificationSettings: NotificationSettings;
-  
-  // Marketing
-  activeCampaigns: Array<{
-    id: string;
-    name: string;
-    type: string;
-    status: string;
-    startDate: string;
-    endDate: string;
-  }>;
+  coupons: Coupon[];
+
+  // Loading states
+  isLoading: boolean;
   
   // Actions
-  updateStats: (stats: AdminStats) => void;
-  updateSalesData: (data: Array<{ date: string; revenue: number; orders: number }>) => void;
+  updateStats: (stats: Partial<AdminStore['stats']>) => void;
+  
+  // Product actions
+  addProduct: (product: Omit<Product, 'id'>) => void;
+  updateProduct: (id: string, product: Partial<Product>) => void;
+  deleteProduct: (id: string) => void;
+  
+  // Category actions
+  addCategory: (category: Omit<Category, 'id'>) => void;
+  updateCategory: (id: number, category: Partial<Category>) => void;
+  deleteCategory: (id: number) => void;
+  
+  // Order actions
+  updateOrderStatus: (id: string, status: Order['status'], trackingNumber?: string) => void;
+  
+  // Customer actions
+  addCustomer: (customer: Omit<Customer, 'id'>) => void;
+  updateCustomer: (id: string, customer: Partial<Customer>) => void;
+  
+  // Inventory actions
   updateInventory: (inventory: InventoryItem[]) => void;
-  updateOrderStatus: (update: OrderStatusUpdate) => void;
-  addLowStockAlert: (item: InventoryItem) => void;
-  removeLowStockAlert: (productId: string) => void;
-  updateNotificationSettings: (settings: NotificationSettings) => void;
-  addCampaign: (campaign: any) => void;
-  updateCampaign: (id: string, updates: any) => void;
+  restockProduct: (productId: string, quantity: number) => void;
+  
+  // Coupon actions
+  addCoupon: (coupon: Omit<Coupon, 'id'>) => void;
+  updateCoupon: (id: string, coupon: Partial<Coupon>) => void;
+  deleteCoupon: (id: string) => void;
+  
+  // Initialize data
+  initializeData: () => void;
 }
 
-export const useAdminStore = create<AdminState>((set, get) => ({
+export const useAdminStore = create<AdminStore>((set, get) => ({
   stats: {
     totalRevenue: 48574,
     totalOrders: 3652,
-    totalCustomers: 12938,
-    totalProducts: 456,
+    totalCustomers: 2450,
+    totalProducts: 156,
     revenueGrowth: 12.5,
     ordersGrowth: 8.2,
     customersGrowth: 5.3,
     productsGrowth: 3.1,
   },
-  
-  salesData: Array.from({ length: 30 }, (_, i) => ({
-    date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    revenue: Math.floor(Math.random() * 5000) + 1000,
-    orders: Math.floor(Math.random() * 100) + 20,
-  })).reverse(),
-  
-  topProducts: [],
-  recentOrders: [],
-  inventory: [
-    {
-      productId: 'P001',
-      productName: 'Wireless Bluetooth Headphones',
-      currentStock: 15,
-      lowStockThreshold: 20,
-      isLowStock: true,
-      lastRestocked: '2024-01-15'
-    },
-    {
-      productId: 'P002',
-      productName: 'Smartphone Case',
-      currentStock: 8,
-      lowStockThreshold: 10,
-      isLowStock: true,
-      lastRestocked: '2024-01-10'
-    }
-  ],
-  lowStockAlerts: [
-    {
-      productId: 'P001',
-      productName: 'Wireless Bluetooth Headphones',
-      currentStock: 15,
-      lowStockThreshold: 20,
-      isLowStock: true,
-      lastRestocked: '2024-01-15'
-    },
-    {
-      productId: 'P002',
-      productName: 'Smartphone Case',
-      currentStock: 8,
-      lowStockThreshold: 10,
-      isLowStock: true,
-      lastRestocked: '2024-01-10'
-    }
-  ],
-  orderUpdates: [],
-  customerSegments: [
-    { segment: 'New Customers', count: 2450, value: 45000 },
-    { segment: 'Returning Customers', count: 7890, value: 156000 },
-    { segment: 'VIP Customers', count: 598, value: 89000 },
-  ],
-  
-  notificationSettings: {
-    orderNotifications: true,
-    lowStockAlerts: true,
-    customerSignups: false,
-    reviewNotifications: true,
-    emailReports: true
+
+  products: [],
+  categories: [],
+  orders: [],
+  customers: [],
+  inventory: [],
+  coupons: [],
+  isLoading: false,
+
+  updateStats: (newStats) =>
+    set((state) => ({
+      stats: { ...state.stats, ...newStats },
+    })),
+
+  addProduct: (product) =>
+    set((state) => ({
+      products: [
+        ...state.products,
+        { ...product, id: Date.now().toString() },
+      ],
+    })),
+
+  updateProduct: (id, product) =>
+    set((state) => ({
+      products: state.products.map((p) =>
+        p.id === id ? { ...p, ...product } : p
+      ),
+    })),
+
+  deleteProduct: (id) =>
+    set((state) => ({
+      products: state.products.filter((p) => p.id !== id),
+    })),
+
+  addCategory: (category) =>
+    set((state) => ({
+      categories: [
+        ...state.categories,
+        { ...category, id: Math.max(0, ...state.categories.map(c => c.id)) + 1 },
+      ],
+    })),
+
+  updateCategory: (id, category) =>
+    set((state) => ({
+      categories: state.categories.map((c) =>
+        c.id === id ? { ...c, ...category } : c
+      ),
+    })),
+
+  deleteCategory: (id) =>
+    set((state) => ({
+      categories: state.categories.filter((c) => c.id !== id),
+    })),
+
+  updateOrderStatus: (id, status, trackingNumber) =>
+    set((state) => ({
+      orders: state.orders.map((order) =>
+        order.id === id
+          ? { ...order, status, ...(trackingNumber && { trackingNumber }) }
+          : order
+      ),
+    })),
+
+  addCustomer: (customer) =>
+    set((state) => ({
+      customers: [
+        ...state.customers,
+        { ...customer, id: Date.now().toString() },
+      ],
+    })),
+
+  updateCustomer: (id, customer) =>
+    set((state) => ({
+      customers: state.customers.map((c) =>
+        c.id === id ? { ...c, ...customer } : c
+      ),
+    })),
+
+  updateInventory: (inventory) =>
+    set({ inventory }),
+
+  restockProduct: (productId, quantity) =>
+    set((state) => ({
+      inventory: state.inventory.map((item) =>
+        item.productId === productId
+          ? {
+              ...item,
+              currentStock: item.currentStock + quantity,
+              isLowStock: item.currentStock + quantity <= item.lowStockThreshold,
+              lastRestocked: new Date().toISOString().split('T')[0],
+            }
+          : item
+      ),
+    })),
+
+  addCoupon: (coupon) =>
+    set((state) => ({
+      coupons: [
+        ...state.coupons,
+        { ...coupon, id: Date.now().toString() },
+      ],
+    })),
+
+  updateCoupon: (id, coupon) =>
+    set((state) => ({
+      coupons: state.coupons.map((c) =>
+        c.id === id ? { ...c, ...coupon } : c
+      ),
+    })),
+
+  deleteCoupon: (id) =>
+    set((state) => ({
+      coupons: state.coupons.filter((c) => c.id !== id),
+    })),
+
+  initializeData: () => {
+    const mockProducts: Product[] = [
+      {
+        id: 'P001',
+        name: 'Wireless Bluetooth Headphones',
+        category: 'Electronics',
+        price: 49.99,
+        stock: 120,
+        status: 'active',
+        description: 'High-quality wireless headphones with noise cancellation',
+        image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300'
+      },
+      {
+        id: 'P002',
+        name: "Men's T-Shirt",
+        category: 'Fashion',
+        price: 14.99,
+        stock: 250,
+        status: 'active',
+        description: 'Comfortable cotton t-shirt in various colors',
+        image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300'
+      },
+      {
+        id: 'P003',
+        name: "Men's Leather Wallet",
+        category: 'Fashion',
+        price: 29.99,
+        stock: 85,
+        status: 'active',
+        description: 'Genuine leather wallet with RFID protection',
+        image: 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=300'
+      },
+      {
+        id: 'P004',
+        name: 'Memory Foam Pillow',
+        category: 'Home',
+        price: 39.99,
+        stock: 60,
+        status: 'active',
+        description: 'Ergonomic memory foam pillow for better sleep',
+        image: 'https://images.unsplash.com/photo-1584269600519-112e9b721d17?w=300'
+      },
+    ];
+
+    const mockCategories: Category[] = [
+      {
+        id: 1,
+        name: 'Electronics',
+        description: 'Electronic devices and gadgets',
+        image: 'https://images.unsplash.com/photo-1550009158-9ebf69173e03?q=80&w=300&auto=format&fit=crop',
+        createdAt: '2025-01-15',
+        products: 56
+      },
+      {
+        id: 2,
+        name: 'Fashion',
+        description: 'Clothing and accessories',
+        image: 'https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=300&auto=format&fit=crop',
+        createdAt: '2025-01-18',
+        products: 124
+      },
+      {
+        id: 3,
+        name: 'Home & Kitchen',
+        description: 'Furniture and kitchen appliances',
+        image: 'https://images.unsplash.com/photo-1556911220-bda9f7f7597b?q=80&w=300&auto=format&fit=crop',
+        createdAt: '2025-01-20',
+        products: 89
+      },
+    ];
+
+    const mockOrders: Order[] = [
+      {
+        id: '1001',
+        customer: 'John Doe',
+        amount: '120.50',
+        date: 'Apr 21, 2025',
+        status: 'Delivered',
+        items: ['Wireless Headphones', 'Phone Case']
+      },
+      {
+        id: '1002',
+        customer: 'Jane Smith',
+        amount: '85.20',
+        date: 'Apr 20, 2025',
+        status: 'Processing',
+        items: ['T-Shirt', 'Jeans']
+      },
+      {
+        id: '1003',
+        customer: 'Robert Johnson',
+        amount: '220.00',
+        date: 'Apr 20, 2025',
+        status: 'Pending',
+        items: ['Laptop Stand', 'Keyboard']
+      },
+    ];
+
+    const mockCustomers: Customer[] = [
+      {
+        id: '1',
+        name: 'John Doe',
+        email: 'john.doe@example.com',
+        phone: '+1 234-567-8901',
+        address: '123 Main St, City, State 12345',
+        registeredAt: '2024-12-01',
+        totalOrders: 5,
+        totalSpent: 450.25,
+        status: 'active'
+      },
+      {
+        id: '2',
+        name: 'Jane Smith',
+        email: 'jane.smith@example.com',
+        phone: '+1 234-567-8902',
+        address: '456 Oak Ave, City, State 12346',
+        registeredAt: '2024-11-15',
+        totalOrders: 3,
+        totalSpent: 275.80,
+        status: 'active'
+      },
+    ];
+
+    const mockCoupons: Coupon[] = [
+      {
+        id: '1',
+        code: 'WELCOME10',
+        type: 'percentage',
+        value: 10,
+        minOrder: 50,
+        usage: 125,
+        maxUsage: 1000,
+        status: 'active',
+        expiryDate: '2024-12-31'
+      },
+      {
+        id: '2',
+        code: 'SAVE20',
+        type: 'fixed',
+        value: 20,
+        minOrder: 100,
+        usage: 45,
+        maxUsage: 500,
+        status: 'active',
+        expiryDate: '2024-06-30'
+      },
+    ];
+
+    set({
+      products: mockProducts,
+      categories: mockCategories,
+      orders: mockOrders,
+      customers: mockCustomers,
+      coupons: mockCoupons,
+    });
   },
-  
-  activeCampaigns: [
-    {
-      id: '1',
-      name: 'Summer Sale',
-      type: 'Discount Campaign',
-      status: 'Active',
-      startDate: '2024-06-01',
-      endDate: '2024-08-31'
-    },
-    {
-      id: '2',
-      name: 'New Customer Welcome',
-      type: 'Email Campaign',
-      status: 'Draft',
-      startDate: '2024-07-01',
-      endDate: '2024-12-31'
-    }
-  ],
-  
-  updateStats: (stats) => set({ stats }),
-  updateSalesData: (salesData) => set({ salesData }),
-  updateInventory: (inventory) => {
-    const lowStockAlerts = inventory.filter(item => item.isLowStock);
-    set({ inventory, lowStockAlerts });
-  },
-  updateOrderStatus: (update) => set(state => ({
-    orderUpdates: [update, ...state.orderUpdates]
-  })),
-  addLowStockAlert: (item) => set(state => ({
-    lowStockAlerts: [...state.lowStockAlerts, item]
-  })),
-  removeLowStockAlert: (productId) => set(state => ({
-    lowStockAlerts: state.lowStockAlerts.filter(item => item.productId !== productId)
-  })),
-  updateNotificationSettings: (notificationSettings) => set({ notificationSettings }),
-  addCampaign: (campaign) => set(state => ({
-    activeCampaigns: [...state.activeCampaigns, campaign]
-  })),
-  updateCampaign: (id, updates) => set(state => ({
-    activeCampaigns: state.activeCampaigns.map(campaign => 
-      campaign.id === id ? { ...campaign, ...updates } : campaign
-    )
-  })),
 }));

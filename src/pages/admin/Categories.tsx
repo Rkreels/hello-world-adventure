@@ -1,36 +1,29 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Search, Plus, Filter, ArrowUpDown } from 'lucide-react';
+import { Search, Plus, ArrowUpDown } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CategoryCard from '@/components/admin/categories/CategoryCard';
 import CategoryTable from '@/components/admin/categories/CategoryTable';
 import CategoryForm from '@/components/admin/categories/CategoryForm';
 import { toast } from 'sonner';
-import { api } from '@/services/api';
-
-interface Category {
-  id: number;
-  name: string;
-  description: string;
-  image: string;
-  createdAt: string;
-  products: number;
-}
+import { useAdminStore } from '@/stores/adminStore';
 
 const Categories = () => {
-  // State management
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // Store state
+  const { categories, addCategory, updateCategory, deleteCategory, initializeData } = useAdminStore();
   
+  // Local state
+  const [isLoading, setIsLoading] = useState(true);
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [openViewDialog, setOpenViewDialog] = useState(false);
-  const [currentCategory, setCurrentCategory] = useState<Category | null>(null);
+  const [currentCategory, setCurrentCategory] = useState<any>(null);
   
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'name' | 'products' | 'date'>('name');
@@ -43,74 +36,17 @@ const Categories = () => {
     image: ''
   });
   
-  // Fetch categories on mount
+  // Initialize data on mount
   useEffect(() => {
-    fetchCategories();
-  }, []);
-  
-  const fetchCategories = async () => {
     setIsLoading(true);
-    
-    try {
-      // Simulate API call with mock data
-      setTimeout(() => {
-        setCategories([
-          { 
-            id: 1, 
-            name: 'Electronics', 
-            description: 'Electronic devices and gadgets',
-            image: 'https://images.unsplash.com/photo-1550009158-9ebf69173e03?q=80&w=2070&auto=format&fit=crop',
-            createdAt: '2025-01-15',
-            products: 56
-          },
-          { 
-            id: 2, 
-            name: 'Fashion', 
-            description: 'Clothing and accessories',
-            image: 'https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=2071&auto=format&fit=crop',
-            createdAt: '2025-01-18',
-            products: 124
-          },
-          { 
-            id: 3, 
-            name: 'Home & Kitchen', 
-            description: 'Furniture and kitchen appliances',
-            image: 'https://images.unsplash.com/photo-1556911220-bda9f7f7597b?q=80&w=2070&auto=format&fit=crop',
-            createdAt: '2025-01-20',
-            products: 89
-          },
-          { 
-            id: 4, 
-            name: 'Beauty', 
-            description: 'Cosmetics and personal care',
-            image: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=2087&auto=format&fit=crop',
-            createdAt: '2025-01-22',
-            products: 74
-          },
-          { 
-            id: 5, 
-            name: 'Sports & Outdoors', 
-            description: 'Sports equipment and outdoor gear',
-            image: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=2070&auto=format&fit=crop',
-            createdAt: '2025-01-25',
-            products: 62
-          }
-        ]);
-        setIsLoading(false);
-      }, 500);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-      toast.error('Failed to load categories');
-      setIsLoading(false);
-    }
-  };
+    initializeData();
+    setTimeout(() => setIsLoading(false), 500);
+  }, [initializeData]);
   
   const handleSort = (field: 'name' | 'products' | 'date') => {
     if (sortBy === field) {
-      // Toggle order if clicking on the same field
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
-      // Set new field and default to ascending
       setSortBy(field);
       setSortOrder('asc');
     }
@@ -138,7 +74,6 @@ const Categories = () => {
       }
     });
   
-  // Form handling
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
@@ -150,26 +85,25 @@ const Categories = () => {
     }
     
     const newCategory = {
-      id: Math.max(0, ...categories.map(c => c.id)) + 1,
       name: formData.name,
       description: formData.description,
-      image: formData.image || 'https://images.unsplash.com/photo-1550009158-9ebf69173e03?q=80&w=2070&auto=format&fit=crop',
+      image: formData.image || 'https://images.unsplash.com/photo-1550009158-9ebf69173e03?q=80&w=300&auto=format&fit=crop',
       createdAt: new Date().toISOString().split('T')[0],
       products: 0
     };
     
-    setCategories([...categories, newCategory]);
+    addCategory(newCategory);
     setFormData({ name: '', description: '', image: '' });
     setOpenAddDialog(false);
     toast.success(`Category "${newCategory.name}" has been created`);
   };
   
-  const handleViewClick = (category: Category) => {
+  const handleViewClick = (category: any) => {
     setCurrentCategory(category);
     setOpenViewDialog(true);
   };
   
-  const handleEditClick = (category: Category) => {
+  const handleEditClick = (category: any) => {
     setCurrentCategory(category);
     setFormData({
       name: category.name,
@@ -185,24 +119,18 @@ const Categories = () => {
       return;
     }
     
-    const updatedCategories = categories.map(cat => 
-      cat.id === currentCategory.id 
-        ? { 
-            ...cat, 
-            name: formData.name, 
-            description: formData.description,
-            image: formData.image
-          } 
-        : cat
-    );
+    updateCategory(currentCategory.id, {
+      name: formData.name,
+      description: formData.description,
+      image: formData.image
+    });
     
-    setCategories(updatedCategories);
     setFormData({ name: '', description: '', image: '' });
     setOpenEditDialog(false);
     toast.success(`Category "${formData.name}" has been updated`);
   };
   
-  const handleDeleteClick = (category: Category) => {
+  const handleDeleteClick = (category: any) => {
     setCurrentCategory(category);
     setOpenDeleteDialog(true);
   };
@@ -210,10 +138,18 @@ const Categories = () => {
   const handleDeleteCategory = () => {
     if (!currentCategory) return;
     
-    const updatedCategories = categories.filter(cat => cat.id !== currentCategory.id);
-    setCategories(updatedCategories);
+    deleteCategory(currentCategory.id);
     setOpenDeleteDialog(false);
     toast.success(`Category "${currentCategory.name}" has been deleted`);
+  };
+  
+  const refreshCategories = () => {
+    setIsLoading(true);
+    initializeData();
+    setTimeout(() => {
+      setIsLoading(false);
+      toast.success('Categories refreshed');
+    }, 500);
   };
   
   return (
@@ -291,7 +227,7 @@ const Categories = () => {
             <ArrowUpDown className="h-3 w-3" />
           </Button>
           
-          <Button variant="outline" size="sm" onClick={fetchCategories}>
+          <Button variant="outline" size="sm" onClick={refreshCategories}>
             Refresh
           </Button>
         </div>
