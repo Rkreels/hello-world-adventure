@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -261,15 +260,6 @@ const Categories = () => {
       </div>
       
       <div className="flex flex-col md:flex-row gap-4 mb-6">
-        <div className="flex-grow">
-          <Tabs value={viewType} onValueChange={setViewType}>
-            <TabsList>
-              <TabsTrigger value="grid">Grid View</TabsTrigger>
-              <TabsTrigger value="table">Table View</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-        
         <div className="flex gap-2">
           <Button
             variant="outline"
@@ -325,7 +315,12 @@ const Categories = () => {
           </Button>
         </div>
       ) : (
-        <>
+        <Tabs value={viewType} onValueChange={setViewType}>
+          <TabsList className="mb-6">
+            <TabsTrigger value="grid">Grid View</TabsTrigger>
+            <TabsTrigger value="table">Table View</TabsTrigger>
+          </TabsList>
+          
           <TabsContent value="grid" className="mt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
               {processedCategories.map((category) => (
@@ -358,7 +353,7 @@ const Categories = () => {
               </CardContent>
             </Card>
           </TabsContent>
-        </>
+        </Tabs>
       )}
       
       {/* Edit Dialog */}
