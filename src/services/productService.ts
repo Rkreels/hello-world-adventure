@@ -1,28 +1,7 @@
 
 import { api } from './api';
 import { toast } from 'sonner';
-
-export interface Product {
-  id: string | number;
-  name: string;
-  description: string;
-  price: number;
-  discountPrice?: number;
-  discountedPrice?: number; // Added for compatibility
-  images: string[];
-  category: string;
-  categoryId: string | number; // Added this field
-  categoryName: string;
-  tags: string[];
-  status: 'active' | 'inactive' | 'draft';
-  featured: boolean; // Added this field
-  isFeatured?: boolean; // For compatibility with existing code
-  stock: number;
-  ratings: number;
-  reviewCount: number;
-  createdAt: string;
-  updatedAt: string;
-}
+import { Product } from '@/types';
 
 export const productService = {
   getAll: async (filters?: { 
@@ -46,12 +25,15 @@ export const productService = {
       
       if (filters?.category) {
         filteredData = filteredData.filter(product => 
-          product.categoryId.toString() === filters.category?.toString()
+          (product.categoryId && product.categoryId.toString() === filters.category?.toString()) ||
+          product.category === filters.category
         );
       }
       
       if (filters?.featured !== undefined) {
-        filteredData = filteredData.filter(product => product.featured === filters.featured);
+        filteredData = filteredData.filter(product => 
+          product.featured === filters.featured || product.isFeatured === filters.featured
+        );
       }
       
       if (filters?.search) {
@@ -59,7 +41,7 @@ export const productService = {
         filteredData = filteredData.filter(product => 
           product.name.toLowerCase().includes(searchTerm) || 
           product.description.toLowerCase().includes(searchTerm) ||
-          product.tags.some(tag => tag.toLowerCase().includes(searchTerm))
+          (product.tags && product.tags.some(tag => tag.toLowerCase().includes(searchTerm)))
         );
       }
       
@@ -88,7 +70,7 @@ export const productService = {
             case 'date':
               return (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()) * sortOrder;
             case 'popularity':
-              return (b.reviewCount - a.reviewCount) * sortOrder;
+              return ((b.reviewCount || 0) - (a.reviewCount || 0)) * sortOrder;
             default:
               return 0;
           }
@@ -114,7 +96,7 @@ export const productService = {
     }
   },
   
-  create: async (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'ratings' | 'reviewCount'>) => {
+  create: async (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'rating' | 'ratings' | 'reviewCount'>) => {
     try {
       const { data } = await api.createProduct(product);
       toast.success(`Product "${product.name}" created successfully`);

@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -15,12 +14,16 @@ export interface Product {
   description: string;
   price: number;
   discountPrice?: number;
+  discountedPrice?: number; // Added for compatibility
   images: string[];
   category: string;
+  categoryId?: string | number; // Added this field
+  categoryName?: string;
   stock: number;
   stockStatus: 'In Stock' | 'Low Stock' | 'Out of Stock';
   isUnlimited?: boolean;
   isFeatured?: boolean;
+  featured?: boolean; // Added this field
   taxIncluded?: boolean;
   expirationStart?: string;
   expirationEnd?: string;
@@ -29,14 +32,30 @@ export interface Product {
   tags?: string[];
   colors?: string[];
   rating?: number;
+  ratings?: number;
   reviewCount?: number;
+  status?: 'active' | 'inactive' | 'draft';
 }
 
 export interface Category {
   id: string;
   name: string;
+  description?: string; // Added this field
   icon: string;
+  image?: string; // Added this field
   productCount: number;
+  products?: number; // Added for compatibility
+  status?: 'active' | 'inactive'; // Added this field
+  createdAt?: string; // Added this field
+}
+
+export interface Brand {
+  id: number | string;
+  name: string;
+  products: number;
+  featured: boolean;
+  logo: string;
+  status: 'active' | 'inactive';
 }
 
 export interface Customer {

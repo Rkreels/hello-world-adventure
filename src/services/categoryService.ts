@@ -1,16 +1,7 @@
 
 import { api } from './api';
 import { toast } from 'sonner';
-
-export interface Category {
-  id: string | number;
-  name: string;
-  description: string;
-  image: string;
-  createdAt: string;
-  products: number;
-  status: 'active' | 'inactive';
-}
+import { Category } from '@/types';
 
 export const categoryService = {
   getAll: async (filters?: { status?: string, search?: string }) => {
@@ -27,7 +18,7 @@ export const categoryService = {
         const searchTerm = filters.search.toLowerCase();
         filteredData = filteredData.filter(cat => 
           cat.name.toLowerCase().includes(searchTerm) || 
-          cat.description.toLowerCase().includes(searchTerm)
+          (cat.description && cat.description.toLowerCase().includes(searchTerm))
         );
       }
       
@@ -57,14 +48,15 @@ export const categoryService = {
     }
   },
   
-  create: async (category: Omit<Category, 'id' | 'createdAt' | 'products'>) => {
+  create: async (category: Omit<Category, 'id' | 'createdAt' | 'products' | 'productCount'>) => {
     try {
       // Simulate creating a category
       const newCategory = {
         ...category,
-        id: Date.now(),
+        id: Date.now().toString(),
         createdAt: new Date().toISOString(),
-        products: 0
+        products: 0,
+        productCount: 0
       };
       
       toast.success(`Category "${category.name}" created successfully`);

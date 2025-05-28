@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -26,7 +25,7 @@ const Brands = () => {
     name: '',
     logo: '',
     featured: false,
-    status: 'active' as const
+    status: 'active' as 'active' | 'inactive'
   });
   
   useEffect(() => {
