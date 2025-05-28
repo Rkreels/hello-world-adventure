@@ -1,157 +1,267 @@
 
-import { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
-import { Search, Filter, Download, MoreHorizontal } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Search, Eye, Edit, Package, Truck, CheckCircle, XCircle } from 'lucide-react';
+import { useAdminStore } from '@/stores/adminStore';
+import OrderStatusManager from '@/components/admin/orders/OrderStatusManager';
+import { toast } from 'sonner';
 
-// Order status badge component
-const OrderStatusBadge = ({ status }: { status: string }) => {
-  const getStatusColor = () => {
+const OrderManagement = () => {
+  const { orders, updateOrderStatus, initializeData } = useAdminStore();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('all');
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
+
+  useEffect(() => {
+    initializeData();
+  }, [initializeData]);
+
+  const filteredOrders = orders.filter(order => {
+    const matchesSearch = order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         order.customer.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = selectedStatus === 'all' || order.status === selectedStatus;
+    return matchesSearch && matchesStatus;
+  });
+
+  const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'Completed':
-        return 'bg-green-100 text-green-800';
-      case 'Processing':
-        return 'bg-blue-100 text-blue-800';
-      case 'Pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'Cancelled':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+      case 'Pending': return <Package className="h-4 w-4" />;
+      case 'Processing': return <Package className="h-4 w-4" />;
+      case 'Shipped': return <Truck className="h-4 w-4" />;
+      case 'Delivered': return <CheckCircle className="h-4 w-4" />;
+      case 'Cancelled': return <XCircle className="h-4 w-4" />;
+      default: return <Package className="h-4 w-4" />;
     }
   };
 
-  return (
-    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor()}`}>
-      {status}
-    </span>
-  );
-};
+  const getStatusBadge = (status: string) => {
+    const configs = {
+      'Pending': 'bg-yellow-100 text-yellow-800',
+      'Processing': 'bg-blue-100 text-blue-800', 
+      'Shipped': 'bg-purple-100 text-purple-800',
+      'Delivered': 'bg-green-100 text-green-800',
+      'Cancelled': 'bg-red-100 text-red-800'
+    };
+    
+    return (
+      <Badge className={`flex items-center gap-1 ${configs[status as keyof typeof configs] || ''}`}>
+        {getStatusIcon(status)}
+        {status}
+      </Badge>
+    );
+  };
 
-// Order table component
-const OrderTable = ({ orders }: { orders: any[] }) => {
-  return (
-    <div className="overflow-x-auto">
-      <table className="w-full border-collapse">
-        <thead>
-          <tr className="bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-            <th className="p-4">Order ID</th>
-            <th className="p-4">Date</th>
-            <th className="p-4">Customer</th>
-            <th className="p-4">Status</th>
-            <th className="p-4">Amount</th>
-            <th className="p-4">Action</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-200">
-          {orders.map((order) => (
-            <tr key={order.id} className="hover:bg-gray-50">
-              <td className="p-4 text-sm">#{order.id}</td>
-              <td className="p-4 text-sm">{order.date}</td>
-              <td className="p-4 text-sm">{order.customer}</td>
-              <td className="p-4">
-                <OrderStatusBadge status={order.status} />
-              </td>
-              <td className="p-4 text-sm">${order.amount}</td>
-              <td className="p-4">
-                <Button variant="ghost" size="icon">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-};
+  const handleViewOrder = (order: any) => {
+    setSelectedOrder(order);
+    setIsDetailDialogOpen(true);
+  };
 
-// Order filtering toolbox
-const OrderFilterToolbar = ({ onFilterChange }: { onFilterChange: (filter: string) => void }) => {
+  const handleStatusUpdate = (orderId: string, status: string, trackingNumber?: string, notes?: string) => {
+    updateOrderStatus(orderId, status as any, trackingNumber);
+    
+    // Update the selected order if it's currently being viewed
+    if (selectedOrder && selectedOrder.id === orderId) {
+      setSelectedOrder({
+        ...selectedOrder,
+        status,
+        trackingNumber: trackingNumber || selectedOrder.trackingNumber
+      });
+    }
+  };
+
+  const ordersByStatus = {
+    all: orders.length,
+    Pending: orders.filter(o => o.status === 'Pending').length,
+    Processing: orders.filter(o => o.status === 'Processing').length,
+    Shipped: orders.filter(o => o.status === 'Shipped').length,
+    Delivered: orders.filter(o => o.status === 'Delivered').length,
+    Cancelled: orders.filter(o => o.status === 'Cancelled').length,
+  };
+
   return (
-    <div className="flex flex-col lg:flex-row gap-4 items-center justify-between mb-6">
-      <div className="flex gap-4 w-full lg:w-auto">
-        <div className="relative w-full lg:w-80">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-          <Input 
-            placeholder="Search orders..." 
-            className="pl-10" 
-          />
+    <div className="p-6 space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold">Order Management</h1>
+        <div className="flex items-center gap-4">
+          <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Orders ({ordersByStatus.all})</SelectItem>
+              <SelectItem value="Pending">Pending ({ordersByStatus.Pending})</SelectItem>
+              <SelectItem value="Processing">Processing ({ordersByStatus.Processing})</SelectItem>
+              <SelectItem value="Shipped">Shipped ({ordersByStatus.Shipped})</SelectItem>
+              <SelectItem value="Delivered">Delivered ({ordersByStatus.Delivered})</SelectItem>
+              <SelectItem value="Cancelled">Cancelled ({ordersByStatus.Cancelled})</SelectItem>
+            </SelectContent>
+          </Select>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              placeholder="Search orders..."
+              className="pl-10 w-64"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
         </div>
-        
-        <Button variant="outline" className="flex gap-2 items-center">
-          <Filter className="h-4 w-4" />
-          <span>Filter</span>
-        </Button>
       </div>
-      
-      <div className="flex gap-4 w-full lg:w-auto">
-        <Select defaultValue="today">
-          <SelectTrigger className="w-full lg:w-40">
-            <SelectValue placeholder="Time Period" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="today">Today</SelectItem>
-            <SelectItem value="yesterday">Yesterday</SelectItem>
-            <SelectItem value="week">This Week</SelectItem>
-            <SelectItem value="month">This Month</SelectItem>
-          </SelectContent>
-        </Select>
-        
-        <Button variant="outline" className="flex gap-2 items-center">
-          <Download className="h-4 w-4" />
-          <span>Export</span>
-        </Button>
-      </div>
-    </div>
-  );
-};
 
-const OrderManagement = () => {
-  const [activeFilter, setActiveFilter] = useState('all');
-  
-  // Sample order data
-  const orders = [
-    { id: '1001', date: 'Apr 21, 2025', customer: 'John Doe', status: 'Completed', amount: '120.50' },
-    { id: '1002', date: 'Apr 20, 2025', customer: 'Jane Smith', status: 'Processing', amount: '85.20' },
-    { id: '1003', date: 'Apr 20, 2025', customer: 'Robert Johnson', status: 'Pending', amount: '220.00' },
-    { id: '1004', date: 'Apr 19, 2025', customer: 'Emily Wilson', status: 'Completed', amount: '44.95' },
-    { id: '1005', date: 'Apr 18, 2025', customer: 'Michael Brown', status: 'Cancelled', amount: '112.30' },
-    { id: '1006', date: 'Apr 18, 2025', customer: 'Sarah Davis', status: 'Processing', amount: '175.60' },
-    { id: '1007', date: 'Apr 17, 2025', customer: 'David Miller', status: 'Completed', amount: '62.75' },
-    { id: '1008', date: 'Apr 16, 2025', customer: 'Lisa Garcia', status: 'Pending', amount: '145.00' }
-  ];
-
-  return (
-    <div className="p-6">
-      <h1 className="text-2xl font-semibold mb-6">Order Management</h1>
-      
-      <Tabs defaultValue="all" className="mb-6">
-        <TabsList className="grid grid-cols-5 w-full md:w-auto">
-          <TabsTrigger value="all">All Orders</TabsTrigger>
-          <TabsTrigger value="completed">Completed</TabsTrigger>
-          <TabsTrigger value="processing">Processing</TabsTrigger>
-          <TabsTrigger value="pending">Pending</TabsTrigger>
-          <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
-        </TabsList>
-      </Tabs>
-      
-      <OrderFilterToolbar onFilterChange={setActiveFilter} />
-      
       <Card>
-        <CardContent className="p-0">
-          <OrderTable orders={orders} />
+        <CardHeader>
+          <CardTitle>Orders</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Tabs value={selectedStatus} onValueChange={setSelectedStatus}>
+            <TabsList className="mb-4">
+              <TabsTrigger value="all">All ({ordersByStatus.all})</TabsTrigger>
+              <TabsTrigger value="Pending">Pending ({ordersByStatus.Pending})</TabsTrigger>
+              <TabsTrigger value="Processing">Processing ({ordersByStatus.Processing})</TabsTrigger>
+              <TabsTrigger value="Shipped">Shipped ({ordersByStatus.Shipped})</TabsTrigger>
+              <TabsTrigger value="Delivered">Delivered ({ordersByStatus.Delivered})</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value={selectedStatus}>
+              {filteredOrders.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-gray-500 text-lg">No orders found</p>
+                  <p className="text-gray-400 text-sm mt-2">
+                    {searchQuery ? 'Try adjusting your search terms' : `No ${selectedStatus === 'all' ? '' : selectedStatus.toLowerCase()} orders at the moment`}
+                  </p>
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Order ID</TableHead>
+                      <TableHead>Customer</TableHead>
+                      <TableHead>Amount</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Tracking</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredOrders.map((order) => (
+                      <TableRow key={order.id}>
+                        <TableCell className="font-medium">#{order.id}</TableCell>
+                        <TableCell>{order.customer}</TableCell>
+                        <TableCell>${order.amount}</TableCell>
+                        <TableCell>{order.date}</TableCell>
+                        <TableCell>{getStatusBadge(order.status)}</TableCell>
+                        <TableCell>
+                          {order.trackingNumber ? (
+                            <code className="text-xs bg-gray-100 px-2 py-1 rounded">
+                              {order.trackingNumber}
+                            </code>
+                          ) : (
+                            <span className="text-gray-400">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <Button size="sm" variant="ghost" onClick={() => handleViewOrder(order)}>
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button size="sm" variant="ghost" onClick={() => handleViewOrder(order)}>
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
+
+      <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Order Details - #{selectedOrder?.id}</DialogTitle>
+          </DialogHeader>
+          {selectedOrder && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-sm">Order Information</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Order ID:</span>
+                      <span className="font-medium">#{selectedOrder.id}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Customer:</span>
+                      <span className="font-medium">{selectedOrder.customer}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Date:</span>
+                      <span className="font-medium">{selectedOrder.date}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Amount:</span>
+                      <span className="font-medium text-lg">${selectedOrder.amount}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Status:</span>
+                      {getStatusBadge(selectedOrder.status)}
+                    </div>
+                    {selectedOrder.trackingNumber && (
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600">Tracking:</span>
+                        <code className="text-xs bg-gray-100 px-2 py-1 rounded">
+                          {selectedOrder.trackingNumber}
+                        </code>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {selectedOrder.items && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-sm">Order Items</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        {selectedOrder.items.map((item: string, index: number) => (
+                          <div key={index} className="flex justify-between items-center py-2 border-b border-gray-100 last:border-0">
+                            <span className="text-sm">{item}</span>
+                            <span className="text-sm text-gray-600">1x</span>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+
+              <div>
+                <OrderStatusManager
+                  orderId={selectedOrder.id}
+                  currentStatus={selectedOrder.status}
+                  onStatusUpdate={handleStatusUpdate}
+                />
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

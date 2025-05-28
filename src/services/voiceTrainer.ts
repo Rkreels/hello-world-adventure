@@ -10,8 +10,9 @@ export interface TrainingStep {
   id: string;
   text: string;
   targetElement?: string;
-  action?: 'click' | 'hover' | 'focus';
+  action?: 'click' | 'hover' | 'focus' | 'type';
   duration?: number;
+  cursorPosition?: { x: number; y: number };
 }
 
 class VoiceTrainerService {
@@ -26,11 +27,9 @@ class VoiceTrainerService {
   }
 
   private initializeVoice() {
-    // Wait for voices to load
     const setVoice = () => {
       const voices = speechSynthesis.getVoices();
       
-      // Prefer natural-sounding voices
       const preferredVoiceNames = [
         'Microsoft Aria Online (Natural) - English (United States)',
         'Microsoft Jenny Online (Natural) - English (United States)',
@@ -51,7 +50,6 @@ class VoiceTrainerService {
         }
       }
 
-      // Fallback to first English voice
       if (!this.preferredVoice) {
         this.preferredVoice = voices.find(v => v.lang.startsWith('en')) || voices[0] || null;
       }
@@ -65,21 +63,19 @@ class VoiceTrainerService {
   }
 
   async speak(text: string): Promise<void> {
-    // Stop any currently playing speech
     this.stopCurrentSpeech();
 
     return new Promise((resolve, reject) => {
       try {
         this.currentUtterance = new SpeechSynthesisUtterance(text);
         
-        // Configure voice settings for more natural speech
         if (this.preferredVoice) {
           this.currentUtterance.voice = this.preferredVoice;
         }
         
-        this.currentUtterance.rate = 0.9; // Slightly slower for clarity
-        this.currentUtterance.pitch = 1.0; // Natural pitch
-        this.currentUtterance.volume = 0.8; // Comfortable volume
+        this.currentUtterance.rate = 0.9;
+        this.currentUtterance.pitch = 1.0;
+        this.currentUtterance.volume = 0.8;
 
         this.currentUtterance.onstart = () => {
           this.isPlaying = true;
@@ -129,33 +125,34 @@ class VoiceTrainerService {
   }
 
   async executeNextStep() {
-    if (!this.currentModule) return;
+    if (!this.currentModule) return null;
 
     const module = this.getTrainingModule(this.currentModule);
     if (!module || this.currentStep >= module.steps.length) {
       await this.speak("Congratulations! You have completed this training module. You can now explore the features on your own, or select another module to learn more.");
       this.currentModule = null;
       this.currentStep = 0;
-      return;
+      return null;
     }
 
     const step = module.steps[this.currentStep];
     
     if (step.targetElement) {
-      this.highlightElement(step.targetElement);
+      const cursorPos = this.highlightElement(step.targetElement);
+      step.cursorPosition = cursorPos;
     }
     
     await this.speak(step.text);
     this.currentStep++;
+    
+    return step;
   }
 
   highlightElement(selector: string) {
-    // Remove previous highlights
     document.querySelectorAll('.voice-trainer-highlight').forEach(el => {
       el.classList.remove('voice-trainer-highlight');
     });
 
-    // Add highlight to target element with multiple selector attempts
     const selectors = [
       selector,
       selector.replace(/\\/g, ''),
@@ -176,7 +173,15 @@ class VoiceTrainerService {
     if (element) {
       element.classList.add('voice-trainer-highlight');
       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      
+      const rect = element.getBoundingClientRect();
+      return {
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2
+      };
     }
+    
+    return { x: 0, y: 0 };
   }
 
   getTrainingModule(moduleId: string): TrainingModule | undefined {
@@ -193,28 +198,29 @@ class VoiceTrainerService {
           {
             id: 'stats',
             text: 'These four cards at the top show your key business metrics: total revenue, orders, customers, and products. They update in real-time and show growth percentages.',
-            targetElement: '.grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4',
+            targetElement: '[data-testid="stats-cards"]',
           },
           {
             id: 'chart',
             text: 'This sales chart displays your revenue and order trends over the last 30 days. You can hover over data points to see specific values for each day.',
-            targetElement: '.col-span-4',
+            targetElement: '[data-testid="sales-chart"]',
           },
           {
             id: 'alerts',
             text: 'The low stock alerts section helps you manage inventory. When products run low, they appear here. Click the restock button to add more inventory.',
-            targetElement: 'h3:has-text("Low Stock")',
+            targetElement: '[data-testid="low-stock-alerts"]',
           },
           {
             id: 'actions',
             text: 'Quick actions let you perform common tasks instantly. You can add products, create coupons, or view reports directly from here.',
+            targetElement: '[data-testid="quick-actions"]',
           },
         ],
       },
       categories: {
         id: 'categories',
         title: 'Category Management',
-        description: 'Learn how to organize your products with categories.',
+        description: 'Learn how to organize your products with categories and perform CRUD operations.',
         steps: [
           {
             id: 'overview',
@@ -224,6 +230,10 @@ class VoiceTrainerService {
             id: 'add',
             text: 'Click the Add Category button to create new product categories. You can add a name, description, and image for each category.',
             targetElement: 'button:has-text("Add Category")',
+          },
+          {
+            id: 'form',
+            text: 'In the category form, fill in the category name, description, and upload an image. Make sure the name is unique and descriptive.',
           },
           {
             id: 'search',
@@ -236,15 +246,23 @@ class VoiceTrainerService {
             targetElement: '[role="tablist"]',
           },
           {
-            id: 'actions',
-            text: 'Each category has action buttons to edit or delete it. Be careful when deleting categories that contain products.',
+            id: 'edit',
+            text: 'To edit a category, click the edit button on any category card or row. This opens the same form with pre-filled data.',
+          },
+          {
+            id: 'delete',
+            text: 'To delete a category, click the delete button. Be careful when deleting categories that contain products - you may need to reassign products first.',
+          },
+          {
+            id: 'bulk',
+            text: 'You can select multiple categories using checkboxes and perform bulk operations like delete or status changes.',
           },
         ],
       },
       products: {
         id: 'products',
         title: 'Product Management',
-        description: 'Master adding, editing, and managing your product inventory.',
+        description: 'Master adding, editing, and managing your product inventory with full CRUD operations.',
         steps: [
           {
             id: 'overview',
@@ -256,8 +274,20 @@ class VoiceTrainerService {
             targetElement: 'button:has-text("Add New Product")',
           },
           {
+            id: 'form-details',
+            text: 'In the product form, enter the product name, detailed description, price, and select a category. Make sure all required fields are filled.',
+          },
+          {
+            id: 'form-inventory',
+            text: 'Set the initial stock quantity and low stock threshold. The system will alert you when stock falls below this threshold.',
+          },
+          {
+            id: 'form-images',
+            text: 'Upload product images to showcase your items. You can upload multiple images and set a primary image.',
+          },
+          {
             id: 'table',
-            text: 'This table shows all your products with important information like stock levels, prices, and status. Products with low stock are highlighted.',
+            text: 'This table shows all your products with important information like stock levels, prices, and status. Products with low stock are highlighted in red.',
             targetElement: 'table',
           },
           {
@@ -271,22 +301,34 @@ class VoiceTrainerService {
             targetElement: 'input[placeholder*="Search"]',
           },
           {
-            id: 'actions',
-            text: 'Each product row has action buttons to view details, edit the product, or remove it from your inventory.',
+            id: 'edit-inline',
+            text: 'Click the edit button on any product row to modify its details. You can update price, stock, status, and other properties.',
+          },
+          {
+            id: 'stock-management',
+            text: 'Monitor stock levels closely. When products show low stock badges, restock them immediately to avoid lost sales.',
+          },
+          {
+            id: 'status-toggle',
+            text: 'Toggle product status between active and inactive. Inactive products won\'t be visible to customers in your store.',
+          },
+          {
+            id: 'bulk-operations',
+            text: 'Select multiple products using checkboxes to perform bulk operations like status changes, category updates, or bulk delete.',
           },
         ],
       },
       orders: {
         id: 'orders',
         title: 'Order Processing',
-        description: 'Learn to efficiently process and manage customer orders.',
+        description: 'Learn to efficiently process and manage customer orders with status updates.',
         steps: [
           {
             id: 'overview',
             text: 'Order management is crucial for customer satisfaction. Here you can track, update, and process all customer orders.',
           },
           {
-            id: 'status',
+            id: 'status-overview',
             text: 'Order status badges show the current state: yellow for pending, blue for processing, purple for shipped, and green for delivered.',
           },
           {
@@ -295,19 +337,35 @@ class VoiceTrainerService {
             targetElement: '[role="tablist"]',
           },
           {
-            id: 'details',
+            id: 'order-details',
             text: 'Click on any order to view detailed information including customer details, items ordered, and shipping information.',
           },
           {
-            id: 'update',
-            text: 'Update order status as you process them. Add tracking numbers when orders ship to keep customers informed.',
+            id: 'status-update',
+            text: 'Update order status as you process them. Select the new status from the dropdown and add tracking numbers when orders ship.',
+          },
+          {
+            id: 'tracking',
+            text: 'When marking orders as shipped, always add tracking numbers. This keeps customers informed about their delivery status.',
+          },
+          {
+            id: 'customer-communication',
+            text: 'Use the notes field to add internal comments about orders. This helps team coordination and customer service.',
+          },
+          {
+            id: 'search-orders',
+            text: 'Search orders by order ID, customer name, or email to quickly find specific orders.',
+          },
+          {
+            id: 'date-filter',
+            text: 'Filter orders by date range to view orders from specific time periods for reporting and analysis.',
           },
         ],
       },
       customers: {
         id: 'customers',
         title: 'Customer Management',
-        description: 'Understand and manage your customer relationships.',
+        description: 'Understand and manage your customer relationships and data.',
         steps: [
           {
             id: 'overview',
@@ -322,6 +380,10 @@ class VoiceTrainerService {
             text: 'The customer directory lists all registered users with their contact information, order history, and account status.',
           },
           {
+            id: 'customer-details',
+            text: 'Click on any customer to view their complete profile including order history, total spent, and contact preferences.',
+          },
+          {
             id: 'search',
             text: 'Search for specific customers by name or email address to quickly access their information.',
             targetElement: 'input[placeholder*="Search"]',
@@ -329,6 +391,22 @@ class VoiceTrainerService {
           {
             id: 'segments',
             text: 'Customer segments help you understand different types of customers: new, regular, VIP, and inactive customers.',
+          },
+          {
+            id: 'add-customer',
+            text: 'Add new customers manually by clicking the Add Customer button and filling in their details.',
+          },
+          {
+            id: 'edit-customer',
+            text: 'Edit customer information by clicking the edit button. You can update contact details, preferences, and notes.',
+          },
+          {
+            id: 'customer-orders',
+            text: 'View a customer\'s complete order history to understand their buying patterns and preferences.',
+          },
+          {
+            id: 'customer-status',
+            text: 'Manage customer account status - active customers can place orders, while inactive accounts are restricted.',
           },
         ],
       },
@@ -359,12 +437,24 @@ class VoiceTrainerService {
             id: 'thresholds',
             text: 'Set low stock thresholds for each product to get timely alerts before you run out completely.',
           },
+          {
+            id: 'batch-restock',
+            text: 'Use batch restocking to update multiple products at once. This is efficient for regular inventory updates.',
+          },
+          {
+            id: 'stock-history',
+            text: 'View stock movement history to understand product turnover rates and optimize inventory levels.',
+          },
+          {
+            id: 'forecasting',
+            text: 'Use sales data to forecast future inventory needs and prevent stockouts during peak periods.',
+          },
         ],
       },
       marketing: {
         id: 'marketing',
         title: 'Marketing Tools',
-        description: 'Create promotions and discount codes to boost sales.',
+        description: 'Create promotions and discount codes to boost sales with full coupon management.',
         steps: [
           {
             id: 'overview',
@@ -376,17 +466,37 @@ class VoiceTrainerService {
             targetElement: 'button:has-text("Create Coupon")',
           },
           {
+            id: 'coupon-form',
+            text: 'In the coupon form, set the coupon code, discount type (percentage or fixed amount), value, and expiry date.',
+          },
+          {
+            id: 'restrictions',
+            text: 'Set minimum order amounts and usage limits to control how coupons are used and prevent abuse.',
+          },
+          {
             id: 'table',
             text: 'This table shows all your active coupons with usage statistics, expiry dates, and current status.',
             targetElement: 'table',
           },
           {
             id: 'codes',
-            text: 'Coupon codes are automatically generated, but you can customize them. Share these codes with customers through email or social media.',
+            text: 'Coupon codes can be customized to be memorable. Share these codes with customers through email or social media.',
+          },
+          {
+            id: 'edit-coupon',
+            text: 'Edit existing coupons by clicking the edit button. You can modify expiry dates, usage limits, and status.',
+          },
+          {
+            id: 'copy-code',
+            text: 'Click the copy button to quickly copy coupon codes for sharing with customers or in marketing campaigns.',
           },
           {
             id: 'tracking',
             text: 'Track coupon performance to see which promotions are most effective for your business.',
+          },
+          {
+            id: 'deactivate',
+            text: 'Deactivate or delete coupons that are no longer needed or have expired to keep your list clean.',
           },
         ],
       },
@@ -418,6 +528,18 @@ class VoiceTrainerService {
             text: 'Export reports as spreadsheets for further analysis, sharing with team members, or record keeping.',
             targetElement: 'button:has-text("Export")',
           },
+          {
+            id: 'filters',
+            text: 'Apply filters to focus on specific products, categories, or customer segments in your reports.',
+          },
+          {
+            id: 'metrics',
+            text: 'Key performance indicators show important metrics like conversion rates, average order value, and customer lifetime value.',
+          },
+          {
+            id: 'comparisons',
+            text: 'Compare performance across different time periods to identify trends and measure growth.',
+          },
         ],
       },
     };
@@ -434,7 +556,6 @@ class VoiceTrainerService {
     this.currentModule = null;
     this.currentStep = 0;
     
-    // Remove all highlights
     document.querySelectorAll('.voice-trainer-highlight').forEach(el => {
       el.classList.remove('voice-trainer-highlight');
     });
