@@ -1,10 +1,4 @@
 
-export interface VoiceTrainerConfig {
-  apiKey: string;
-  voiceId: string;
-  model: string;
-}
-
 export interface TrainingModule {
   id: string;
   title: string;
@@ -21,92 +15,107 @@ export interface TrainingStep {
 }
 
 class VoiceTrainerService {
-  private config: VoiceTrainerConfig | null = null;
-  private currentAudio: HTMLAudioElement | null = null;
+  private currentUtterance: SpeechSynthesisUtterance | null = null;
   private isPlaying = false;
   private currentModule: string | null = null;
   private currentStep = 0;
+  private preferredVoice: SpeechSynthesisVoice | null = null;
 
-  initialize(config: VoiceTrainerConfig) {
-    this.config = config;
+  constructor() {
+    this.initializeVoice();
   }
 
-  async generateSpeech(text: string): Promise<string> {
-    if (!this.config) {
-      throw new Error('Voice trainer not initialized');
-    }
+  private initializeVoice() {
+    // Wait for voices to load
+    const setVoice = () => {
+      const voices = speechSynthesis.getVoices();
+      
+      // Prefer natural-sounding voices
+      const preferredVoiceNames = [
+        'Microsoft Aria Online (Natural) - English (United States)',
+        'Microsoft Jenny Online (Natural) - English (United States)',
+        'Google UK English Female',
+        'Google US English',
+        'Microsoft Zira - English (United States)',
+        'Alex',
+        'Samantha',
+        'Karen',
+        'Daniel'
+      ];
 
-    try {
-      const response = await fetch('https://api.elevenlabs.io/v1/text-to-speech/' + this.config.voiceId, {
-        method: 'POST',
-        headers: {
-          'Accept': 'audio/mpeg',
-          'Content-Type': 'application/json',
-          'xi-api-key': this.config.apiKey,
-        },
-        body: JSON.stringify({
-          text,
-          model_id: this.config.model,
-          voice_settings: {
-            stability: 0.5,
-            similarity_boost: 0.5,
-          },
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to generate speech');
+      for (const voiceName of preferredVoiceNames) {
+        const voice = voices.find(v => v.name.includes(voiceName.split(' ')[1]) || v.name === voiceName);
+        if (voice) {
+          this.preferredVoice = voice;
+          break;
+        }
       }
 
-      const audioBlob = await response.blob();
-      return URL.createObjectURL(audioBlob);
-    } catch (error) {
-      console.error('Error generating speech:', error);
-      throw error;
+      // Fallback to first English voice
+      if (!this.preferredVoice) {
+        this.preferredVoice = voices.find(v => v.lang.startsWith('en')) || voices[0] || null;
+      }
+    };
+
+    if (speechSynthesis.getVoices().length > 0) {
+      setVoice();
+    } else {
+      speechSynthesis.addEventListener('voiceschanged', setVoice);
     }
   }
 
   async speak(text: string): Promise<void> {
-    // Stop any currently playing audio
-    this.stopCurrentAudio();
+    // Stop any currently playing speech
+    this.stopCurrentSpeech();
 
-    try {
-      const audioUrl = await this.generateSpeech(text);
-      this.currentAudio = new Audio(audioUrl);
-      this.isPlaying = true;
+    return new Promise((resolve, reject) => {
+      try {
+        this.currentUtterance = new SpeechSynthesisUtterance(text);
+        
+        // Configure voice settings for more natural speech
+        if (this.preferredVoice) {
+          this.currentUtterance.voice = this.preferredVoice;
+        }
+        
+        this.currentUtterance.rate = 0.9; // Slightly slower for clarity
+        this.currentUtterance.pitch = 1.0; // Natural pitch
+        this.currentUtterance.volume = 0.8; // Comfortable volume
 
-      return new Promise((resolve, reject) => {
-        if (!this.currentAudio) return reject(new Error('No audio'));
+        this.currentUtterance.onstart = () => {
+          this.isPlaying = true;
+        };
 
-        this.currentAudio.onended = () => {
+        this.currentUtterance.onend = () => {
           this.isPlaying = false;
-          URL.revokeObjectURL(audioUrl);
+          this.currentUtterance = null;
           resolve();
         };
 
-        this.currentAudio.onerror = () => {
+        this.currentUtterance.onerror = (event) => {
           this.isPlaying = false;
-          reject(new Error('Audio playback failed'));
+          this.currentUtterance = null;
+          console.error('Speech synthesis error:', event);
+          reject(new Error('Speech synthesis failed'));
         };
 
-        this.currentAudio.play().catch(reject);
-      });
-    } catch (error) {
-      this.isPlaying = false;
-      throw error;
-    }
+        speechSynthesis.speak(this.currentUtterance);
+      } catch (error) {
+        this.isPlaying = false;
+        reject(error);
+      }
+    });
   }
 
-  stopCurrentAudio() {
-    if (this.currentAudio && this.isPlaying) {
-      this.currentAudio.pause();
-      this.currentAudio.currentTime = 0;
+  stopCurrentSpeech() {
+    if (this.isPlaying && this.currentUtterance) {
+      speechSynthesis.cancel();
       this.isPlaying = false;
+      this.currentUtterance = null;
     }
   }
 
   async startModuleTraining(moduleId: string) {
-    this.stopCurrentAudio();
+    this.stopCurrentSpeech();
     this.currentModule = moduleId;
     this.currentStep = 0;
 
@@ -115,8 +124,8 @@ class VoiceTrainerService {
       throw new Error(`Training module ${moduleId} not found`);
     }
 
-    await this.speak(`Welcome to ${module.title} training. ${module.description}`);
-    await this.executeNextStep();
+    await this.speak(`Welcome to ${module.title} training. ${module.description} Let's get started!`);
+    setTimeout(() => this.executeNextStep(), 500);
   }
 
   async executeNextStep() {
@@ -124,19 +133,19 @@ class VoiceTrainerService {
 
     const module = this.getTrainingModule(this.currentModule);
     if (!module || this.currentStep >= module.steps.length) {
-      await this.speak("Training completed! You can now explore the features on your own.");
+      await this.speak("Congratulations! You have completed this training module. You can now explore the features on your own, or select another module to learn more.");
       this.currentModule = null;
       this.currentStep = 0;
       return;
     }
 
     const step = module.steps[this.currentStep];
-    await this.speak(step.text);
-
+    
     if (step.targetElement) {
       this.highlightElement(step.targetElement);
     }
-
+    
+    await this.speak(step.text);
     this.currentStep++;
   }
 
@@ -146,8 +155,24 @@ class VoiceTrainerService {
       el.classList.remove('voice-trainer-highlight');
     });
 
-    // Add highlight to target element
-    const element = document.querySelector(selector);
+    // Add highlight to target element with multiple selector attempts
+    const selectors = [
+      selector,
+      selector.replace(/\\/g, ''),
+      `[data-testid="${selector}"]`,
+      selector.replace(/:/g, '\\:')
+    ];
+
+    let element: Element | null = null;
+    for (const sel of selectors) {
+      try {
+        element = document.querySelector(sel);
+        if (element) break;
+      } catch (e) {
+        continue;
+      }
+    }
+
     if (element) {
       element.classList.add('voice-trainer-highlight');
       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -162,182 +187,235 @@ class VoiceTrainerService {
         description: 'Learn how to navigate and understand your admin dashboard.',
         steps: [
           {
+            id: 'welcome',
+            text: 'Welcome to your admin dashboard! This is your command center where you can monitor your business performance at a glance.',
+          },
+          {
             id: 'stats',
-            text: 'These cards show your key business metrics: revenue, orders, customers, and products. They update in real-time.',
+            text: 'These four cards at the top show your key business metrics: total revenue, orders, customers, and products. They update in real-time and show growth percentages.',
             targetElement: '.grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4',
           },
           {
             id: 'chart',
-            text: 'This sales chart shows your revenue trends over time. You can hover over points to see specific values.',
-            targetElement: '[data-testid="sales-chart"]',
+            text: 'This sales chart displays your revenue and order trends over the last 30 days. You can hover over data points to see specific values for each day.',
+            targetElement: '.col-span-4',
           },
           {
             id: 'alerts',
-            text: 'Low stock alerts help you manage inventory. Click on any alert to restock items.',
-            targetElement: '[data-testid="low-stock-alerts"]',
+            text: 'The low stock alerts section helps you manage inventory. When products run low, they appear here. Click the restock button to add more inventory.',
+            targetElement: 'h3:has-text("Low Stock")',
           },
           {
             id: 'actions',
-            text: 'Quick actions let you perform common tasks quickly. Try clicking on any action button.',
-            targetElement: '[data-testid="quick-actions"]',
+            text: 'Quick actions let you perform common tasks instantly. You can add products, create coupons, or view reports directly from here.',
           },
         ],
       },
       categories: {
         id: 'categories',
         title: 'Category Management',
-        description: 'Learn how to manage product categories in your store.',
+        description: 'Learn how to organize your products with categories.',
         steps: [
           {
+            id: 'overview',
+            text: 'Categories help organize your products and make them easier for customers to find. You can create, edit, and manage all your product categories here.',
+          },
+          {
             id: 'add',
-            text: 'Click the Add Category button to create new product categories for organizing your inventory.',
+            text: 'Click the Add Category button to create new product categories. You can add a name, description, and image for each category.',
             targetElement: 'button:has-text("Add Category")',
           },
           {
             id: 'search',
-            text: 'Use the search bar to quickly find specific categories by name or description.',
-            targetElement: 'input[placeholder="Search categories"]',
-          },
-          {
-            id: 'sort',
-            text: 'Sort categories by name, product count, or creation date using these buttons.',
-            targetElement: '.flex.gap-2:has(button:has-text("Name"))',
+            text: 'Use the search bar to quickly find specific categories by typing the category name or description.',
+            targetElement: 'input[placeholder*="Search"]',
           },
           {
             id: 'views',
-            text: 'Switch between grid and table views to see categories in your preferred layout.',
+            text: 'Switch between grid view and table view using these tabs. Grid view shows images, while table view provides detailed information.',
             targetElement: '[role="tablist"]',
+          },
+          {
+            id: 'actions',
+            text: 'Each category has action buttons to edit or delete it. Be careful when deleting categories that contain products.',
           },
         ],
       },
       products: {
         id: 'products',
         title: 'Product Management',
-        description: 'Master product creation, editing, and inventory management.',
+        description: 'Master adding, editing, and managing your product inventory.',
         steps: [
           {
-            id: 'list',
-            text: 'This table shows all your products with key information like stock levels and prices.',
-            targetElement: 'table',
+            id: 'overview',
+            text: 'This is where you manage all your products. You can add new products, edit existing ones, track inventory levels, and set pricing.',
           },
           {
             id: 'add',
-            text: 'Click Add New Product to create products for your store.',
+            text: 'Click Add New Product to create products for your store. You will need to provide details like name, description, price, and category.',
             targetElement: 'button:has-text("Add New Product")',
           },
           {
+            id: 'table',
+            text: 'This table shows all your products with important information like stock levels, prices, and status. Products with low stock are highlighted.',
+            targetElement: 'table',
+          },
+          {
             id: 'filter',
-            text: 'Filter products by category using this dropdown menu.',
-            targetElement: 'select:has(option:has-text("All Categories"))',
+            text: 'Filter products by category using this dropdown menu to focus on specific product types.',
+            targetElement: 'select',
+          },
+          {
+            id: 'search',
+            text: 'Use the search function to quickly find specific products by name or description.',
+            targetElement: 'input[placeholder*="Search"]',
           },
           {
             id: 'actions',
-            text: 'Use these action buttons to view, edit, or delete products.',
-            targetElement: 'td:last-child button',
+            text: 'Each product row has action buttons to view details, edit the product, or remove it from your inventory.',
           },
         ],
       },
       orders: {
         id: 'orders',
-        title: 'Order Management',
-        description: 'Learn to process and manage customer orders effectively.',
+        title: 'Order Processing',
+        description: 'Learn to efficiently process and manage customer orders.',
         steps: [
           {
+            id: 'overview',
+            text: 'Order management is crucial for customer satisfaction. Here you can track, update, and process all customer orders.',
+          },
+          {
             id: 'status',
-            text: 'Order status badges show the current state: pending, processing, shipped, or delivered.',
-            targetElement: '.bg-yellow-100, .bg-blue-100, .bg-purple-100, .bg-green-100',
+            text: 'Order status badges show the current state: yellow for pending, blue for processing, purple for shipped, and green for delivered.',
           },
           {
             id: 'tabs',
-            text: 'Use these tabs to filter orders by status for better organization.',
+            text: 'Use these status tabs to filter orders by their current state. This helps you focus on orders that need attention.',
             targetElement: '[role="tablist"]',
           },
           {
-            id: 'export',
-            text: 'Export order data for reporting and accounting purposes.',
-            targetElement: 'button:has-text("Export")',
+            id: 'details',
+            text: 'Click on any order to view detailed information including customer details, items ordered, and shipping information.',
+          },
+          {
+            id: 'update',
+            text: 'Update order status as you process them. Add tracking numbers when orders ship to keep customers informed.',
           },
         ],
       },
       customers: {
         id: 'customers',
         title: 'Customer Management',
-        description: 'Understand your customers and manage their accounts.',
+        description: 'Understand and manage your customer relationships.',
         steps: [
           {
+            id: 'overview',
+            text: 'Customer management helps you understand your audience and provide better service. Track customer behavior and manage accounts here.',
+          },
+          {
             id: 'analytics',
-            text: 'Customer analytics show growth trends and key metrics about your customer base.',
-            targetElement: '[data-testid="customer-analytics"]',
+            text: 'Customer analytics show growth trends, loyalty segments, and key metrics about your customer base over time.',
           },
           {
             id: 'directory',
-            text: 'The customer directory lists all registered users with their contact information.',
-            targetElement: '[data-testid="customer-directory"]',
+            text: 'The customer directory lists all registered users with their contact information, order history, and account status.',
+          },
+          {
+            id: 'search',
+            text: 'Search for specific customers by name or email address to quickly access their information.',
+            targetElement: 'input[placeholder*="Search"]',
+          },
+          {
+            id: 'segments',
+            text: 'Customer segments help you understand different types of customers: new, regular, VIP, and inactive customers.',
           },
         ],
       },
       inventory: {
         id: 'inventory',
-        title: 'Inventory Management',
-        description: 'Keep track of stock levels and manage restocking.',
+        title: 'Inventory Control',
+        description: 'Keep track of stock levels and manage restocking efficiently.',
         steps: [
           {
+            id: 'overview',
+            text: 'Inventory management ensures you never run out of popular products. Monitor stock levels and get alerts when items run low.',
+          },
+          {
             id: 'levels',
-            text: 'This table shows current stock levels for all products. Red badges indicate low stock.',
+            text: 'This table shows current stock levels for all products. Red badges indicate items that are below the low stock threshold.',
             targetElement: 'table',
           },
           {
+            id: 'alerts',
+            text: 'Low stock alerts appear when inventory drops below set thresholds. Take action quickly to avoid stockouts.',
+          },
+          {
             id: 'restock',
-            text: 'Click restock buttons to add more inventory for products running low.',
+            text: 'Click restock buttons to add more inventory for products running low. Set appropriate restock quantities based on demand.',
             targetElement: 'button:has-text("Restock")',
           },
           {
-            id: 'search',
-            text: 'Search for specific products to quickly check their stock status.',
-            targetElement: 'input[placeholder="Search products..."]',
+            id: 'thresholds',
+            text: 'Set low stock thresholds for each product to get timely alerts before you run out completely.',
           },
         ],
       },
       marketing: {
         id: 'marketing',
-        title: 'Marketing & Coupons',
-        description: 'Create discount codes and promotional campaigns.',
+        title: 'Marketing Tools',
+        description: 'Create promotions and discount codes to boost sales.',
         steps: [
           {
+            id: 'overview',
+            text: 'Marketing tools help you create promotions and discount codes to attract customers and increase sales.',
+          },
+          {
             id: 'create',
-            text: 'Create new coupons with custom discount percentages or fixed amounts.',
+            text: 'Create new coupons with custom discount percentages or fixed amounts. Set minimum order requirements and usage limits.',
             targetElement: 'button:has-text("Create Coupon")',
           },
           {
             id: 'table',
-            text: 'This table shows all your active coupons with usage statistics.',
+            text: 'This table shows all your active coupons with usage statistics, expiry dates, and current status.',
             targetElement: 'table',
           },
           {
-            id: 'copy',
-            text: 'Copy coupon codes to share with customers using the copy button.',
-            targetElement: 'button:has([data-testid="copy-icon"])',
+            id: 'codes',
+            text: 'Coupon codes are automatically generated, but you can customize them. Share these codes with customers through email or social media.',
+          },
+          {
+            id: 'tracking',
+            text: 'Track coupon performance to see which promotions are most effective for your business.',
           },
         ],
       },
       reports: {
         id: 'reports',
-        title: 'Reports & Analytics',
-        description: 'Generate business reports and analyze performance.',
+        title: 'Analytics & Reports',
+        description: 'Generate insights and reports to understand your business performance.',
         steps: [
           {
+            id: 'overview',
+            text: 'Reports and analytics provide valuable insights into your business performance and help you make data-driven decisions.',
+          },
+          {
             id: 'tabs',
-            text: 'Different report types: sales, products, customers, and inventory analytics.',
+            text: 'Different report types are available: sales performance, product analytics, customer insights, and inventory reports.',
             targetElement: '[role="tablist"]',
           },
           {
             id: 'period',
-            text: 'Select time periods to focus your analysis on specific date ranges.',
-            targetElement: 'select:has(option:has-text("Last 30 days"))',
+            text: 'Select different time periods to analyze trends over days, weeks, months, or custom date ranges.',
+            targetElement: 'select',
+          },
+          {
+            id: 'charts',
+            text: 'Visual charts and graphs make it easy to understand trends and patterns in your business data.',
           },
           {
             id: 'export',
-            text: 'Export reports as spreadsheets for further analysis or record keeping.',
+            text: 'Export reports as spreadsheets for further analysis, sharing with team members, or record keeping.',
             targetElement: 'button:has-text("Export")',
           },
         ],
@@ -352,7 +430,7 @@ class VoiceTrainerService {
   }
 
   stopTraining() {
-    this.stopCurrentAudio();
+    this.stopCurrentSpeech();
     this.currentModule = null;
     this.currentStep = 0;
     
@@ -360,6 +438,14 @@ class VoiceTrainerService {
     document.querySelectorAll('.voice-trainer-highlight').forEach(el => {
       el.classList.remove('voice-trainer-highlight');
     });
+  }
+
+  getCurrentModule(): string | null {
+    return this.currentModule;
+  }
+
+  getCurrentStep(): number {
+    return this.currentStep;
   }
 }
 

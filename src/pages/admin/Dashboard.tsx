@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { DollarSign, ShoppingBag, Users, Activity } from 'lucide-react';
 import StatsCard from '@/components/admin/dashboard/StatsCard';
 import RecentOrders from '@/components/admin/dashboard/RecentOrders';
@@ -10,7 +10,12 @@ import QuickActions from '@/components/admin/dashboard/QuickActions';
 import { useAdminStore } from '@/stores/adminStore';
 
 const Dashboard = () => {
-  const { stats } = useAdminStore();
+  const { stats, initializeData } = useAdminStore();
+
+  useEffect(() => {
+    // Initialize mock data when component mounts
+    initializeData();
+  }, [initializeData]);
   
   // Sample data for recent orders and top products
   const recentOrders = [
@@ -36,7 +41,7 @@ const Dashboard = () => {
       </div>
       
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" data-testid="stats-cards">
         <StatsCard
           title="Total Revenue"
           value={`$${stats.totalRevenue.toLocaleString()}`}
@@ -72,10 +77,16 @@ const Dashboard = () => {
       
       {/* Charts and Analytics */}
       <div className="grid grid-cols-1 lg:grid-cols-6 gap-6">
-        <SalesChart />
+        <div data-testid="sales-chart">
+          <SalesChart />
+        </div>
         <div className="lg:col-span-2 space-y-6">
-          <LowStockAlerts />
-          <QuickActions />
+          <div data-testid="low-stock-alerts">
+            <LowStockAlerts />
+          </div>
+          <div data-testid="quick-actions">
+            <QuickActions />
+          </div>
         </div>
       </div>
       

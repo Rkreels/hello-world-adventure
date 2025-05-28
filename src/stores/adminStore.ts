@@ -64,6 +64,25 @@ interface Coupon {
   expiryDate: string;
 }
 
+interface SalesData {
+  date: string;
+  revenue: number;
+  orders: number;
+}
+
+interface LowStockAlert {
+  productId: string;
+  productName: string;
+  currentStock: number;
+  lowStockThreshold: number;
+}
+
+interface CustomerSegment {
+  name: string;
+  count: number;
+  percentage: number;
+}
+
 interface AdminStore {
   // Stats
   stats: {
@@ -84,6 +103,9 @@ interface AdminStore {
   customers: Customer[];
   inventory: InventoryItem[];
   coupons: Coupon[];
+  salesData: SalesData[];
+  lowStockAlerts: LowStockAlert[];
+  customerSegments: CustomerSegment[];
 
   // Loading states
   isLoading: boolean;
@@ -111,6 +133,7 @@ interface AdminStore {
   // Inventory actions
   updateInventory: (inventory: InventoryItem[]) => void;
   restockProduct: (productId: string, quantity: number) => void;
+  removeLowStockAlert: (productId: string) => void;
   
   // Coupon actions
   addCoupon: (coupon: Omit<Coupon, 'id'>) => void;
@@ -139,6 +162,9 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
   customers: [],
   inventory: [],
   coupons: [],
+  salesData: [],
+  lowStockAlerts: [],
+  customerSegments: [],
   isLoading: false,
 
   updateStats: (newStats) =>
@@ -225,6 +251,12 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
             }
           : item
       ),
+      lowStockAlerts: state.lowStockAlerts.filter((alert) => alert.productId !== productId),
+    })),
+
+  removeLowStockAlert: (productId) =>
+    set((state) => ({
+      lowStockAlerts: state.lowStockAlerts.filter((alert) => alert.productId !== productId),
     })),
 
   addCoupon: (coupon) =>
@@ -395,12 +427,43 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
       },
     ];
 
+    const mockSalesData: SalesData[] = Array.from({ length: 30 }, (_, i) => ({
+      date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString(),
+      revenue: Math.floor(Math.random() * 5000) + 1000,
+      orders: Math.floor(Math.random() * 50) + 10,
+    }));
+
+    const mockLowStockAlerts: LowStockAlert[] = [
+      {
+        productId: 'P001',
+        productName: 'Wireless Bluetooth Headphones',
+        currentStock: 5,
+        lowStockThreshold: 10,
+      },
+      {
+        productId: 'P004',
+        productName: 'Memory Foam Pillow',
+        currentStock: 3,
+        lowStockThreshold: 5,
+      },
+    ];
+
+    const mockCustomerSegments: CustomerSegment[] = [
+      { name: 'New Customers', count: 450, percentage: 35 },
+      { name: 'Regular Customers', count: 580, percentage: 45 },
+      { name: 'VIP Customers', count: 195, percentage: 15 },
+      { name: 'Inactive Customers', percentage: 5, count: 65 },
+    ];
+
     set({
       products: mockProducts,
       categories: mockCategories,
       orders: mockOrders,
       customers: mockCustomers,
       coupons: mockCoupons,
+      salesData: mockSalesData,
+      lowStockAlerts: mockLowStockAlerts,
+      customerSegments: mockCustomerSegments,
     });
   },
 }));

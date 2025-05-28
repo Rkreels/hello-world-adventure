@@ -2,62 +2,52 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Mic, MicOff, Play, Square, Settings, HelpCircle, Volume2 } from 'lucide-react';
-import { voiceTrainer, VoiceTrainerConfig } from '@/services/voiceTrainer';
+import { Mic, MicOff, Play, Square, Volume2, VolumeX, Pause } from 'lucide-react';
+import { voiceTrainer } from '@/services/voiceTrainer';
 import { toast } from 'sonner';
 
 const VoiceTrainer = () => {
-  const [isConfigured, setIsConfigured] = useState(false);
   const [isTraining, setIsTraining] = useState(false);
-  const [config, setConfig] = useState<VoiceTrainerConfig>({
-    apiKey: '',
-    voiceId: '9BWtsMINqrJLrRacOk9x', // Aria voice
-    model: 'eleven_multilingual_v2'
-  });
-  const [showConfig, setShowConfig] = useState(false);
+  const [currentModule, setCurrentModule] = useState<string | null>(null);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isVoiceEnabled, setIsVoiceEnabled] = useState(true);
 
   useEffect(() => {
-    // Check if configuration exists in localStorage
-    const savedConfig = localStorage.getItem('voiceTrainerConfig');
-    if (savedConfig) {
-      const parsedConfig = JSON.parse(savedConfig);
-      setConfig(parsedConfig);
-      voiceTrainer.initialize(parsedConfig);
-      setIsConfigured(true);
+    // Check if speech synthesis is supported
+    if (!('speechSynthesis' in window)) {
+      toast.error('Text-to-speech is not supported in your browser');
+      setIsVoiceEnabled(false);
     }
+
+    // Update training state periodically
+    const interval = setInterval(() => {
+      const trainingActive = voiceTrainer.isTrainingActive();
+      const module = voiceTrainer.getCurrentModule();
+      const step = voiceTrainer.getCurrentStep();
+      
+      setIsTraining(trainingActive);
+      setCurrentModule(module);
+      setCurrentStep(step);
+      setIsPlaying(speechSynthesis.speaking);
+    }, 500);
+
+    return () => clearInterval(interval);
   }, []);
 
-  const handleSaveConfig = () => {
-    if (!config.apiKey.trim()) {
-      toast.error('Please enter your ElevenLabs API key');
-      return;
-    }
-
-    localStorage.setItem('voiceTrainerConfig', JSON.stringify(config));
-    voiceTrainer.initialize(config);
-    setIsConfigured(true);
-    setShowConfig(false);
-    toast.success('Voice trainer configured successfully');
-  };
-
   const startTraining = async (moduleId: string) => {
-    if (!isConfigured) {
-      toast.error('Please configure the voice trainer first');
-      setShowConfig(true);
+    if (!isVoiceEnabled) {
+      toast.error('Voice guidance is not available in your browser');
       return;
     }
 
     try {
       setIsTraining(true);
       await voiceTrainer.startModuleTraining(moduleId);
-      toast.success(`Started training for ${moduleId}`);
+      toast.success(`Started training for ${getModuleTitle(moduleId)}`);
     } catch (error) {
       console.error('Training error:', error);
-      toast.error('Failed to start training. Please check your API key.');
+      toast.error('Failed to start training. Please try again.');
       setIsTraining(false);
     }
   };
@@ -65,6 +55,8 @@ const VoiceTrainer = () => {
   const stopTraining = () => {
     voiceTrainer.stopTraining();
     setIsTraining(false);
+    setCurrentModule(null);
+    setCurrentStep(0);
     toast.info('Training stopped');
   };
 
@@ -78,6 +70,41 @@ const VoiceTrainer = () => {
     }
   };
 
+  const pauseResumeSpeech = () => {
+    if (speechSynthesis.speaking && !speechSynthesis.paused) {
+      speechSynthesis.pause();
+      toast.info('Speech paused');
+    } else if (speechSynthesis.paused) {
+      speechSynthesis.resume();
+      toast.info('Speech resumed');
+    }
+  };
+
+  const toggleVoice = () => {
+    if (isVoiceEnabled) {
+      voiceTrainer.stopCurrentSpeech();
+      setIsVoiceEnabled(false);
+      toast.info('Voice guidance disabled');
+    } else {
+      setIsVoiceEnabled(true);
+      toast.info('Voice guidance enabled');
+    }
+  };
+
+  const getModuleTitle = (moduleId: string): string => {
+    const titles: Record<string, string> = {
+      dashboard: 'Dashboard',
+      categories: 'Categories',
+      products: 'Products',
+      orders: 'Orders',
+      customers: 'Customers',
+      inventory: 'Inventory',
+      marketing: 'Marketing',
+      reports: 'Reports',
+    };
+    return titles[moduleId] || moduleId;
+  };
+
   const trainingModules = [
     { id: 'dashboard', title: 'Dashboard', description: 'Learn the main dashboard' },
     { id: 'categories', title: 'Categories', description: 'Manage product categories' },
@@ -89,13 +116,6 @@ const VoiceTrainer = () => {
     { id: 'reports', title: 'Reports', description: 'Analytics and reporting' },
   ];
 
-  const voiceOptions = [
-    { id: '9BWtsMINqrJLrRacOk9x', name: 'Aria' },
-    { id: 'EXAVITQu4vr4xnSDxMaL', name: 'Sarah' },
-    { id: 'CwhRBWXzGAHq8TQ4Fs17', name: 'Roger' },
-    { id: 'FGY2WhTYpPnrIDTdsKH5', name: 'Laura' },
-  ];
-
   return (
     <>
       <style>{`
@@ -105,125 +125,117 @@ const VoiceTrainer = () => {
           background-color: rgba(16, 185, 129, 0.1) !important;
           border-radius: 4px !important;
           animation: pulse 2s infinite !important;
+          position: relative !important;
+          z-index: 1000 !important;
+        }
+        
+        .voice-trainer-highlight::before {
+          content: '';
+          position: absolute;
+          top: -5px;
+          left: -5px;
+          right: -5px;
+          bottom: -5px;
+          background: linear-gradient(45deg, #10b981, #34d399);
+          border-radius: 8px;
+          z-index: -1;
+          opacity: 0.3;
+          animation: glow 2s infinite alternate;
         }
         
         @keyframes pulse {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.7; }
         }
+        
+        @keyframes glow {
+          0% { opacity: 0.3; }
+          100% { opacity: 0.6; }
+        }
       `}</style>
 
-      <Card className="fixed bottom-4 right-4 w-80 z-50 shadow-lg">
+      <Card className="fixed bottom-4 right-4 w-80 z-50 shadow-lg border-2">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-sm">
-            <Volume2 className="h-4 w-4" />
+            {isVoiceEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
             Voice Trainer
-            <Dialog open={showConfig} onOpenChange={setShowConfig}>
-              <DialogTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  <Settings className="h-4 w-4" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Voice Trainer Configuration</DialogTitle>
-                  <DialogDescription>
-                    Configure your ElevenLabs API settings for voice guidance.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="apiKey">ElevenLabs API Key</Label>
-                    <Input
-                      id="apiKey"
-                      type="password"
-                      placeholder="Enter your API key"
-                      value={config.apiKey}
-                      onChange={(e) => setConfig({ ...config, apiKey: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="voice">Voice</Label>
-                    <Select value={config.voiceId} onValueChange={(value) => setConfig({ ...config, voiceId: value })}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {voiceOptions.map((voice) => (
-                          <SelectItem key={voice.id} value={voice.id}>
-                            {voice.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="model">Model</Label>
-                    <Select value={config.model} onValueChange={(value) => setConfig({ ...config, model: value })}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="eleven_multilingual_v2">Multilingual v2 (Best Quality)</SelectItem>
-                        <SelectItem value="eleven_turbo_v2_5">Turbo v2.5 (Fast)</SelectItem>
-                        <SelectItem value="eleven_turbo_v2">Turbo v2 (English Only)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <Button onClick={handleSaveConfig} className="w-full">
-                    Save Configuration
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={toggleVoice}
+              className="ml-auto"
+            >
+              {isVoiceEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+            </Button>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {!isConfigured ? (
+          {!isVoiceEnabled ? (
             <div className="text-center py-4">
-              <HelpCircle className="h-8 w-8 mx-auto text-gray-400 mb-2" />
+              <VolumeX className="h-8 w-8 mx-auto text-gray-400 mb-2" />
               <p className="text-sm text-gray-600 mb-3">
-                Configure your ElevenLabs API key to start voice training
+                Voice guidance is disabled
               </p>
-              <Button onClick={() => setShowConfig(true)} size="sm">
-                Configure Now
+              <Button onClick={toggleVoice} size="sm">
+                Enable Voice
               </Button>
             </div>
           ) : (
             <>
               {isTraining ? (
                 <div className="space-y-2">
+                  <div className="text-center">
+                    <p className="text-sm font-medium text-green-600">
+                      Training: {getModuleTitle(currentModule || '')}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Step {currentStep + 1}
+                    </p>
+                  </div>
                   <div className="flex gap-2">
                     <Button onClick={continueTraining} size="sm" className="flex-1">
                       <Play className="h-4 w-4 mr-1" />
                       Continue
                     </Button>
+                    {isPlaying && (
+                      <Button onClick={pauseResumeSpeech} variant="outline" size="sm">
+                        <Pause className="h-4 w-4" />
+                      </Button>
+                    )}
                     <Button onClick={stopTraining} variant="outline" size="sm">
                       <Square className="h-4 w-4" />
                     </Button>
                   </div>
                   <p className="text-xs text-center text-gray-600">
-                    Training in progress...
+                    {isPlaying ? 'Speaking...' : 'Click Continue for next step'}
                   </p>
                 </div>
               ) : (
                 <>
-                  <p className="text-xs text-gray-600 mb-3">
-                    Choose a module to learn:
-                  </p>
+                  <div className="text-center mb-3">
+                    <Volume2 className="h-8 w-8 mx-auto text-green-600 mb-2" />
+                    <p className="text-xs text-gray-600">
+                      Choose a module to learn with voice guidance:
+                    </p>
+                  </div>
                   <div className="grid grid-cols-2 gap-1 max-h-48 overflow-y-auto">
                     {trainingModules.map((module) => (
                       <Button
                         key={module.id}
                         variant="outline"
                         size="sm"
-                        className="text-xs p-2 h-auto flex-col items-start"
+                        className="text-xs p-2 h-auto flex-col items-start hover:bg-green-50 hover:border-green-200"
                         onClick={() => startTraining(module.id)}
                       >
                         <span className="font-medium">{module.title}</span>
                         <span className="text-gray-500 text-[10px]">{module.description}</span>
                       </Button>
                     ))}
+                  </div>
+                  <div className="text-center pt-2 border-t">
+                    <p className="text-[10px] text-gray-500">
+                      🎧 Using browser text-to-speech for natural voice guidance
+                    </p>
                   </div>
                 </>
               )}
