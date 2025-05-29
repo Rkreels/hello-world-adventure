@@ -8,23 +8,27 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { Image, X } from 'lucide-react';
 
-interface CategoryFormProps {
-  formData: {
-    name: string;
-    description: string;
-    image: string;
-  };
-  setFormData: React.Dispatch<React.SetStateAction<{
-    name: string;
-    description: string;
-    image: string;
-  }>>;
-  onSave: () => void;
-  onCancel: () => void;
-  submitLabel: string;
+interface Category {
+  id: number;
+  name: string;
+  description: string;
+  image: string;
+  products: number;
+  createdAt: string;
 }
 
-const CategoryForm = ({ formData, setFormData, onSave, onCancel, submitLabel }: CategoryFormProps) => {
+interface CategoryFormProps {
+  category?: Category | null;
+  onSubmit: (categoryData: any) => void;
+  onCancel: () => void;
+}
+
+const CategoryForm = ({ category, onSubmit, onCancel }: CategoryFormProps) => {
+  const [formData, setFormData] = useState({
+    name: category?.name || '',
+    description: category?.description || '',
+    image: category?.image || ''
+  });
   const [imagePreview, setImagePreview] = useState<string | null>(formData.image || null);
   const [isUploading, setIsUploading] = useState(false);
   
@@ -60,7 +64,7 @@ const CategoryForm = ({ formData, setFormData, onSave, onCancel, submitLabel }: 
       toast.error('Category name is required');
       return;
     }
-    onSave();
+    onSubmit(formData);
   };
   
   return (
@@ -135,7 +139,7 @@ const CategoryForm = ({ formData, setFormData, onSave, onCancel, submitLabel }: 
       <DialogFooter>
         <Button variant="outline" onClick={onCancel} type="button">Cancel</Button>
         <Button onClick={handleSubmit} type="button" disabled={isUploading || !formData.name.trim()}>
-          {submitLabel}
+          {category ? 'Update Category' : 'Add Category'}
         </Button>
       </DialogFooter>
     </>

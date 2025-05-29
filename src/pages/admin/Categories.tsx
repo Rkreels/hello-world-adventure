@@ -12,12 +12,21 @@ import CategoryForm from '@/components/admin/categories/CategoryForm';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 
+interface Category {
+  id: number;
+  name: string;
+  description: string;
+  image: string;
+  products: number;
+  createdAt: string;
+}
+
 const Categories = () => {
   const { categories, addCategory, updateCategory, deleteCategory, initializeData } = useAdminStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [view, setView] = useState<'grid' | 'table'>('grid');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<any>(null);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
   useEffect(() => {
     initializeData();
@@ -40,7 +49,7 @@ const Categories = () => {
     toast.success('Category added successfully');
   };
 
-  const handleEditCategory = (category: any) => {
+  const handleEditCategory = (category: Category) => {
     setEditingCategory(category);
     setIsDialogOpen(true);
   };
@@ -58,8 +67,8 @@ const Categories = () => {
     }
   };
 
-  const handleDeleteCategory = (id: number) => {
-    deleteCategory(id);
+  const handleDeleteCategory = (category: Category) => {
+    deleteCategory(category.id);
     toast.success('Category deleted successfully');
   };
 
