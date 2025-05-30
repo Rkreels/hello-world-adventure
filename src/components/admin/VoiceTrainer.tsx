@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX, MousePointer } from 'lucide-react';
 import { voiceTrainer } from '@/services/voiceTrainer';
@@ -11,6 +11,8 @@ const VoiceTrainer = () => {
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
   const [showCursor, setShowCursor] = useState(false);
   const [currentElement, setCurrentElement] = useState<string | null>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastElementRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     // Check if speech synthesis is supported
@@ -19,12 +21,12 @@ const VoiceTrainer = () => {
       setIsVoiceEnabled(false);
     }
 
-    // Update playing state periodically
+    // Update playing state more frequently for better responsiveness
     const interval = setInterval(() => {
       setIsPlaying(speechSynthesis.speaking);
-    }, 500);
+    }, 100);
 
-    // Initialize page guidance
+    // Initialize page guidance immediately
     if (isVoiceEnabled) {
       voiceTrainer.initializePageGuidance();
     }
@@ -35,23 +37,37 @@ const VoiceTrainer = () => {
   useEffect(() => {
     if (!isVoiceEnabled) return;
 
-    let hoverTimeout: NodeJS.Timeout;
-
     const handleMouseMove = (e: MouseEvent) => {
       setCursorPosition({ x: e.clientX, y: e.clientY });
       
-      clearTimeout(hoverTimeout);
-      hoverTimeout = setTimeout(() => {
-        const element = e.target as HTMLElement;
+      const element = e.target as HTMLElement;
+      
+      // Skip if it's the same element or a child of the last element
+      if (lastElementRef.current && 
+          (element === lastElementRef.current || lastElementRef.current.contains(element))) {
+        return;
+      }
+
+      // Clear any existing timeout
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+
+      // Stop current speech immediately when hovering over a new element
+      voiceTrainer.stopCurrentSpeech();
+      
+      // Set new timeout with reduced delay for faster response
+      hoverTimeoutRef.current = setTimeout(() => {
         const elementInfo = voiceTrainer.getElementInfo(element);
         
         if (elementInfo && elementInfo !== currentElement) {
           setCurrentElement(elementInfo);
+          lastElementRef.current = element;
           voiceTrainer.guideElement(element);
           setShowCursor(true);
           setTimeout(() => setShowCursor(false), 2000);
         }
-      }, 800); // Wait 800ms before starting guidance
+      }, 200); // Reduced from 800ms to 200ms for faster response
     };
 
     const handleClick = (e: MouseEvent) => {
@@ -60,13 +76,17 @@ const VoiceTrainer = () => {
     };
 
     const handleLocationChange = () => {
+      // Reset tracking when page changes
+      setCurrentElement(null);
+      lastElementRef.current = null;
+      
       setTimeout(() => {
         voiceTrainer.handlePageChange();
-      }, 1000); // Wait for page to load
+      }, 500); // Reduced delay for faster page guidance
     };
 
     // Add event listeners
-    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mousemove', handleMouseMove, { passive: true });
     document.addEventListener('click', handleClick);
     window.addEventListener('popstate', handleLocationChange);
 
@@ -82,7 +102,9 @@ const VoiceTrainer = () => {
       document.removeEventListener('click', handleClick);
       window.removeEventListener('popstate', handleLocationChange);
       history.pushState = originalPushState;
-      clearTimeout(hoverTimeout);
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
     };
   }, [isVoiceEnabled, currentElement]);
 
@@ -94,7 +116,7 @@ const VoiceTrainer = () => {
     } else {
       setIsVoiceEnabled(true);
       voiceTrainer.initializePageGuidance();
-      toast.info('Voice guidance enabled - hover over elements for guidance');
+      toast.info('Voice guidance enabled - hover over elements for instant guidance');
     }
   };
 
@@ -114,47 +136,51 @@ const VoiceTrainer = () => {
         .voice-trainer-highlight {
           outline: 3px solid #10b981 !important;
           outline-offset: 2px !important;
-          background-color: rgba(16, 185, 129, 0.1) !important;
-          border-radius: 4px !important;
-          animation: pulse 2s infinite !important;
+          background-color: rgba(16, 185, 129, 0.15) !important;
+          border-radius: 6px !important;
+          animation: pulse 1.5s infinite !important;
           position: relative !important;
           z-index: 1000 !important;
+          box-shadow: 0 0 15px rgba(16, 185, 129, 0.4) !important;
         }
         
         .voice-trainer-highlight::before {
           content: '';
           position: absolute;
-          top: -5px;
-          left: -5px;
-          right: -5px;
-          bottom: -5px;
-          background: linear-gradient(45deg, #10b981, #34d399);
+          top: -3px;
+          left: -3px;
+          right: -3px;
+          bottom: -3px;
+          background: linear-gradient(45deg, #10b981, #34d399, #6ee7b7);
           border-radius: 8px;
           z-index: -1;
-          opacity: 0.3;
-          animation: glow 2s infinite alternate;
+          opacity: 0.4;
+          animation: glow 1s infinite alternate;
         }
         
         .voice-trainer-cursor {
           position: fixed;
-          width: 20px;
-          height: 20px;
-          background: #10b981;
+          width: 24px;
+          height: 24px;
+          background: linear-gradient(45deg, #10b981, #34d399);
           border-radius: 50%;
           pointer-events: none;
           z-index: 9999;
-          transition: all 0.3s ease;
-          box-shadow: 0 0 20px rgba(16, 185, 129, 0.8);
+          transition: all 0.2s ease;
+          box-shadow: 0 0 25px rgba(16, 185, 129, 0.9);
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
         
         @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.7; }
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.8; transform: scale(1.02); }
         }
         
         @keyframes glow {
-          0% { opacity: 0.3; }
-          100% { opacity: 0.6; }
+          0% { opacity: 0.4; }
+          100% { opacity: 0.7; }
         }
       `}</style>
 
@@ -162,11 +188,11 @@ const VoiceTrainer = () => {
         <div 
           className="voice-trainer-cursor"
           style={{
-            left: cursorPosition.x - 10,
-            top: cursorPosition.y - 10,
+            left: cursorPosition.x - 12,
+            top: cursorPosition.y - 12,
           }}
         >
-          <MousePointer className="h-4 w-4 text-white" />
+          <MousePointer className="h-3 w-3 text-white" />
         </div>
       )}
 
@@ -176,7 +202,7 @@ const VoiceTrainer = () => {
             variant={isVoiceEnabled ? "default" : "outline"}
             size="sm" 
             onClick={toggleVoice}
-            className="shadow-lg"
+            className="shadow-lg transition-all duration-200 hover:scale-105"
           >
             {isVoiceEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
           </Button>
@@ -186,7 +212,7 @@ const VoiceTrainer = () => {
               variant="outline" 
               size="sm" 
               onClick={pauseResumeSpeech}
-              className="shadow-lg"
+              className="shadow-lg transition-all duration-200 hover:scale-105"
             >
               {speechSynthesis.paused ? 'Resume' : 'Pause'}
             </Button>
@@ -194,8 +220,15 @@ const VoiceTrainer = () => {
         </div>
         
         {isVoiceEnabled && (
-          <div className="mt-2 text-xs text-center text-gray-600 bg-white px-2 py-1 rounded shadow">
-            {isPlaying ? 'Speaking...' : 'Hover for guidance'}
+          <div className="mt-2 text-xs text-center text-gray-600 bg-white px-3 py-2 rounded-lg shadow-lg border">
+            {isPlaying ? (
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                Speaking...
+              </div>
+            ) : (
+              'Hover for instant guidance'
+            )}
           </div>
         )}
       </div>
