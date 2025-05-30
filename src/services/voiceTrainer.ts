@@ -78,8 +78,8 @@ class VoiceTrainerService {
           this.currentUtterance.voice = this.preferredVoice;
         }
         
-        // Optimized speech settings for clarity and speed
-        this.currentUtterance.rate = 1.1;
+        // Normal speech settings for clarity
+        this.currentUtterance.rate = 1.0;
         this.currentUtterance.pitch = 1.0;
         this.currentUtterance.volume = 0.9;
 
@@ -117,15 +117,16 @@ class VoiceTrainerService {
   }
 
   getElementInfo(element: HTMLElement): string | null {
-    // Create a more specific identifier
+    // Create a more specific identifier based on element properties
     const tagName = element.tagName.toLowerCase();
     const className = element.className;
     const id = element.id;
-    const text = element.textContent?.trim().substring(0, 30) || '';
+    const text = element.textContent?.trim().substring(0, 50) || '';
     const role = element.getAttribute('role');
     const ariaLabel = element.getAttribute('aria-label');
+    const dataTestId = element.getAttribute('data-testid');
     
-    return `${tagName}-${id || className.split(' ')[0] || role || text}`;
+    return `${tagName}-${id || dataTestId || className.split(' ')[0] || role || text.replace(/\s+/g, '-')}`;
   }
 
   async guideElement(element: HTMLElement) {
@@ -152,112 +153,164 @@ class VoiceTrainerService {
     const title = element.getAttribute('title');
     const placeholder = element.getAttribute('placeholder');
     const type = element.getAttribute('type');
+    const dataTestId = element.getAttribute('data-testid');
     
-    // Enhanced Button elements with detailed use cases
+    // Dashboard-specific guidance
+    if (window.location.pathname.includes('/dashboard')) {
+      if (dataTestId === 'stats-cards' || className.includes('stats') || element.closest('[data-testid="stats-cards"]')) {
+        return 'These are your key performance indicators showing total revenue, orders, customers, and active products. These metrics help you track business growth and make informed decisions about your operations.';
+      }
+      
+      if (dataTestId === 'sales-chart' || className.includes('chart') || element.closest('[data-testid="sales-chart"]')) {
+        return 'This sales chart visualizes your revenue trends over time. Use it to identify peak sales periods, seasonal patterns, and growth opportunities. The data helps you plan inventory and marketing strategies.';
+      }
+      
+      if (dataTestId === 'quick-actions' || element.closest('[data-testid="quick-actions"]')) {
+        return 'Quick actions provide shortcuts to common tasks like adding products, viewing reports, or managing customers. These buttons save time by giving direct access to frequently used features.';
+      }
+      
+      if (dataTestId === 'low-stock-alerts' || element.closest('[data-testid="low-stock-alerts"]')) {
+        return 'Low stock alerts notify you when products are running out. Monitor these alerts to prevent stockouts and maintain customer satisfaction by reordering inventory before it depletes.';
+      }
+    }
+
+    // Specific button analysis based on text content and context
     if (tagName === 'button' || role === 'button') {
-      if (text?.toLowerCase().includes('add')) {
-        return `This is an Add button for creating new ${this.getContextualItem()}. Click it to open a creation form where you can enter details like name, description, and other properties. For example, adding a new category helps organize your products better, while adding products expands your inventory. This is essential for growing your business catalog.`;
+      const buttonText = text?.toLowerCase() || '';
+      
+      // Add Product buttons
+      if (buttonText.includes('add product')) {
+        return 'Add Product button creates new items in your inventory. Click to open a form where you enter product details like name, description, price, images, and stock quantity. This expands your catalog and gives customers more purchasing options.';
       }
-      if (text?.toLowerCase().includes('edit')) {
-        return `This is an Edit button for modifying existing ${this.getContextualItem()}. Click it to open a form pre-filled with current data that you can update. For example, you might edit a product to update its price, change the description, or modify stock levels. This helps keep your information current and accurate.`;
+      
+      // Add Category buttons  
+      if (buttonText.includes('add category')) {
+        return 'Add Category button creates product groupings for better organization. Categories help customers find products easily and help you manage inventory efficiently. Examples include Electronics, Clothing, or Home & Garden.';
       }
-      if (text?.toLowerCase().includes('delete')) {
-        return `This is a Delete button for removing ${this.getContextualItem()}. Use this carefully as it permanently removes items from your system. For example, delete outdated products, unused categories, or cancelled orders. Always double-check before deleting as this action may not be reversible.`;
+      
+      // Edit buttons with context
+      if (buttonText.includes('edit')) {
+        const context = this.getContextualItem();
+        return `Edit button modifies existing ${context}. Click to open a pre-filled form with current data that you can update. For example, edit product prices for sales, update descriptions for clarity, or modify stock levels after receiving shipments.`;
       }
-      if (text?.toLowerCase().includes('save') || text?.toLowerCase().includes('submit')) {
-        return `This is a Save button to confirm and store your changes. Click it after filling out the form completely. The system will validate your input and save the data to the database. Always review your information before saving to ensure accuracy.`;
+      
+      // Delete buttons with context
+      if (buttonText.includes('delete') || buttonText.includes('remove')) {
+        const context = this.getContextualItem();
+        return `Delete button permanently removes ${context} from your system. Use carefully as this action cannot be undone. For example, delete discontinued products, outdated categories, or cancelled orders to keep your system organized.`;
       }
-      if (text?.toLowerCase().includes('cancel')) {
-        return `This is a Cancel button to close the current form without saving any changes. Use this if you want to discard your edits or exit the form. Any unsaved changes will be lost, so make sure you don't need to keep your modifications.`;
+      
+      // View/Details buttons
+      if (buttonText.includes('view') || buttonText.includes('details') || buttonText.includes('see more')) {
+        const context = this.getContextualItem();
+        return `View Details button displays comprehensive information about this ${context}. See all properties, related data, and available actions. This helps you understand the complete context before making decisions.`;
       }
-      if (text?.toLowerCase().includes('view') || text?.toLowerCase().includes('details')) {
-        return `This is a View Details button to see comprehensive information about this ${this.getContextualItem()}. Click it to open a detailed view with all properties, related data, and available actions. This helps you understand the complete context before making decisions.`;
+      
+      // Import/Export buttons
+      if (buttonText.includes('import')) {
+        return 'Import button uploads data from external files like CSV or Excel. Use this to bulk add products, update inventory, or migrate data from other systems. Ensure your file format matches the required template.';
       }
-      if (text?.toLowerCase().includes('export')) {
-        return `This is an Export button to download your data in various formats like CSV or PDF. Use this to create backups, share data with others, or analyze information in external tools. For example, export product lists for inventory analysis or customer data for marketing campaigns.`;
+      
+      if (buttonText.includes('export')) {
+        return 'Export button downloads your data in various formats. Create backups, share data with stakeholders, or analyze information in external tools like Excel. Useful for inventory reports or sales analysis.';
       }
-      if (text?.toLowerCase().includes('import')) {
-        return `This is an Import button to upload data from external files. Use this to bulk add products, update inventory, or migrate data from other systems. Make sure your file format matches the required template to avoid errors.`;
+      
+      // Reports button
+      if (buttonText.includes('report')) {
+        return 'View Reports button accesses business analytics and performance metrics. Track sales trends, customer behavior, inventory turnover, and profitability. Use these insights to make data-driven business decisions.';
       }
-      return `This is a ${text || 'action'} button. Click it to ${text?.toLowerCase() || 'perform an action'}. Buttons trigger specific actions that help you manage your business operations efficiently.`;
+      
+      // Settings button
+      if (buttonText.includes('settings') || buttonText.includes('configure')) {
+        return 'Settings button opens configuration options for system preferences, user accounts, and business rules. Customize your admin experience, manage permissions, and set up integrations with other tools.';
+      }
+      
+      // Save/Submit buttons
+      if (buttonText.includes('save') || buttonText.includes('submit') || buttonText.includes('create')) {
+        return 'Save button confirms and stores your changes to the database. Always review your information for accuracy before saving. The system validates required fields and data formats before processing.';
+      }
+      
+      // Cancel buttons
+      if (buttonText.includes('cancel') || buttonText.includes('close')) {
+        return 'Cancel button closes the current form without saving changes. Any unsaved modifications will be lost. Use this to exit forms when you decide not to proceed with changes.';
+      }
+      
+      return `This ${buttonText || 'action'} button performs a specific operation. Click it to ${buttonText || 'execute the action'} and manage your business operations effectively.`;
     }
     
-    // Enhanced Input elements with specific guidance
+    // Enhanced Input field guidance
     if (tagName === 'input') {
       if (type === 'search' || placeholder?.toLowerCase().includes('search')) {
-        return `This is a search box for quickly finding specific ${this.getContextualItem()}. Type keywords, names, or IDs to filter results instantly. For example, search for product names, customer emails, or order numbers. Use partial matches - typing "phone" will find "Smartphone" and "Headphones".`;
+        return `Search field for finding specific ${this.getContextualItem()}. Type keywords, product names, customer emails, or order numbers. The search filters results in real-time as you type, making it easy to locate specific items quickly.`;
       }
+      
       if (type === 'email') {
-        return `This is an email input field. Enter a valid email address in the format user@domain.com. This is used for customer communication, order confirmations, and account management. Double-check for typos as incorrect emails prevent important notifications.`;
+        return 'Email input field requires a valid email address format like user@domain.com. This is used for customer communication, order confirmations, and account management. Double-check for typos to ensure proper delivery.';
       }
+      
       if (type === 'password') {
-        return `This is a password field for secure authentication. Enter a strong password with at least 8 characters, including letters, numbers, and symbols. The text is hidden for security. Use a unique password that you don't use elsewhere.`;
+        return 'Password field for secure authentication. Enter a strong password with at least 8 characters including letters, numbers, and symbols. The text is hidden for security purposes.';
       }
-      if (type === 'number') {
-        return `This is a number input field for ${placeholder || 'numeric values'}. Enter only numbers - for example, product prices, quantities, or percentages. Use decimal points for prices like 29.99. The system may have minimum and maximum limits.`;
+      
+      if (type === 'number' || placeholder?.toLowerCase().includes('price') || placeholder?.toLowerCase().includes('quantity')) {
+        return `Numeric input for ${placeholder || 'values like prices or quantities'}. Enter numbers only - use decimal points for prices like 29.99. The system validates minimum and maximum ranges to ensure data accuracy.`;
       }
-      if (type === 'tel') {
-        return `This is a phone number field. Enter a valid phone number including area code. For example, +1-555-123-4567 or (555) 123-4567. This is used for customer contact and order communication.`;
-      }
+      
       if (placeholder?.toLowerCase().includes('name')) {
-        return `This is a name input field for ${placeholder}. Enter a clear, descriptive name that helps identify this item. For products, use names that customers will search for. For categories, use broad terms that group related items logically.`;
+        return `Name field for ${placeholder}. Enter clear, descriptive names that help identify items. For products, use names customers will search for. For categories, use broad terms that logically group related items.`;
       }
-      return `This is an input field for ${placeholder || ariaLabel || 'information'}. Click here and type the required information. Ensure accuracy as this data affects your business operations and customer experience.`;
+      
+      return `Input field for ${placeholder || ariaLabel || 'entering information'}. Type the required data accurately as this affects your business operations and customer experience.`;
     }
     
-    // Enhanced Table and data display elements
+    // Table and data display elements
     if (tagName === 'table' || role === 'table' || className.includes('table')) {
-      return `This is a data table displaying your ${this.getContextualItem()} in an organized format. Each row represents one item, and columns show different properties. You can sort columns by clicking headers, filter data using search, and perform actions like edit or delete on individual rows. Use this to get an overview of your data and manage multiple items efficiently.`;
+      const context = this.getContextualItem();
+      return `Data table displaying your ${context} in organized rows and columns. Sort by clicking column headers, filter using search, and use action buttons for operations like edit or delete. This gives you an overview of all items for efficient management.`;
     }
     
-    // Enhanced Navigation elements
+    // Navigation elements
     if (role === 'navigation' || className.includes('nav') || tagName === 'nav') {
-      return `This is the navigation menu for moving between different sections of your admin panel. Each link takes you to a specific management area like products, categories, orders, or customers. Use this to quickly switch between different business functions and access the tools you need.`;
+      return 'Navigation menu for moving between admin sections. Each link takes you to specific management areas like products, categories, orders, or customers. Use this to quickly access different business functions.';
     }
     
-    // Enhanced Card elements with context
+    // Card elements with enhanced context
     if (className.includes('card') || element.closest('.card')) {
-      return `This is an information card displaying key details about ${this.getContextualItem()}. Cards organize related information in digestible chunks, making it easier to scan and understand data quickly. Look for action buttons within the card to perform operations on this specific item.`;
+      const context = this.getContextualItem();
+      return `Information card displaying key details about ${context}. Cards organize related data in digestible sections, making it easier to scan and understand information quickly. Look for action buttons within cards.`;
     }
     
-    // Stats and metrics cards
-    if (className.includes('stats') || text?.includes('$') || text?.includes('%')) {
-      return `This is a statistics card showing important business metrics. These numbers help you track performance, identify trends, and make informed decisions. For example, revenue cards show earnings, order cards track sales volume, and growth percentages indicate business progress over time.`;
-    }
-    
-    // Form elements with detailed guidance
+    // Form elements
     if (tagName === 'form') {
-      return `This is a form for entering and submitting information. Fill out all required fields marked with asterisks. Use the Tab key to move between fields efficiently. The form validates your input before submission to ensure data quality. Review everything before clicking the submit button.`;
+      return 'Form for entering and submitting information. Fill all required fields marked with asterisks. Use Tab to navigate between fields efficiently. The form validates input before submission to ensure data quality.';
     }
     
-    // Enhanced Select elements
+    // Select dropdown elements
     if (tagName === 'select') {
-      return `This is a dropdown menu for selecting from available options. Click to see all choices and select the most appropriate one. For example, choose product categories, order statuses, or customer types. Some dropdowns allow searching by typing the first few letters.`;
+      return 'Dropdown menu for selecting from available options. Click to see all choices and select the most appropriate one. Some dropdowns allow searching by typing the first few letters.';
     }
     
-    // Enhanced Link elements with context
+    // Link elements with specific navigation context
     if (tagName === 'a') {
       const href = element.getAttribute('href');
       if (href?.includes('dashboard')) {
-        return `This link takes you to the main dashboard with overview metrics and recent activity. Use this as your starting point to get a quick view of your business status and access quick actions.`;
+        return 'Dashboard link takes you to the main overview with key metrics and recent activity. Your central hub for monitoring business performance and accessing quick actions.';
       }
       if (href?.includes('product')) {
-        return `This link navigates to product management where you can add, edit, and organize your product catalog. This is where you manage inventory, pricing, and product information.`;
+        return 'Products link navigates to inventory management where you can add, edit, and organize your product catalog. Manage pricing, descriptions, images, and stock levels.';
       }
       if (href?.includes('order')) {
-        return `This link goes to order management where you can track customer orders, update statuses, and manage fulfillment. Critical for processing sales and maintaining customer satisfaction.`;
+        return 'Orders link goes to order management for tracking customer purchases, updating statuses, and managing fulfillment. Critical for processing sales and customer satisfaction.';
       }
-      return `This link navigates to ${text || 'another section'}. Click to access ${text?.toLowerCase() || 'related functionality'} and manage that aspect of your business.`;
+      if (href?.includes('customer')) {
+        return 'Customers link accesses customer relationship management. View profiles, track purchase history, and analyze buying patterns to improve service and marketing.';
+      }
+      return `Navigation link to ${text || 'another section'}. Click to access ${text?.toLowerCase() || 'related functionality'} for managing that aspect of your business.`;
     }
     
     // Textarea elements
     if (tagName === 'textarea') {
-      return `This is a text area for entering longer descriptions or detailed information. You can type multiple lines and paragraphs. For example, use this for product descriptions, category explanations, or customer notes. Be descriptive but concise to help users understand the content.`;
-    }
-    
-    // Chart and visualization elements
-    if (className.includes('chart') || element.querySelector('svg') || className.includes('recharts')) {
-      return `This is a chart or graph displaying your business data visually. Charts help you identify trends, compare performance, and spot patterns quickly. Hover over data points for detailed information. Use these insights to make informed business decisions and track progress over time.`;
+      return 'Text area for longer descriptions or detailed information. Type multiple lines and paragraphs. Use for product descriptions, category explanations, or detailed notes that require more space.';
     }
     
     return null;
@@ -272,34 +325,39 @@ class VoiceTrainerService {
     if (path.includes('inventory')) return 'inventory items';
     if (path.includes('coupon')) return 'coupons';
     if (path.includes('report')) return 'reports';
+    if (path.includes('dashboard')) return 'dashboard metrics';
     return 'items';
   }
 
   async handleElementClick(element: HTMLElement) {
     const guidance = this.getClickGuidance(element);
     if (guidance) {
-      // Brief pause then guide with faster response
-      setTimeout(() => this.speak(guidance), 300);
+      setTimeout(() => this.speak(guidance), 200);
     }
   }
 
   private getClickGuidance(element: HTMLElement): string | null {
     const text = element.textContent?.trim();
+    const buttonText = text?.toLowerCase() || '';
     
-    if (text?.includes('Add Category')) {
-      return `Excellent! You're creating a new category. Categories help organize your products logically. Fill in a clear name like "Electronics" or "Clothing", add a helpful description, and upload an attractive image. Good categories make it easier for customers to find products and for you to manage inventory.`;
+    if (buttonText.includes('add category')) {
+      return 'You clicked Add Category. The form will open for creating a new product category. Enter a clear category name, helpful description, and upload an attractive image. Good categories make product organization easier for both you and customers.';
     }
-    if (text?.includes('Add Product')) {
-      return `Perfect! You're adding a new product to your catalog. This expands your business offerings. Enter detailed product information including name, description, price, and stock quantity. High-quality images and accurate descriptions increase sales and reduce customer questions.`;
+    
+    if (buttonText.includes('add product')) {
+      return 'You clicked Add Product. The product creation form will open. Fill in detailed information including name, description, competitive pricing, high-quality images, and accurate stock quantities to attract customers.';
     }
-    if (text?.includes('Edit')) {
-      return `Great choice! You're updating existing information. This keeps your data current and accurate. Review all fields carefully, make necessary changes, and save when done. Regular updates ensure customers see the latest information and pricing.`;
+    
+    if (buttonText.includes('edit')) {
+      return 'You clicked Edit. The modification form will open with current data pre-filled. Review all fields carefully, make necessary updates, and save when complete to keep information current.';
     }
-    if (text?.includes('Delete')) {
-      return `You're removing this item permanently. This action helps maintain a clean, organized system by removing outdated or unnecessary items. Double-check that you really want to delete this before confirming, as it may not be recoverable.`;
+    
+    if (buttonText.includes('delete')) {
+      return 'You clicked Delete. Confirm you want to permanently remove this item. This action helps maintain a clean, organized system but may not be reversible, so double-check before proceeding.';
     }
-    if (text?.includes('View') || text?.includes('Details')) {
-      return `You're opening detailed information. This comprehensive view shows all properties and related data, helping you understand the complete context before making decisions or edits.`;
+    
+    if (buttonText.includes('view') || buttonText.includes('details')) {
+      return 'You clicked View Details. A comprehensive information panel will open showing all properties and related data, helping you understand the complete context.';
     }
     
     return null;
@@ -309,13 +367,12 @@ class VoiceTrainerService {
     const newPage = window.location.pathname;
     if (newPage !== this.currentPage) {
       this.currentPage = newPage;
-      this.lastGuidedElement = null; // Reset element tracking
-      this.elementCache.clear(); // Clear cache for new page
+      this.lastGuidedElement = null;
+      this.elementCache.clear();
       
-      // Immediate guidance with faster response
       setTimeout(() => {
         this.initializePageGuidance();
-      }, 800);
+      }, 300);
     }
   }
 
@@ -330,34 +387,34 @@ class VoiceTrainerService {
 
   private getPageGuidance(path: string): string | null {
     if (path.includes('/admin/dashboard')) {
-      return `Welcome to your comprehensive admin dashboard! This is your business command center showing key performance metrics, recent activity, and quick actions. The stats cards at the top display revenue, orders, customers, and products - these numbers reflect your business health. Use the charts to identify trends and the quick action buttons to perform common tasks efficiently. Hover over any element for detailed guidance on how to use it effectively.`;
+      return 'Welcome to your admin dashboard - your business command center. The stats cards show key performance metrics, charts display sales trends, and quick action buttons provide shortcuts to common tasks. Hover over any element for detailed guidance on its specific functionality.';
     }
     if (path.includes('/admin/categories')) {
-      return `You're now in Category Management - the foundation of product organization! Here you organize products into logical groups that help customers navigate your store easily. You can create new categories with the Add button, edit existing ones to update names or descriptions, and delete unused categories. Well-organized categories improve customer experience and make inventory management much easier. Think of categories like store aisles - they should be intuitive and comprehensive.`;
+      return 'Category Management page for organizing your products into logical groups. Create new categories with the Add button, edit existing ones to update information, and delete unused categories. Well-organized categories improve customer navigation and inventory management.';
     }
     if (path.includes('/admin/products')) {
-      return `Welcome to Product Management - your inventory control center! This is where you manage your entire product catalog that customers see and purchase. Add new products to expand your offerings, edit existing ones to update prices or descriptions, and track inventory levels. Each product needs a clear name, detailed description, competitive pricing, and attractive images. Good product management directly impacts sales and customer satisfaction.`;
+      return 'Product Management page for controlling your entire inventory catalog. Add new products to expand offerings, edit existing ones to update details, and manage stock levels. Quality product information directly impacts sales and customer satisfaction.';
     }
     if (path.includes('/admin/orders')) {
-      return `You're in Order Management - the heart of your sales operations! Here you track every customer purchase from creation to delivery. Monitor order statuses, update shipping information, process payments, and handle customer communications. Quick order processing improves customer satisfaction and builds trust. Use filters to find specific orders and actions to update their progress through fulfillment.`;
+      return 'Order Management page for tracking customer purchases from creation to delivery. Monitor order statuses, update shipping information, and manage customer communications. Efficient order processing builds customer trust and satisfaction.';
     }
     if (path.includes('/admin/customers')) {
-      return `This is Customer Management - your relationship hub! View customer profiles, track purchase history, analyze buying patterns, and manage customer communications. Understanding your customers helps you provide better service, create targeted marketing campaigns, and build loyalty. Use customer data to identify your best buyers and opportunities for growth.`;
+      return 'Customer Management page for relationship building and analysis. View customer profiles, track purchase history, and analyze buying patterns. Understanding customers helps provide better service and create targeted marketing campaigns.';
     }
     if (path.includes('/admin/inventory')) {
-      return `Welcome to Inventory Management - your stock control system! Monitor product quantities, get low stock alerts, track product movements, and manage reordering. Proper inventory management prevents stockouts that lose sales and overstocking that ties up capital. Set up automatic alerts for low stock items to maintain optimal inventory levels.`;
+      return 'Inventory Management page for stock control and monitoring. Track product quantities, receive low stock alerts, and manage reordering. Proper inventory management prevents stockouts and optimizes cash flow.';
     }
     if (path.includes('/admin/marketing')) {
-      return `You're in the Marketing section - your sales growth engine! Create promotional campaigns, manage discount coupons, track marketing performance, and boost sales with targeted offers. Effective marketing drives traffic, increases conversions, and builds customer loyalty. Use coupons strategically to encourage purchases and reward customer loyalty.`;
+      return 'Marketing section for promotional campaigns and sales growth. Create discount coupons, manage marketing campaigns, and track performance metrics. Effective marketing drives traffic and increases conversions.';
     }
     if (path.includes('/admin/reports')) {
-      return `This is the Reports section - your business intelligence center! Analyze sales performance, track key metrics, identify trends, and make data-driven decisions. Reports show you what's working, what needs improvement, and where opportunities exist. Regular report analysis helps you understand your business performance and plan for growth.`;
+      return 'Reports section for business intelligence and analytics. Analyze sales performance, track key metrics, and identify growth opportunities. Regular report analysis helps make data-driven business decisions.';
     }
     if (path.includes('/admin/settings')) {
-      return `You're in Settings - your system configuration area! Manage user accounts, configure system preferences, set up integrations, and customize your admin experience. Proper settings ensure smooth operations and security. Review settings regularly to optimize performance and maintain security standards.`;
+      return 'Settings page for system configuration and preferences. Manage user accounts, configure integrations, and customize your admin experience. Proper settings ensure smooth operations and security.';
     }
     
-    return `You're now in the admin panel - your complete business management system! This powerful interface gives you control over every aspect of your online business. Each section is designed to help you manage specific operations efficiently. Hover over any element to learn about its functionality and get practical guidance on how to use it effectively for your business success.`;
+    return 'Admin panel for complete business management. Each section provides tools for specific operations. Hover over elements to learn about their functionality and get practical guidance for business success.';
   }
 
   highlightElement(element: HTMLElement) {

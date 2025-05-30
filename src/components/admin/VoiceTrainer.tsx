@@ -11,7 +11,6 @@ const VoiceTrainer = () => {
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
   const [showCursor, setShowCursor] = useState(false);
   const [currentElement, setCurrentElement] = useState<string | null>(null);
-  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastElementRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -48,26 +47,19 @@ const VoiceTrainer = () => {
         return;
       }
 
-      // Clear any existing timeout
-      if (hoverTimeoutRef.current) {
-        clearTimeout(hoverTimeoutRef.current);
-      }
-
       // Stop current speech immediately when hovering over a new element
       voiceTrainer.stopCurrentSpeech();
       
-      // Set new timeout with reduced delay for faster response
-      hoverTimeoutRef.current = setTimeout(() => {
-        const elementInfo = voiceTrainer.getElementInfo(element);
-        
-        if (elementInfo && elementInfo !== currentElement) {
-          setCurrentElement(elementInfo);
-          lastElementRef.current = element;
-          voiceTrainer.guideElement(element);
-          setShowCursor(true);
-          setTimeout(() => setShowCursor(false), 2000);
-        }
-      }, 200); // Reduced from 800ms to 200ms for faster response
+      // Start guidance immediately without delay
+      const elementInfo = voiceTrainer.getElementInfo(element);
+      
+      if (elementInfo && elementInfo !== currentElement) {
+        setCurrentElement(elementInfo);
+        lastElementRef.current = element;
+        voiceTrainer.guideElement(element);
+        setShowCursor(true);
+        setTimeout(() => setShowCursor(false), 2000);
+      }
     };
 
     const handleClick = (e: MouseEvent) => {
@@ -82,7 +74,7 @@ const VoiceTrainer = () => {
       
       setTimeout(() => {
         voiceTrainer.handlePageChange();
-      }, 500); // Reduced delay for faster page guidance
+      }, 500);
     };
 
     // Add event listeners
@@ -102,9 +94,6 @@ const VoiceTrainer = () => {
       document.removeEventListener('click', handleClick);
       window.removeEventListener('popstate', handleLocationChange);
       history.pushState = originalPushState;
-      if (hoverTimeoutRef.current) {
-        clearTimeout(hoverTimeoutRef.current);
-      }
     };
   }, [isVoiceEnabled, currentElement]);
 
