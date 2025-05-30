@@ -123,53 +123,27 @@ const VoiceTrainer = () => {
     <>
       <style>{`
         .voice-trainer-highlight {
-          outline: 3px solid #10b981 !important;
-          outline-offset: 2px !important;
-          background-color: rgba(16, 185, 129, 0.15) !important;
-          border-radius: 6px !important;
-          animation: pulse 1.5s infinite !important;
+          outline: 2px solid #10b981 !important;
+          outline-offset: 1px !important;
+          background-color: rgba(16, 185, 129, 0.05) !important;
+          border-radius: 4px !important;
           position: relative !important;
           z-index: 1000 !important;
-          box-shadow: 0 0 15px rgba(16, 185, 129, 0.4) !important;
-        }
-        
-        .voice-trainer-highlight::before {
-          content: '';
-          position: absolute;
-          top: -3px;
-          left: -3px;
-          right: -3px;
-          bottom: -3px;
-          background: linear-gradient(45deg, #10b981, #34d399, #6ee7b7);
-          border-radius: 8px;
-          z-index: -1;
-          opacity: 0.4;
-          animation: glow 1s infinite alternate;
         }
         
         .voice-trainer-cursor {
           position: fixed;
-          width: 24px;
-          height: 24px;
+          width: 20px;
+          height: 20px;
           background: linear-gradient(45deg, #10b981, #34d399);
           border-radius: 50%;
           pointer-events: none;
           z-index: 9999;
           transition: all 0.2s ease;
-          box-shadow: 0 0 25px rgba(16, 185, 129, 0.9);
+          box-shadow: 0 0 15px rgba(16, 185, 129, 0.6);
           display: flex;
           align-items: center;
           justify-content: center;
-        }
-        
-        @keyframes pulse {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.8; transform: scale(1.02); }
-        }
-        
-        @keyframes glow {
-          0% { opacity: 0.4; }
-          100% { opacity: 0.7; }
         }
       `}</style>
 
@@ -177,11 +151,11 @@ const VoiceTrainer = () => {
         <div 
           className="voice-trainer-cursor"
           style={{
-            left: cursorPosition.x - 12,
-            top: cursorPosition.y - 12,
+            left: cursorPosition.x - 10,
+            top: cursorPosition.y - 10,
           }}
         >
-          <MousePointer className="h-3 w-3 text-white" />
+          <MousePointer className="h-2 w-2 text-white" />
         </div>
       )}
 

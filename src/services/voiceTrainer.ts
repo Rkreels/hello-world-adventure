@@ -392,20 +392,32 @@ class VoiceTrainerService {
     if (path.includes('/admin/categories')) {
       return 'Category Management page for organizing your products into logical groups. Create new categories with the Add button, edit existing ones to update information, and delete unused categories. Well-organized categories improve customer navigation and inventory management.';
     }
-    if (path.includes('/admin/products')) {
-      return 'Product Management page for controlling your entire inventory catalog. Add new products to expand offerings, edit existing ones to update details, and manage stock levels. Quality product information directly impacts sales and customer satisfaction.';
+    if (path.includes('/admin/products') || path.includes('/admin/add-product')) {
+      return 'Product Management section for controlling your entire inventory catalog. Add new products to expand offerings, edit existing ones to update details, and manage stock levels. Quality product information directly impacts sales and customer satisfaction.';
     }
-    if (path.includes('/admin/orders')) {
+    if (path.includes('/admin/product-media')) {
+      return 'Product Media Management for handling product images, videos, and documents. Upload high-quality media files, organize them into folders, and attach them to products. Good media improves product presentation and conversion rates.';
+    }
+    if (path.includes('/admin/product-reviews')) {
+      return 'Product Reviews Management for monitoring customer feedback. Approve or reject reviews, respond to customer concerns, and use feedback to improve products. Reviews build trust and help customers make informed decisions.';
+    }
+    if (path.includes('/admin/orders') || path.includes('/admin/order-management')) {
       return 'Order Management page for tracking customer purchases from creation to delivery. Monitor order statuses, update shipping information, and manage customer communications. Efficient order processing builds customer trust and satisfaction.';
     }
-    if (path.includes('/admin/customers')) {
+    if (path.includes('/admin/customers') || path.includes('/admin/customer-management')) {
       return 'Customer Management page for relationship building and analysis. View customer profiles, track purchase history, and analyze buying patterns. Understanding customers helps provide better service and create targeted marketing campaigns.';
     }
     if (path.includes('/admin/inventory')) {
       return 'Inventory Management page for stock control and monitoring. Track product quantities, receive low stock alerts, and manage reordering. Proper inventory management prevents stockouts and optimizes cash flow.';
     }
-    if (path.includes('/admin/marketing')) {
-      return 'Marketing section for promotional campaigns and sales growth. Create discount coupons, manage marketing campaigns, and track performance metrics. Effective marketing drives traffic and increases conversions.';
+    if (path.includes('/admin/marketing') || path.includes('/admin/coupons')) {
+      return 'Marketing and Coupon Management section for promotional campaigns and sales growth. Create discount coupons, manage marketing campaigns, and track performance metrics. Effective marketing drives traffic and increases conversions.';
+    }
+    if (path.includes('/admin/brands')) {
+      return 'Brand Management page for organizing products by manufacturer or brand. Create brand profiles, upload logos, and associate products with brands. This helps customers find products from their preferred manufacturers.';
+    }
+    if (path.includes('/admin/transactions')) {
+      return 'Transaction Management page for financial monitoring and payment processing. Track payments, refunds, and revenue analytics. Monitor payment methods and ensure secure transaction processing for customer trust.';
     }
     if (path.includes('/admin/reports')) {
       return 'Reports section for business intelligence and analytics. Analyze sales performance, track key metrics, and identify growth opportunities. Regular report analysis helps make data-driven business decisions.';
@@ -423,13 +435,15 @@ class VoiceTrainerService {
       el.classList.remove('voice-trainer-highlight');
     });
 
-    // Add highlight to current element
-    element.classList.add('voice-trainer-highlight');
-    
-    // Remove highlight after animation completes
-    setTimeout(() => {
-      element.classList.remove('voice-trainer-highlight');
-    }, 2500);
+    // Add highlight to current element (but not buttons to avoid awkward auto-selection)
+    if (element.tagName.toLowerCase() !== 'button' && element.getAttribute('role') !== 'button') {
+      element.classList.add('voice-trainer-highlight');
+      
+      // Remove highlight after animation completes
+      setTimeout(() => {
+        element.classList.remove('voice-trainer-highlight');
+      }, 2500);
+    }
   }
 }
 
