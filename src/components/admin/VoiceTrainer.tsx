@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Volume2, VolumeX, MousePointer } from 'lucide-react';
+import { Volume2, VolumeX } from 'lucide-react';
 import { voiceTrainer } from '@/services/voiceTrainer';
 import { toast } from 'sonner';
 
@@ -9,7 +9,6 @@ const VoiceTrainer = () => {
   const [isVoiceEnabled, setIsVoiceEnabled] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
-  const [showCursor, setShowCursor] = useState(false);
   const [currentElement, setCurrentElement] = useState<string | null>(null);
   const lastElementRef = useRef<HTMLElement | null>(null);
 
@@ -37,6 +36,7 @@ const VoiceTrainer = () => {
     if (!isVoiceEnabled) return;
 
     const handleMouseMove = (e: MouseEvent) => {
+      // Track cursor position internally but don't show visual cursor
       setCursorPosition({ x: e.clientX, y: e.clientY });
       
       const element = e.target as HTMLElement;
@@ -57,8 +57,6 @@ const VoiceTrainer = () => {
         setCurrentElement(elementInfo);
         lastElementRef.current = element;
         voiceTrainer.guideElement(element);
-        setShowCursor(true);
-        setTimeout(() => setShowCursor(false), 2000);
       }
     };
 
@@ -130,34 +128,7 @@ const VoiceTrainer = () => {
           position: relative !important;
           z-index: 1000 !important;
         }
-        
-        .voice-trainer-cursor {
-          position: fixed;
-          width: 20px;
-          height: 20px;
-          background: linear-gradient(45deg, #10b981, #34d399);
-          border-radius: 50%;
-          pointer-events: none;
-          z-index: 9999;
-          transition: all 0.2s ease;
-          box-shadow: 0 0 15px rgba(16, 185, 129, 0.6);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
       `}</style>
-
-      {showCursor && (
-        <div 
-          className="voice-trainer-cursor"
-          style={{
-            left: cursorPosition.x - 10,
-            top: cursorPosition.y - 10,
-          }}
-        >
-          <MousePointer className="h-2 w-2 text-white" />
-        </div>
-      )}
 
       <div className="fixed bottom-4 right-4 z-40">
         <div className="flex gap-2">
