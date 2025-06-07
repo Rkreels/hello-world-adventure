@@ -6,7 +6,6 @@ import RecentOrders from '@/components/admin/dashboard/RecentOrders';
 import TopSellingProducts from '@/components/admin/dashboard/TopSellingProducts';
 import SalesChart from '@/components/admin/dashboard/SalesChart';
 import LowStockAlerts from '@/components/admin/dashboard/LowStockAlerts';
-import QuickActions from '@/components/admin/dashboard/QuickActions';
 import { useAdminStore } from '@/stores/adminStore';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -22,22 +21,22 @@ const Dashboard = () => {
 
   // Handlers for making stats cards functional
   const handleViewRevenue = () => {
-    navigate('/admin/reports');
+    navigate('/simulation/ecommerce/admin/reports');
     toast.info('Viewing revenue reports');
   };
 
   const handleViewOrders = () => {
-    navigate('/admin/orders');
+    navigate('/simulation/ecommerce/admin/orders');
     toast.info('Viewing order management');
   };
 
   const handleViewCustomers = () => {
-    navigate('/admin/customer-management');
+    navigate('/simulation/ecommerce/admin/customers');
     toast.info('Viewing customer management');
   };
 
   const handleViewProducts = () => {
-    navigate('/admin/products');
+    navigate('/simulation/ecommerce/admin/products/list');
     toast.info('Viewing product catalog');
   };
 
@@ -144,9 +143,6 @@ const Dashboard = () => {
         <div className="lg:col-span-2 space-y-6">
           <div data-testid="low-stock-alerts">
             <LowStockAlerts />
-          </div>
-          <div data-testid="quick-actions">
-            <QuickActions />
           </div>
         </div>
       </div>

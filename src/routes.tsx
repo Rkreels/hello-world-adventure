@@ -23,6 +23,7 @@ import AdminRole from './pages/admin/AdminRole';
 import AdminAuthority from './pages/admin/AdminAuthority';
 import Coupons from './pages/admin/Coupons';
 import Brands from './pages/admin/Brands';
+import Reports from './pages/admin/Reports';
 
 // Shop pages
 import Landing from './pages/shop/Landing';
@@ -49,21 +50,26 @@ import Accessibility from './pages/shop/Accessibility';
 import Profile from './pages/shop/Profile';
 import OrderDetails from './pages/shop/OrderDetails';
 import SearchPage from './pages/shop/SearchPage';
+import CustomerManagement from './pages/admin/CustomerManagement';
 
 const routes: RouteObject[] = [
   {
-    path: '/login',
+    path: '/',
+    element: <Navigate to="/simulation/ecommerce" replace />,
+  },
+  {
+    path: '/simulation/ecommerce/login',
     element: <Login />,
   },
   {
-    path: '/admin',
+    path: '/simulation/ecommerce/admin',
     element: <ProtectedRoute adminOnly={true} />,
     children: [
       {
         path: '',
         element: <AdminLayout />,
         children: [
-          { path: '', element: <Navigate to="/admin/dashboard" replace /> },
+          { path: '', element: <Navigate to="/simulation/ecommerce/admin/dashboard" replace /> },
           { path: 'dashboard', element: <Dashboard /> },
           { path: 'role', element: <AdminRole /> },
           { path: 'authority', element: <AdminAuthority /> },
@@ -74,9 +80,11 @@ const routes: RouteObject[] = [
           { path: 'transactions', element: <Transactions /> },
           { path: 'categories', element: <AdminCategories /> },
           { path: 'customers', element: <Customers /> },
+          { path: 'customer-management', element: <CustomerManagement /> },
           { path: 'orders', element: <OrderManagement /> },
           { path: 'coupons', element: <Coupons /> },
           { path: 'brands', element: <Brands /> },
+          { path: 'reports', element: <Reports /> },
           { path: 'search', element: <SearchResults /> },
           { path: 'profile', element: <AdminProfile /> },
         ],
@@ -84,7 +92,7 @@ const routes: RouteObject[] = [
     ],
   },
   {
-    path: '/',
+    path: '/simulation/ecommerce',
     element: <ShopLayout />,
     children: [
       { path: '', element: <Landing /> },
