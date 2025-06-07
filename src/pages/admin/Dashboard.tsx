@@ -8,14 +8,63 @@ import SalesChart from '@/components/admin/dashboard/SalesChart';
 import LowStockAlerts from '@/components/admin/dashboard/LowStockAlerts';
 import QuickActions from '@/components/admin/dashboard/QuickActions';
 import { useAdminStore } from '@/stores/adminStore';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const Dashboard = () => {
-  const { stats, initializeData } = useAdminStore();
+  const { stats, initializeData, updateStats } = useAdminStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Initialize mock data when component mounts
     initializeData();
   }, [initializeData]);
+
+  // Handlers for making stats cards functional
+  const handleViewRevenue = () => {
+    navigate('/admin/reports');
+    toast.info('Viewing revenue reports');
+  };
+
+  const handleViewOrders = () => {
+    navigate('/admin/orders');
+    toast.info('Viewing order management');
+  };
+
+  const handleViewCustomers = () => {
+    navigate('/admin/customer-management');
+    toast.info('Viewing customer management');
+  };
+
+  const handleViewProducts = () => {
+    navigate('/admin/products');
+    toast.info('Viewing product catalog');
+  };
+
+  const handleRefreshStats = () => {
+    // Simulate data refresh with slight variations
+    const variations = {
+      totalRevenue: stats.totalRevenue + Math.floor(Math.random() * 1000) - 500,
+      totalOrders: stats.totalOrders + Math.floor(Math.random() * 50) - 25,
+      totalCustomers: stats.totalCustomers + Math.floor(Math.random() * 20) - 10,
+      totalProducts: stats.totalProducts + Math.floor(Math.random() * 5) - 2,
+      revenueGrowth: Number((Math.random() * 20 - 10).toFixed(1)),
+      ordersGrowth: Number((Math.random() * 15 - 7.5).toFixed(1)),
+      customersGrowth: Number((Math.random() * 10 - 5).toFixed(1)),
+      productsGrowth: Number((Math.random() * 8 - 4).toFixed(1)),
+    };
+    
+    updateStats(variations);
+    toast.success('Dashboard data refreshed');
+  };
+
+  const handleDownloadReport = (type: string) => {
+    toast.info(`Downloading ${type} report...`);
+    // Simulate download
+    setTimeout(() => {
+      toast.success(`${type} report downloaded successfully`);
+    }, 2000);
+  };
   
   // Sample data for recent orders and top products
   const recentOrders = [
@@ -48,6 +97,9 @@ const Dashboard = () => {
           change={{ value: `${stats.revenueGrowth}%`, positive: stats.revenueGrowth > 0 }}
           icon={<DollarSign className="h-6 w-6 text-white" />}
           colorClass="bg-green-500 text-white"
+          onView={handleViewRevenue}
+          onRefresh={handleRefreshStats}
+          onDownload={() => handleDownloadReport('Revenue')}
         />
         
         <StatsCard
@@ -56,6 +108,9 @@ const Dashboard = () => {
           change={{ value: `${stats.ordersGrowth}%`, positive: stats.ordersGrowth > 0 }}
           icon={<ShoppingBag className="h-6 w-6 text-white" />}
           colorClass="bg-blue-500 text-white"
+          onView={handleViewOrders}
+          onRefresh={handleRefreshStats}
+          onDownload={() => handleDownloadReport('Orders')}
         />
         
         <StatsCard
@@ -64,6 +119,9 @@ const Dashboard = () => {
           change={{ value: `${stats.customersGrowth}%`, positive: stats.customersGrowth > 0 }}
           icon={<Users className="h-6 w-6 text-white" />}
           colorClass="bg-purple-500 text-white"
+          onView={handleViewCustomers}
+          onRefresh={handleRefreshStats}
+          onDownload={() => handleDownloadReport('Customers')}
         />
         
         <StatsCard
@@ -72,6 +130,9 @@ const Dashboard = () => {
           change={{ value: `${stats.productsGrowth}%`, positive: stats.productsGrowth > 0 }}
           icon={<Activity className="h-6 w-6 text-white" />}
           colorClass="bg-orange-500 text-white"
+          onView={handleViewProducts}
+          onRefresh={handleRefreshStats}
+          onDownload={() => handleDownloadReport('Products')}
         />
       </div>
       
