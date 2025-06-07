@@ -24,7 +24,7 @@ const RecentOrders = ({ orders }: RecentOrdersProps) => {
   const navigate = useNavigate();
 
   const handleViewAllOrders = () => {
-    navigate('/admin/orders');
+    navigate('/ecommerce/admin/orders');
     toast.info('Viewing all orders');
   };
 
@@ -33,7 +33,7 @@ const RecentOrders = ({ orders }: RecentOrdersProps) => {
   };
 
   const handleOrderClick = (orderId: string) => {
-    navigate(`/admin/orders/${orderId}`);
+    navigate(`/ecommerce/admin/orders/${orderId}`);
     toast.info(`Viewing order #${orderId}`);
   };
 

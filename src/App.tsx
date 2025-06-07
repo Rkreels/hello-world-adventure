@@ -30,7 +30,7 @@ const AppRoutes = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <BrowserRouter basename="/simulation/ecommerce">
+      <BrowserRouter basename="/simulation">
         <AuthProvider>
           <ScrollToTop />
           <Routes>

@@ -55,21 +55,21 @@ import CustomerManagement from './pages/admin/CustomerManagement';
 const routes: RouteObject[] = [
   {
     path: '/',
-    element: <Navigate to="/simulation/ecommerce" replace />,
+    element: <Navigate to="/ecommerce" replace />,
   },
   {
-    path: '/simulation/ecommerce/login',
+    path: '/ecommerce/login',
     element: <Login />,
   },
   {
-    path: '/simulation/ecommerce/admin',
+    path: '/ecommerce/admin',
     element: <ProtectedRoute adminOnly={true} />,
     children: [
       {
         path: '',
         element: <AdminLayout />,
         children: [
-          { path: '', element: <Navigate to="/simulation/ecommerce/admin/dashboard" replace /> },
+          { path: '', element: <Navigate to="/ecommerce/admin/dashboard" replace /> },
           { path: 'dashboard', element: <Dashboard /> },
           { path: 'role', element: <AdminRole /> },
           { path: 'authority', element: <AdminAuthority /> },
@@ -92,7 +92,7 @@ const routes: RouteObject[] = [
     ],
   },
   {
-    path: '/simulation/ecommerce',
+    path: '/ecommerce',
     element: <ShopLayout />,
     children: [
       { path: '', element: <Landing /> },
