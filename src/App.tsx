@@ -77,7 +77,7 @@ const ScrollToTop = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <BrowserRouter basename="/simulation/ecommerce">
+      <BrowserRouter>
         <AuthProvider>
           <ScrollToTop />
           <Routes>
