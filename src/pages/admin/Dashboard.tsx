@@ -21,22 +21,22 @@ const Dashboard = () => {
 
   // Handlers for making stats cards functional
   const handleViewRevenue = () => {
-    navigate('/ecommerce/admin/reports');
+    navigate('/admin/reports');
     toast.info('Viewing revenue reports');
   };
 
   const handleViewOrders = () => {
-    navigate('/ecommerce/admin/orders');
+    navigate('/admin/orders');
     toast.info('Viewing order management');
   };
 
   const handleViewCustomers = () => {
-    navigate('/ecommerce/admin/customers');
+    navigate('/admin/customers');
     toast.info('Viewing customer management');
   };
 
   const handleViewProducts = () => {
-    navigate('/ecommerce/admin/products/list');
+    navigate('/admin/products/list');
     toast.info('Viewing product catalog');
   };
 

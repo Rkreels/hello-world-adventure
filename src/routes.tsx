@@ -55,44 +55,6 @@ import CustomerManagement from './pages/admin/CustomerManagement';
 const routes: RouteObject[] = [
   {
     path: '/',
-    element: <Navigate to="/ecommerce" replace />,
-  },
-  {
-    path: '/ecommerce/login',
-    element: <Login />,
-  },
-  {
-    path: '/ecommerce/admin',
-    element: <ProtectedRoute adminOnly={true} />,
-    children: [
-      {
-        path: '',
-        element: <AdminLayout />,
-        children: [
-          { path: '', element: <Navigate to="/ecommerce/admin/dashboard" replace /> },
-          { path: 'dashboard', element: <Dashboard /> },
-          { path: 'role', element: <AdminRole /> },
-          { path: 'authority', element: <AdminAuthority /> },
-          { path: 'products/add', element: <AddProduct /> },
-          { path: 'products/list', element: <ProductsList /> },
-          { path: 'products/media', element: <ProductMedia /> },
-          { path: 'products/reviews', element: <ProductReviews /> },
-          { path: 'transactions', element: <Transactions /> },
-          { path: 'categories', element: <AdminCategories /> },
-          { path: 'customers', element: <Customers /> },
-          { path: 'customer-management', element: <CustomerManagement /> },
-          { path: 'orders', element: <OrderManagement /> },
-          { path: 'coupons', element: <Coupons /> },
-          { path: 'brands', element: <Brands /> },
-          { path: 'reports', element: <Reports /> },
-          { path: 'search', element: <SearchResults /> },
-          { path: 'profile', element: <AdminProfile /> },
-        ],
-      },
-    ],
-  },
-  {
-    path: '/ecommerce',
     element: <ShopLayout />,
     children: [
       { path: '', element: <Landing /> },
@@ -131,6 +93,36 @@ const routes: RouteObject[] = [
       { path: 'all-categories', element: <ShopCategories /> },
       { path: 'promotions', element: <Deals /> },
       { path: 'new', element: <NewArrivals /> },
+    ],
+  },
+  {
+    path: '/admin',
+    element: <ProtectedRoute adminOnly={true} />,
+    children: [
+      {
+        path: '',
+        element: <AdminLayout />,
+        children: [
+          { path: '', element: <Navigate to="/admin/dashboard" replace /> },
+          { path: 'dashboard', element: <Dashboard /> },
+          { path: 'role', element: <AdminRole /> },
+          { path: 'authority', element: <AdminAuthority /> },
+          { path: 'products/add', element: <AddProduct /> },
+          { path: 'products/list', element: <ProductsList /> },
+          { path: 'products/media', element: <ProductMedia /> },
+          { path: 'products/reviews', element: <ProductReviews /> },
+          { path: 'transactions', element: <Transactions /> },
+          { path: 'categories', element: <AdminCategories /> },
+          { path: 'customers', element: <Customers /> },
+          { path: 'customer-management', element: <CustomerManagement /> },
+          { path: 'orders', element: <OrderManagement /> },
+          { path: 'coupons', element: <Coupons /> },
+          { path: 'brands', element: <Brands /> },
+          { path: 'reports', element: <Reports /> },
+          { path: 'search', element: <SearchResults /> },
+          { path: 'profile', element: <AdminProfile /> },
+        ],
+      },
     ],
   },
 ];
