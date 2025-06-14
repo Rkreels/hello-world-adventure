@@ -12,13 +12,19 @@ const QuickActions = () => {
     {
       label: 'Add Product',
       icon: Plus,
-      action: () => navigate('/admin/add-product'),
+      action: () => {
+        navigate('/admin/products/add');
+        toast.success('Navigating to Add Product');
+      },
       color: 'bg-green-500 hover:bg-green-600'
     },
     {
       label: 'View Reports',
       icon: BarChart3,
-      action: () => navigate('/admin/reports'),
+      action: () => {
+        navigate('/admin/reports');
+        toast.success('Opening Reports Dashboard');
+      },
       color: 'bg-orange-500 hover:bg-orange-600'
     },
     {
@@ -36,19 +42,25 @@ const QuickActions = () => {
     {
       label: 'Manage Customers',
       icon: Users,
-      action: () => navigate('/admin/customer-management'),
+      action: () => {
+        navigate('/admin/customer-management');
+        toast.success('Opening Customer Management');
+      },
       color: 'bg-indigo-500 hover:bg-indigo-600'
     },
     {
       label: 'Settings',
       icon: Settings,
-      action: () => navigate('/admin/settings'),
+      action: () => {
+        navigate('/admin/settings');
+        toast.info('Settings page coming soon');
+      },
       color: 'bg-gray-500 hover:bg-gray-600'
     }
   ];
 
   return (
-    <Card>
+    <Card data-testid="quick-actions">
       <CardHeader>
         <CardTitle>Quick Actions</CardTitle>
       </CardHeader>
@@ -58,11 +70,12 @@ const QuickActions = () => {
             <Button
               key={index}
               variant="outline"
-              className={`h-auto p-4 flex flex-col items-center gap-2 ${action.color} text-white border-none`}
+              className={`h-auto p-4 flex flex-col items-center gap-2 ${action.color} text-white border-none transition-all duration-200 hover:scale-105 focus:scale-105`}
               onClick={action.action}
+              aria-label={`${action.label} - Quick action button`}
             >
               <action.icon className="h-5 w-5" />
-              <span className="text-xs font-medium">{action.label}</span>
+              <span className="text-xs font-medium text-center">{action.label}</span>
             </Button>
           ))}
         </div>

@@ -22,6 +22,8 @@ class VoiceTrainerService {
   private lastGuidedElement: string | null = null;
   private currentPage: string = '';
   private elementCache: Map<string, string> = new Map();
+  private retryCount = 0;
+  private maxRetries = 3;
 
   constructor() {
     this.initializeVoice();
@@ -72,19 +74,26 @@ class VoiceTrainerService {
 
     return new Promise((resolve, reject) => {
       try {
+        // Check if speech synthesis is available
+        if (!('speechSynthesis' in window)) {
+          console.warn('Speech synthesis not supported');
+          resolve();
+          return;
+        }
+
         this.currentUtterance = new SpeechSynthesisUtterance(text);
         
         if (this.preferredVoice) {
           this.currentUtterance.voice = this.preferredVoice;
         }
         
-        // Normal speech settings
         this.currentUtterance.rate = 1.0;
         this.currentUtterance.pitch = 1.0;
         this.currentUtterance.volume = 0.9;
 
         this.currentUtterance.onstart = () => {
           this.isPlaying = true;
+          this.retryCount = 0;
         };
 
         this.currentUtterance.onend = () => {
@@ -96,14 +105,26 @@ class VoiceTrainerService {
         this.currentUtterance.onerror = (event) => {
           this.isPlaying = false;
           this.currentUtterance = null;
-          console.error('Speech synthesis error:', event);
-          reject(new Error('Speech synthesis failed'));
+          
+          console.warn('Speech synthesis error:', event);
+          
+          // Retry with fallback approach
+          if (this.retryCount < this.maxRetries) {
+            this.retryCount++;
+            setTimeout(() => {
+              this.speak(text).then(resolve).catch(reject);
+            }, 500);
+          } else {
+            console.error('Speech synthesis failed after retries');
+            resolve(); // Don't reject to avoid breaking the app
+          }
         };
 
         speechSynthesis.speak(this.currentUtterance);
       } catch (error) {
         this.isPlaying = false;
-        reject(error);
+        console.error('Speech synthesis setup error:', error);
+        resolve(); // Don't reject to avoid breaking the app
       }
     });
   }
@@ -151,141 +172,149 @@ class VoiceTrainerService {
     const type = element.getAttribute('type');
     const dataTestId = element.getAttribute('data-testid');
     const currentPath = window.location.pathname;
-    
-    // Dashboard-specific guidance
+
+    // Enhanced guidance for modals and popups
+    if (element.closest('[role="dialog"]') || element.closest('.modal') || className.includes('modal')) {
+      return this.getModalGuidance(element);
+    }
+
+    // Enhanced guidance for dropdowns
+    if (element.closest('[role="menu"]') || element.closest('.dropdown') || className.includes('dropdown')) {
+      return this.getDropdownGuidance(element);
+    }
+
+    // Enhanced guidance for sidebar elements
+    if (element.closest('.sidebar') || element.closest('[data-sidebar]') || className.includes('sidebar')) {
+      return this.getSidebarGuidance(element);
+    }
+
+    // Enhanced dashboard guidance
     if (currentPath.includes('/admin/dashboard')) {
-      if (dataTestId === 'stats-cards' || className.includes('stats') || element.closest('[data-testid="stats-cards"]')) {
-        return 'Dashboard statistics overview showing key business metrics. Total Revenue displays your income, Total Orders shows customer purchases, Total Customers counts your user base, and Active Products tracks inventory. These metrics update in real-time to help monitor business performance and identify growth trends.';
-      }
-      
-      if (dataTestId === 'sales-chart' || className.includes('chart') || element.closest('[data-testid="sales-chart"]')) {
-        return 'Sales performance chart displaying revenue and order trends over time. This interactive visualization helps identify peak sales periods, seasonal patterns, and growth opportunities. Use this data for inventory planning, marketing campaigns, and business forecasting.';
-      }
-      
-      if (dataTestId === 'quick-actions' || element.closest('[data-testid="quick-actions"]')) {
-        return 'Quick action shortcuts for common administrative tasks. Add Product creates new inventory items, View Reports accesses analytics dashboard, Import Products handles bulk uploads, Export Data downloads reports, Manage Customers handles user accounts, and Settings configures system preferences.';
-      }
-      
-      if (dataTestId === 'low-stock-alerts' || element.closest('[data-testid="low-stock-alerts"]')) {
-        return 'Inventory monitoring system showing products with low stock levels. This alert system prevents stockouts by notifying when items fall below threshold levels. Click Restock buttons to update inventory or review detailed stock information.';
-      }
-
-      // Specific dashboard buttons
-      if (tagName === 'button' && text) {
-        const buttonText = text.toLowerCase();
-        if (buttonText.includes('add product')) {
-          return 'Add Product button navigates to the product creation form where you can add new items to your inventory with details, images, pricing, and categories.';
-        }
-        if (buttonText.includes('view reports')) {
-          return 'View Reports button opens the analytics dashboard with detailed business insights, sales data, customer behavior, and performance metrics.';
-        }
-        if (buttonText.includes('import products')) {
-          return 'Import Products button allows bulk product uploads via CSV or Excel files, streamlining inventory management for large catalogs.';
-        }
-        if (buttonText.includes('export data')) {
-          return 'Export Data button downloads business information in various formats for accounting, analysis, or backup purposes.';
-        }
-        if (buttonText.includes('manage customers')) {
-          return 'Manage Customers button opens customer relationship management tools for viewing profiles, order history, and communication.';
-        }
-        if (buttonText.includes('settings')) {
-          return 'Settings button accesses system configuration options including payment methods, shipping, taxes, and store preferences.';
-        }
-        if (buttonText.includes('restock')) {
-          return 'Restock button updates inventory levels for low-stock items. Click to add quantities and maintain adequate stock levels.';
-        }
-      }
+      return this.getDashboardGuidance(element, dataTestId, className, text);
     }
 
-    // Enhanced guidance for other pages
-    if (currentPath.includes('/admin/add-product') || currentPath.includes('/admin/products')) {
-      if (tagName === 'input') {
-        if (placeholder?.toLowerCase().includes('name') || type === 'text') {
-          return 'Product Name field for the item title customers will see in search results and listings. Use descriptive, keyword-rich names that clearly identify the product and its key features.';
-        }
-        if (placeholder?.toLowerCase().includes('price') || type === 'number') {
-          return 'Price field for setting product cost. Consider competitor pricing, profit margins, and psychological pricing strategies. Include decimals for precise pricing.';
-        }
-        if (placeholder?.toLowerCase().includes('stock') || placeholder?.toLowerCase().includes('quantity')) {
-          return 'Stock Quantity field for inventory management. Set initial stock levels and enable low-stock alerts to prevent stockouts.';
-        }
-      }
-      if (tagName === 'textarea' || placeholder?.toLowerCase().includes('description')) {
-        return 'Product Description area for detailed item information. Include features, benefits, specifications, materials, and usage instructions to help customers make informed decisions.';
-      }
-      if (tagName === 'select' || role === 'combobox') {
-        return 'Category selection dropdown for organizing products into logical groups. Choose appropriate categories to improve navigation and searchability.';
-      }
-      if (tagName === 'button') {
-        const buttonText = text?.toLowerCase() || '';
-        if (buttonText.includes('save') || buttonText.includes('create') || buttonText.includes('add')) {
-          return 'Save Product button stores your new item in the catalog. Ensure all required fields are completed before saving.';
-        }
-        if (buttonText.includes('upload') || buttonText.includes('image')) {
-          return 'Image Upload button adds product photos. High-quality images from multiple angles increase conversion rates and reduce returns.';
-        }
-      }
+    // Enhanced form guidance
+    if (tagName === 'input' || tagName === 'textarea' || tagName === 'select') {
+      return this.getFormGuidance(element, type, placeholder);
     }
 
-    if (currentPath.includes('/admin/categories')) {
-      if (tagName === 'button') {
-        const buttonText = text?.toLowerCase() || '';
-        if (buttonText.includes('add category')) {
-          return 'Add Category button creates new product groupings for better organization and navigation. Categories help customers find related products easily.';
-        }
-        if (buttonText.includes('edit')) {
-          return 'Edit Category button modifies existing category information including name, description, and associated products.';
-        }
-        if (buttonText.includes('delete')) {
-          return 'Delete Category button permanently removes categories. Ensure no products are assigned before deletion.';
-        }
-      }
-      if (tagName === 'input' && placeholder?.toLowerCase().includes('name')) {
-        return 'Category Name field for creating product groups. Use broad, intuitive terms that customers would naturally search for.';
-      }
-    }
-
-    // Generic guidance for common elements
+    // Enhanced button guidance
     if (tagName === 'button' || role === 'button') {
-      const buttonText = text?.toLowerCase() || '';
-      if (buttonText.includes('edit')) {
-        return `Edit button modifies existing ${this.getContextualItem()}. Opens a form with current data for updates and changes.`;
-      }
-      if (buttonText.includes('delete') || buttonText.includes('remove')) {
-        return `Delete button permanently removes ${this.getContextualItem()} from the system. This action cannot be undone.`;
-      }
-      if (buttonText.includes('view') || buttonText.includes('details')) {
-        return `View Details button displays comprehensive information about ${this.getContextualItem()} including full specifications and history.`;
-      }
+      return this.getButtonGuidance(element, text);
     }
-    
-    if (type === 'search') {
-      return `Search field for finding specific ${this.getContextualItem()}. Type keywords to filter results in real-time.`;
+
+    // Enhanced link guidance
+    if (tagName === 'a' || role === 'link') {
+      return this.getLinkGuidance(element, text);
     }
-    
-    if (tagName === 'table' || role === 'table' || className.includes('table')) {
-      const context = this.getContextualItem();
-      return `Data table displaying ${context} in organized rows and columns. Sort by clicking headers, use pagination for large datasets, and access actions for each item.`;
-    }
-    
+
     return null;
   }
 
-  private getContextualItem(): string {
-    const path = window.location.pathname;
-    if (path.includes('/admin/add-product') || path.includes('/admin/products')) return 'products';
-    if (path.includes('/admin/categories')) return 'categories';
-    if (path.includes('/admin/orders')) return 'orders';
-    if (path.includes('/admin/customers')) return 'customers';
-    if (path.includes('/admin/inventory')) return 'inventory items';
-    if (path.includes('/admin/coupons') || path.includes('/admin/marketing')) return 'marketing campaigns';
-    if (path.includes('/admin/product-reviews')) return 'product reviews';
-    if (path.includes('/admin/product-media')) return 'media files';
-    if (path.includes('/admin/transactions')) return 'financial transactions';
-    if (path.includes('/admin/brands')) return 'brand information';
-    if (path.includes('/admin/reports')) return 'business reports';
-    if (path.includes('/admin/dashboard')) return 'dashboard metrics';
-    return 'items';
+  private getModalGuidance(element: HTMLElement): string {
+    const text = element.textContent?.trim();
+    if (element.tagName.toLowerCase() === 'button') {
+      if (text?.toLowerCase().includes('close') || text?.toLowerCase().includes('cancel')) {
+        return 'Close button - Click to dismiss this dialog and return to the previous view.';
+      }
+      if (text?.toLowerCase().includes('save') || text?.toLowerCase().includes('confirm')) {
+        return 'Confirm button - Click to save changes and proceed with the action.';
+      }
+    }
+    return 'Interactive modal dialog element. Use Tab to navigate between options, Enter to select, or Escape to close.';
+  }
+
+  private getDropdownGuidance(element: HTMLElement): string {
+    const text = element.textContent?.trim();
+    if (element.getAttribute('role') === 'menuitem') {
+      return `Menu option: ${text}. Click to select this option from the dropdown menu.`;
+    }
+    return 'Dropdown menu element. Navigate with arrow keys, select with Enter, or click to choose options.';
+  }
+
+  private getSidebarGuidance(element: HTMLElement): string {
+    const text = element.textContent?.trim();
+    if (element.tagName.toLowerCase() === 'a' || element.getAttribute('role') === 'button') {
+      return `Sidebar navigation: ${text}. Click to navigate to this section of the administration panel.`;
+    }
+    return 'Sidebar navigation element for accessing different sections of the admin panel.';
+  }
+
+  private getDashboardGuidance(element: HTMLElement, dataTestId: string | null, className: string, text: string | undefined): string | null {
+    if (dataTestId === 'stats-cards' || className.includes('stats') || element.closest('[data-testid="stats-cards"]')) {
+      return 'Dashboard statistics overview showing key business metrics including revenue, orders, customers, and products. These real-time metrics help monitor business performance and identify growth opportunities.';
+    }
+    
+    if (dataTestId === 'sales-chart' || className.includes('chart') || element.closest('[data-testid="sales-chart"]')) {
+      return 'Interactive sales performance chart displaying revenue trends over time. Analyze peak sales periods, seasonal patterns, and growth opportunities for strategic business planning.';
+    }
+    
+    if (dataTestId === 'quick-actions' || element.closest('[data-testid="quick-actions"]')) {
+      return 'Quick action panel with shortcuts to common administrative tasks including adding products, viewing reports, managing customers, and system settings.';
+    }
+    
+    if (dataTestId === 'low-stock-alerts' || element.closest('[data-testid="low-stock-alerts"]')) {
+      return 'Inventory monitoring system showing products with low stock levels. Prevents stockouts by alerting when items fall below threshold levels.';
+    }
+
+    if (text && element.tagName.toLowerCase() === 'button') {
+      return this.getDashboardButtonGuidance(text.toLowerCase());
+    }
+
+    return null;
+  }
+
+  private getDashboardButtonGuidance(buttonText: string): string | null {
+    if (buttonText.includes('add product')) {
+      return 'Add Product button - Navigate to product creation form to add new inventory items with comprehensive details and images.';
+    }
+    if (buttonText.includes('view reports')) {
+      return 'View Reports button - Access detailed analytics dashboard with business insights, sales data, and performance metrics.';
+    }
+    if (buttonText.includes('restock')) {
+      return 'Restock button - Update inventory levels for low-stock items to maintain adequate supply.';
+    }
+    return null;
+  }
+
+  private getFormGuidance(element: HTMLElement, type: string | null, placeholder: string | null): string {
+    if (type === 'email') {
+      return 'Email input field. Enter a valid email address for account creation or login authentication.';
+    }
+    if (type === 'password') {
+      return 'Password input field. Enter your secure password. Passwords should be at least 8 characters long.';
+    }
+    if (type === 'search') {
+      return 'Search input field. Type keywords to find specific items or filter results in real-time.';
+    }
+    if (placeholder) {
+      return `Input field for ${placeholder.toLowerCase()}. Enter the required information to proceed.`;
+    }
+    return 'Form input field. Enter the required information to continue.';
+  }
+
+  private getButtonGuidance(element: HTMLElement, text: string | undefined): string {
+    if (!text) return 'Interactive button element. Click to perform an action.';
+    
+    const buttonText = text.toLowerCase();
+    if (buttonText.includes('save') || buttonText.includes('submit')) {
+      return 'Save button - Click to store your changes and proceed.';
+    }
+    if (buttonText.includes('cancel') || buttonText.includes('close')) {
+      return 'Cancel button - Click to dismiss changes and return to previous view.';
+    }
+    if (buttonText.includes('delete') || buttonText.includes('remove')) {
+      return 'Delete button - Click to permanently remove this item. This action cannot be undone.';
+    }
+    if (buttonText.includes('edit') || buttonText.includes('modify')) {
+      return 'Edit button - Click to modify existing information or settings.';
+    }
+    return `${text} button - Click to ${buttonText}.`;
+  }
+
+  private getLinkGuidance(element: HTMLElement, text: string | undefined): string {
+    if (!text) return 'Navigation link. Click to navigate to another page or section.';
+    return `Navigation link to ${text}. Click to navigate to this section.`;
   }
 
   async handleElementClick(element: HTMLElement) {
@@ -298,18 +327,15 @@ class VoiceTrainerService {
   private getClickGuidance(element: HTMLElement): string | null {
     const text = element.textContent?.trim();
     const buttonText = text?.toLowerCase() || '';
-    const currentPath = window.location.pathname;
     
-    if (currentPath.includes('/admin/dashboard')) {
-      if (buttonText.includes('add product')) {
-        return 'Navigating to Add Product page where you can create new inventory items with comprehensive details and images.';
-      }
-      if (buttonText.includes('view reports')) {
-        return 'Opening Reports dashboard with detailed analytics, sales metrics, and business intelligence insights.';
-      }
-      if (buttonText.includes('restock')) {
-        return 'Inventory updated successfully. The low stock alert has been resolved and stock levels are now adequate.';
-      }
+    if (buttonText.includes('restock')) {
+      return 'Inventory updated successfully. Stock levels have been replenished and low stock alert resolved.';
+    }
+    if (buttonText.includes('save') || buttonText.includes('submit')) {
+      return 'Information saved successfully. Your changes have been stored.';
+    }
+    if (buttonText.includes('delete')) {
+      return 'Item deleted successfully. The selected item has been permanently removed.';
     }
     
     return null;
@@ -339,34 +365,19 @@ class VoiceTrainerService {
 
   private getPageGuidance(path: string): string | null {
     if (path.includes('/admin/dashboard')) {
-      return 'Welcome to your Admin Dashboard. Monitor business performance through statistics cards, analyze sales trends with interactive charts, access quick action shortcuts for common tasks, and review inventory alerts. This central hub provides real-time insights for effective business management.';
+      return 'Admin Dashboard - Monitor business performance through statistics, analyze sales trends, access quick actions, and review inventory alerts. This central hub provides comprehensive business management tools.';
     }
-    if (path.includes('/admin/add-product')) {
-      return 'Add Product page for expanding your catalog. Complete all product details including name, description, pricing, images, stock quantities, and category selection. Comprehensive product information improves search visibility and customer conversion rates.';
+    if (path.includes('/admin/orders')) {
+      return 'Order Management - View, process, and track customer orders. Update order status, manage shipping, and handle customer communications.';
     }
-    if (path.includes('/admin/products') || path.includes('/admin/product-list')) {
-      return 'Product Management section for inventory control. View, edit, and manage all products in organized tables. Update pricing, stock levels, descriptions, and remove discontinued items to maintain an optimized catalog.';
+    if (path.includes('/admin/products')) {
+      return 'Product Management - Manage your product catalog including adding new items, updating existing products, and organizing inventory.';
     }
-    if (path.includes('/admin/categories')) {
-      return 'Category Management for product organization. Create logical product groups, edit existing categories, and maintain structured navigation. Well-organized categories improve customer experience and simplify inventory management.';
-    }
-    if (path.includes('/admin/product-media')) {
-      return 'Product Media Management for visual content. Upload high-quality images, organize media files, and maintain consistent product presentation. Quality visuals significantly impact customer purchasing decisions.';
-    }
-    if (path.includes('/admin/product-reviews')) {
-      return 'Product Reviews Management for customer feedback. Review and approve authentic testimonials, moderate content, and maintain quality standards. Customer reviews build trust and provide valuable social proof.';
-    }
-    if (path.includes('/admin/coupons') || path.includes('/admin/marketing')) {
-      return 'Marketing and Coupon Management for promotional campaigns. Create discount codes, set usage limits, track performance, and drive sales through strategic promotions and customer incentives.';
-    }
-    if (path.includes('/admin/transactions')) {
-      return 'Transaction Management for financial oversight. Monitor payments, process refunds, track revenue, and export financial data for accounting. Comprehensive transaction management ensures financial accuracy.';
-    }
-    if (path.includes('/admin/brands')) {
-      return 'Brand Management for manufacturer organization. Create brand profiles, associate products, and maintain consistent brand representation throughout your catalog for improved product discovery.';
+    if (path.includes('/admin/customers')) {
+      return 'Customer Management - View customer profiles, order history, and manage customer relationships.';
     }
     
-    return 'Admin panel section for business management. Each area provides specialized tools for specific operations. Hover over elements to receive detailed guidance about functionality and best practices.';
+    return 'Administration panel for comprehensive business management. Navigate using the sidebar or hover over elements for detailed guidance.';
   }
 }
 

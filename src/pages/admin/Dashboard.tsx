@@ -1,156 +1,162 @@
-
-import React, { useEffect } from 'react';
-import { DollarSign, ShoppingBag, Users, Activity } from 'lucide-react';
+import React from 'react';
+import { DollarSign, ShoppingCart, Users, Package } from 'lucide-react';
 import StatsCard from '@/components/admin/dashboard/StatsCard';
+import SalesChart from '@/components/admin/dashboard/SalesChart';
 import RecentOrders from '@/components/admin/dashboard/RecentOrders';
 import TopSellingProducts from '@/components/admin/dashboard/TopSellingProducts';
-import SalesChart from '@/components/admin/dashboard/SalesChart';
+import QuickActions from '@/components/admin/dashboard/QuickActions';
 import LowStockAlerts from '@/components/admin/dashboard/LowStockAlerts';
-import { useAdminStore } from '@/stores/adminStore';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 const Dashboard = () => {
-  const { stats, initializeData, updateStats } = useAdminStore();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    // Initialize mock data when component mounts
-    initializeData();
-  }, [initializeData]);
-
-  // Handlers for making stats cards functional
-  const handleViewRevenue = () => {
-    navigate('/admin/reports');
-    toast.info('Viewing revenue reports');
+  const handleStatsAction = (type: string) => {
+    toast.info(`Viewing detailed ${type} analytics`);
   };
 
-  const handleViewOrders = () => {
-    navigate('/admin/orders');
-    toast.info('Viewing order management');
+  const handleRefreshStats = (type: string) => {
+    toast.success(`${type} data refreshed successfully`);
   };
 
-  const handleViewCustomers = () => {
-    navigate('/admin/customers');
-    toast.info('Viewing customer management');
-  };
-
-  const handleViewProducts = () => {
-    navigate('/admin/products/list');
-    toast.info('Viewing product catalog');
-  };
-
-  const handleRefreshStats = () => {
-    // Simulate data refresh with slight variations
-    const variations = {
-      totalRevenue: stats.totalRevenue + Math.floor(Math.random() * 1000) - 500,
-      totalOrders: stats.totalOrders + Math.floor(Math.random() * 50) - 25,
-      totalCustomers: stats.totalCustomers + Math.floor(Math.random() * 20) - 10,
-      totalProducts: stats.totalProducts + Math.floor(Math.random() * 5) - 2,
-      revenueGrowth: Number((Math.random() * 20 - 10).toFixed(1)),
-      ordersGrowth: Number((Math.random() * 15 - 7.5).toFixed(1)),
-      customersGrowth: Number((Math.random() * 10 - 5).toFixed(1)),
-      productsGrowth: Number((Math.random() * 8 - 4).toFixed(1)),
-    };
-    
-    updateStats(variations);
-    toast.success('Dashboard data refreshed');
-  };
-
-  const handleDownloadReport = (type: string) => {
-    toast.info(`Downloading ${type} report...`);
-    // Simulate download
-    setTimeout(() => {
-      toast.success(`${type} report downloaded successfully`);
-    }, 2000);
-  };
-  
-  // Sample data for recent orders and top products
-  const recentOrders = [
-    { id: '8531', customer: 'John Doe', amount: '125.00', date: '2 mins ago', avatar: 'https://ui-avatars.com/api/?name=John+Doe' },
-    { id: '8530', customer: 'Sarah Smith', amount: '89.50', date: '24 mins ago', avatar: 'https://ui-avatars.com/api/?name=Sarah+Smith' },
-    { id: '8529', customer: 'Mike Johnson', amount: '270.00', date: '2 hours ago', avatar: 'https://ui-avatars.com/api/?name=Mike+Johnson' },
-    { id: '8528', customer: 'Emily Brown', amount: '63.25', date: '3 hours ago', avatar: 'https://ui-avatars.com/api/?name=Emily+Brown' },
+  const statsData = [
+    {
+      title: 'Total Revenue',
+      value: '$54,239',
+      change: { value: '+12.5%', positive: true },
+      icon: <DollarSign className="h-6 w-6 text-white" />,
+      colorClass: 'bg-green-500',
+      onView: () => handleStatsAction('revenue'),
+      onRefresh: () => handleRefreshStats('Revenue')
+    },
+    {
+      title: 'Total Orders',
+      value: '1,429',
+      change: { value: '+8.2%', positive: true },
+      icon: <ShoppingCart className="h-6 w-6 text-white" />,
+      colorClass: 'bg-blue-500',
+      onView: () => handleStatsAction('orders'),
+      onRefresh: () => handleRefreshStats('Orders')
+    },
+    {
+      title: 'Total Customers',
+      value: '892',
+      change: { value: '+15.1%', positive: true },
+      icon: <Users className="h-6 w-6 text-white" />,
+      colorClass: 'bg-purple-500',
+      onView: () => handleStatsAction('customers'),
+      onRefresh: () => handleRefreshStats('Customers')
+    },
+    {
+      title: 'Active Products',
+      value: '256',
+      change: { value: '-2.1%', positive: false },
+      icon: <Package className="h-6 w-6 text-white" />,
+      colorClass: 'bg-orange-500',
+      onView: () => handleStatsAction('products'),
+      onRefresh: () => handleRefreshStats('Products')
+    }
   ];
-  
+
+  const recentOrders = [
+    {
+      id: '12345',
+      customer: 'John Doe',
+      amount: '125.99',
+      date: '2 hours ago',
+      avatar: 'https://i.pravatar.cc/150?img=1'
+    },
+    {
+      id: '12346',
+      customer: 'Jane Smith',
+      amount: '89.50',
+      date: '4 hours ago',
+      avatar: 'https://i.pravatar.cc/150?img=2'
+    },
+    {
+      id: '12347',
+      customer: 'Mike Johnson',
+      amount: '200.00',
+      date: '6 hours ago',
+      avatar: 'https://i.pravatar.cc/150?img=3'
+    }
+  ];
+
   const topProducts = [
-    { id: 1, name: 'Wireless Earbuds', category: 'Electronics', price: '89.99', growth: '+12.5%', image: 'https://placehold.co/100' },
-    { id: 2, name: 'Smart Watch', category: 'Electronics', price: '199.99', growth: '+8.2%', image: 'https://placehold.co/100' },
-    { id: 3, name: 'Laptop Sleeve', category: 'Accessories', price: '24.99', growth: '+5.7%', image: 'https://placehold.co/100' },
+    {
+      id: 1,
+      name: 'Wireless Headphones',
+      category: 'Electronics',
+      price: '99.99',
+      growth: '+15%',
+      image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=100'
+    },
+    {
+      id: 2,
+      name: 'Smart Watch',
+      category: 'Wearables',
+      price: '299.99',
+      growth: '+22%',
+      image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=100'
+    },
+    {
+      id: 3,
+      name: 'Laptop Stand',
+      category: 'Accessories',
+      price: '49.99',
+      growth: '+8%',
+      image: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=100'
+    }
   ];
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Dashboard</h1>
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-600 mt-1">Welcome back! Here's what's happening with your store.</p>
+        </div>
         <div className="text-sm text-gray-500">
           Last updated: {new Date().toLocaleString()}
         </div>
       </div>
-      
+
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" data-testid="stats-cards">
-        <StatsCard
-          title="Total Revenue"
-          value={`$${stats.totalRevenue.toLocaleString()}`}
-          change={{ value: `${stats.revenueGrowth}%`, positive: stats.revenueGrowth > 0 }}
-          icon={<DollarSign className="h-6 w-6 text-white" />}
-          colorClass="bg-green-500 text-white"
-          onView={handleViewRevenue}
-          onRefresh={handleRefreshStats}
-          onDownload={() => handleDownloadReport('Revenue')}
-        />
-        
-        <StatsCard
-          title="Total Orders"
-          value={stats.totalOrders.toLocaleString()}
-          change={{ value: `${stats.ordersGrowth}%`, positive: stats.ordersGrowth > 0 }}
-          icon={<ShoppingBag className="h-6 w-6 text-white" />}
-          colorClass="bg-blue-500 text-white"
-          onView={handleViewOrders}
-          onRefresh={handleRefreshStats}
-          onDownload={() => handleDownloadReport('Orders')}
-        />
-        
-        <StatsCard
-          title="Total Customers"
-          value={stats.totalCustomers.toLocaleString()}
-          change={{ value: `${stats.customersGrowth}%`, positive: stats.customersGrowth > 0 }}
-          icon={<Users className="h-6 w-6 text-white" />}
-          colorClass="bg-purple-500 text-white"
-          onView={handleViewCustomers}
-          onRefresh={handleRefreshStats}
-          onDownload={() => handleDownloadReport('Customers')}
-        />
-        
-        <StatsCard
-          title="Active Products"
-          value={stats.totalProducts.toString()}
-          change={{ value: `${stats.productsGrowth}%`, positive: stats.productsGrowth > 0 }}
-          icon={<Activity className="h-6 w-6 text-white" />}
-          colorClass="bg-orange-500 text-white"
-          onView={handleViewProducts}
-          onRefresh={handleRefreshStats}
-          onDownload={() => handleDownloadReport('Products')}
-        />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6" data-testid="stats-cards">
+        {statsData.map((stat, index) => (
+          <StatsCard key={index} {...stat} />
+        ))}
       </div>
-      
-      {/* Charts and Analytics */}
-      <div className="grid grid-cols-1 lg:grid-cols-6 gap-6">
-        <div data-testid="sales-chart">
+
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Sales Chart - Takes 2 columns on large screens */}
+        <div className="lg:col-span-2" data-testid="sales-chart">
           <SalesChart />
         </div>
-        <div className="lg:col-span-2 space-y-6">
-          <div data-testid="low-stock-alerts">
-            <LowStockAlerts />
-          </div>
-        </div>
+        
+        {/* Quick Actions */}
+        <QuickActions />
       </div>
-      
-      {/* Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+      {/* Secondary Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Recent Orders - Takes 2 columns */}
         <RecentOrders orders={recentOrders} />
-        <TopSellingProducts products={topProducts} />
+        
+        {/* Low Stock Alerts */}
+        <LowStockAlerts />
+      </div>
+
+      {/* Top Products */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <TopSellingProducts products={topProducts} />
+        </div>
+        
+        {/* Additional space for future widgets */}
+        <div className="hidden lg:block">
+          {/* Placeholder for future dashboard widgets */}
+        </div>
       </div>
     </div>
   );
