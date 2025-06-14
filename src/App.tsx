@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -36,6 +37,9 @@ import Coupons from "./pages/admin/Coupons";
 import Brands from "./pages/admin/Brands";
 import Reports from "./pages/admin/Reports";
 import CustomerManagement from "./pages/admin/CustomerManagement";
+import Settings from "./pages/admin/Settings";
+import Marketing from "./pages/admin/Marketing";
+import Inventory from "./pages/admin/Inventory";
 
 // Shop pages
 import Landing from "./pages/shop/Landing";
@@ -128,21 +132,26 @@ const App = () => (
               <Route path="" element={<AdminLayout />}>
                 <Route index element={<Dashboard />} />
                 <Route path="dashboard" element={<Dashboard />} />
-                <Route path="role" element={<AdminRole />} />
-                <Route path="authority" element={<AdminAuthority />} />
+                <Route path="admin-role" element={<AdminRole />} />
+                <Route path="admin-authority" element={<AdminAuthority />} />
+                <Route path="products" element={<ProductsList />} />
                 <Route path="products/add" element={<AddProduct />} />
                 <Route path="products/list" element={<ProductsList />} />
-                <Route path="products/media" element={<ProductMedia />} />
-                <Route path="products/reviews" element={<ProductReviews />} />
+                <Route path="product-media" element={<ProductMedia />} />
+                <Route path="product-reviews" element={<ProductReviews />} />
+                <Route path="inventory" element={<Inventory />} />
                 <Route path="transactions" element={<Transactions />} />
                 <Route path="categories" element={<AdminCategories />} />
+                <Route path="brands" element={<Brands />} />
                 <Route path="customers" element={<Customers />} />
                 <Route path="customer-management" element={<CustomerManagement />} />
+                <Route path="order-management" element={<OrderManagement />} />
                 <Route path="orders" element={<OrderManagement />} />
                 <Route path="orders/:orderId" element={<OrderDetail />} />
+                <Route path="marketing" element={<Marketing />} />
                 <Route path="coupons" element={<Coupons />} />
-                <Route path="brands" element={<Brands />} />
                 <Route path="reports" element={<Reports />} />
+                <Route path="settings" element={<Settings />} />
                 <Route path="search" element={<SearchResults />} />
                 <Route path="profile" element={<AdminProfile />} />
               </Route>
