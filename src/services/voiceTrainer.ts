@@ -1,4 +1,3 @@
-
 export interface TrainingModule {
   id: string;
   title: string;
@@ -15,6 +14,11 @@ export interface TrainingStep {
   cursorPosition?: { x: number; y: number };
 }
 
+interface VoiceSettings {
+  volume: number;
+  speechRate: number;
+}
+
 class VoiceTrainerService {
   private currentUtterance: SpeechSynthesisUtterance | null = null;
   private isPlaying = false;
@@ -24,6 +28,7 @@ class VoiceTrainerService {
   private elementCache: Map<string, string> = new Map();
   private retryCount = 0;
   private maxRetries = 3;
+  private settings: VoiceSettings = { volume: 0.9, speechRate: 1.0 };
 
   constructor() {
     this.initializeVoice();
@@ -69,6 +74,10 @@ class VoiceTrainerService {
     }
   }
 
+  updateSettings(newSettings: Partial<VoiceSettings>) {
+    this.settings = { ...this.settings, ...newSettings };
+  }
+
   async speak(text: string): Promise<void> {
     this.stopCurrentSpeech();
 
@@ -87,9 +96,9 @@ class VoiceTrainerService {
           this.currentUtterance.voice = this.preferredVoice;
         }
         
-        this.currentUtterance.rate = 1.0;
+        this.currentUtterance.rate = this.settings.speechRate;
         this.currentUtterance.pitch = 1.0;
-        this.currentUtterance.volume = 0.9;
+        this.currentUtterance.volume = this.settings.volume;
 
         this.currentUtterance.onstart = () => {
           this.isPlaying = true;
@@ -348,9 +357,12 @@ class VoiceTrainerService {
       this.lastGuidedElement = null;
       this.elementCache.clear();
       
+      // Stop current speech immediately
+      this.stopCurrentSpeech();
+      
       setTimeout(() => {
         this.initializePageGuidance();
-      }, 300);
+      }, 100);
     }
   }
 

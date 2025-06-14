@@ -1,27 +1,18 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Volume2, VolumeX, Pause, Play, Settings, Minimize2, Maximize2 } from 'lucide-react';
+import { Volume2, VolumeX, Pause, Play, Settings, X } from 'lucide-react';
 import { voiceTrainer } from '@/services/voiceTrainer';
 import { toast } from 'sonner';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet';
-import { Slider } from '@/components/ui/slider';
 
 const VoiceTrainer = () => {
   const [isVoiceEnabled, setIsVoiceEnabled] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const [currentElement, setCurrentElement] = useState<string | null>(null);
-  const [isMinimized, setIsMinimized] = useState(false);
-  const [volume, setVolume] = useState([0.9]);
-  const [speechRate, setSpeechRate] = useState([1.0]);
+  const [volume, setVolume] = useState(0.9);
+  const [speechRate, setSpeechRate] = useState(1.0);
+  const [showSettings, setShowSettings] = useState(false);
   const lastElementRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -34,7 +25,10 @@ const VoiceTrainer = () => {
 
     // Update playing state more frequently for better responsiveness
     const interval = setInterval(() => {
-      setIsPlaying(speechSynthesis.speaking);
+      const speaking = speechSynthesis.speaking;
+      const paused = speechSynthesis.paused;
+      setIsPlaying(speaking && !paused);
+      setIsPaused(speaking && paused);
     }, 100);
 
     // Initialize page guidance immediately
@@ -42,8 +36,27 @@ const VoiceTrainer = () => {
       voiceTrainer.initializePageGuidance();
     }
 
-    return () => clearInterval(interval);
+    // Listen for Escape key to stop speech
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        voiceTrainer.stopCurrentSpeech();
+        setCurrentElement(null);
+        toast.info('Voice guidance stopped');
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
   }, [isVoiceEnabled]);
+
+  useEffect(() => {
+    // Update voice trainer settings
+    voiceTrainer.updateSettings({ volume, speechRate });
+  }, [volume, speechRate]);
 
   useEffect(() => {
     if (!isVoiceEnabled) return;
@@ -64,6 +77,7 @@ const VoiceTrainer = () => {
 
       // Stop current speech immediately when hovering over a new element
       voiceTrainer.stopCurrentSpeech();
+      setCurrentElement(null);
       
       // Start guidance immediately without delay
       const elementInfo = voiceTrainer.getElementInfo(element);
@@ -87,13 +101,14 @@ const VoiceTrainer = () => {
     };
 
     const handleLocationChange = () => {
-      // Reset tracking when page changes
+      // Stop current speech immediately and reset tracking when page changes
+      voiceTrainer.stopCurrentSpeech();
       setCurrentElement(null);
       lastElementRef.current = null;
       
       setTimeout(() => {
         voiceTrainer.handlePageChange();
-      }, 500);
+      }, 100);
     };
 
     // Add event listeners
@@ -103,8 +118,15 @@ const VoiceTrainer = () => {
 
     // Listen for React Router navigation
     const originalPushState = history.pushState;
+    const originalReplaceState = history.replaceState;
+    
     history.pushState = function(...args) {
       originalPushState.apply(history, args);
+      handleLocationChange();
+    };
+    
+    history.replaceState = function(...args) {
+      originalReplaceState.apply(history, args);
       handleLocationChange();
     };
 
@@ -113,6 +135,7 @@ const VoiceTrainer = () => {
       document.removeEventListener('click', handleClick);
       window.removeEventListener('popstate', handleLocationChange);
       history.pushState = originalPushState;
+      history.replaceState = originalReplaceState;
     };
   }, [isVoiceEnabled, currentElement]);
 
@@ -120,6 +143,7 @@ const VoiceTrainer = () => {
     if (isVoiceEnabled) {
       voiceTrainer.stopCurrentSpeech();
       setIsVoiceEnabled(false);
+      setCurrentElement(null);
       toast.info('Voice guidance disabled');
     } else {
       setIsVoiceEnabled(true);
@@ -131,169 +155,137 @@ const VoiceTrainer = () => {
   const pauseResumeSpeech = () => {
     if (speechSynthesis.speaking && !speechSynthesis.paused) {
       speechSynthesis.pause();
+      setIsPaused(true);
       toast.info('Speech paused');
     } else if (speechSynthesis.paused) {
       speechSynthesis.resume();
+      setIsPaused(false);
       toast.info('Speech resumed');
     }
   };
 
-  const handleVolumeChange = (newVolume: number[]) => {
-    setVolume(newVolume);
-    // Note: Volume changes will apply to new utterances
+  const stopSpeech = () => {
+    voiceTrainer.stopCurrentSpeech();
+    setCurrentElement(null);
+    toast.info('Speech stopped');
   };
-
-  const handleRateChange = (newRate: number[]) => {
-    setSpeechRate(newRate);
-    // Note: Rate changes will apply to new utterances
-  };
-
-  if (isMinimized) {
-    return (
-      <div className="fixed bottom-4 right-4 z-50 voice-trainer-controls">
-        <Button
-          onClick={() => setIsMinimized(false)}
-          className="h-12 w-12 rounded-full shadow-lg bg-green-600 hover:bg-green-700"
-          size="icon"
-        >
-          <Volume2 className="h-5 w-5" />
-        </Button>
-      </div>
-    );
-  }
 
   return (
     <div className="fixed bottom-4 right-4 z-50 voice-trainer-controls">
-      <Card className="w-80 sm:w-96 shadow-xl border-2 border-green-200 bg-white/95 backdrop-blur-sm">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Volume2 className="h-5 w-5 text-green-600" />
-              <span className="font-semibold text-sm">Voice Guide</span>
-            </div>
-            <div className="flex gap-1">
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                    <Settings className="h-4 w-4" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="right" className="w-80">
-                  <SheetHeader>
-                    <SheetTitle>Voice Settings</SheetTitle>
-                    <SheetDescription>
-                      Customize your voice guidance experience
-                    </SheetDescription>
-                  </SheetHeader>
-                  <div className="space-y-6 mt-6">
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">
-                        Volume: {Math.round(volume[0] * 100)}%
-                      </label>
-                      <Slider
-                        value={volume}
-                        onValueChange={handleVolumeChange}
-                        max={1}
-                        min={0}
-                        step={0.1}
-                        className="w-full"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">
-                        Speech Rate: {speechRate[0]}x
-                      </label>
-                      <Slider
-                        value={speechRate}
-                        onValueChange={handleRateChange}
-                        max={2}
-                        min={0.5}
-                        step={0.1}
-                        className="w-full"
-                      />
-                    </div>
-                    <div className="text-xs text-gray-600">
-                      <p className="mb-2"><strong>Tips:</strong></p>
-                      <ul className="space-y-1 list-disc list-inside">
-                        <li>Hover over elements for instant guidance</li>
-                        <li>Click buttons to hear confirmation</li>
-                        <li>Navigate with keyboard for accessibility</li>
-                        <li>Use Escape key to stop current speech</li>
-                      </ul>
-                    </div>
-                  </div>
-                </SheetContent>
-              </Sheet>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsMinimized(true)}
-                className="h-8 w-8 p-0"
-              >
-                <Minimize2 className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+      {/* Compact floating controls */}
+      <div className="flex items-center gap-2 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border-2 border-green-200 p-2">
+        {/* Main toggle */}
+        <Button
+          variant={isVoiceEnabled ? "default" : "outline"}
+          size="sm"
+          onClick={toggleVoice}
+          className="h-8 w-8 p-0"
+        >
+          {isVoiceEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+        </Button>
 
-          <div className="flex gap-2 mb-3">
-            <Button
-              variant={isVoiceEnabled ? "default" : "outline"}
-              size="sm"
-              onClick={toggleVoice}
-              className="flex-1 transition-all duration-200 hover:scale-105"
-            >
-              {isVoiceEnabled ? <Volume2 className="h-4 w-4 mr-2" /> : <VolumeX className="h-4 w-4 mr-2" />}
-              {isVoiceEnabled ? 'Enabled' : 'Disabled'}
-            </Button>
-
-            {isVoiceEnabled && isPlaying && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={pauseResumeSpeech}
-                className="transition-all duration-200 hover:scale-105"
-              >
-                {speechSynthesis.paused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
-              </Button>
-            )}
-          </div>
-
-          <div className="text-center">
-            {isVoiceEnabled ? (
-              isPlaying ? (
-                <div className="flex items-center justify-center gap-2 text-green-600">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-xs font-medium">Speaking...</span>
-                  <div className="flex gap-1">
-                    {[1, 2, 3].map(i => (
-                      <div
-                        key={i}
-                        className="w-1 h-3 bg-green-500 rounded-full animate-pulse"
-                        style={{ animationDelay: `${i * 0.2}s` }}
-                      />
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="text-xs text-gray-600">
-                  <span className="inline-block w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-                  Hover for instant guidance
-                </div>
-              )
-            ) : (
-              <div className="text-xs text-gray-400">Voice guidance disabled</div>
-            )}
-          </div>
-
-          {currentElement && isVoiceEnabled && (
-            <div className="mt-3 p-2 bg-green-50 rounded-lg border border-green-200">
-              <div className="text-xs text-green-700 font-medium truncate">
-                Current: {currentElement.split('-').pop()?.replace(/-/g, ' ')}
+        {/* Pause/Resume/Stop controls - only show when voice is enabled */}
+        {isVoiceEnabled && (
+          <>
+            {(isPlaying || isPaused) && (
+              <div className="flex gap-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={pauseResumeSpeech}
+                  className="h-8 w-8 p-0"
+                >
+                  {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={stopSpeech}
+                  className="h-8 w-8 p-0"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
               </div>
+            )}
+
+            {/* Settings toggle */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowSettings(!showSettings)}
+              className="h-8 w-8 p-0"
+            >
+              <Settings className="h-4 w-4" />
+            </Button>
+          </>
+        )}
+
+        {/* Status indicator */}
+        <div className="flex items-center gap-1">
+          {isVoiceEnabled ? (
+            isPlaying ? (
+              <div className="flex items-center gap-1">
+                <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-xs text-green-600">On</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1">
+                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                <span className="text-xs text-blue-600">Ready</span>
+              </div>
+            )
+          ) : (
+            <div className="flex items-center gap-1">
+              <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+              <span className="text-xs text-gray-400">Off</span>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
+
+      {/* Settings panel */}
+      {showSettings && isVoiceEnabled && (
+        <div className="absolute bottom-full right-0 mb-2 w-64 bg-white rounded-lg shadow-lg border p-4">
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">
+                Volume: {Math.round(volume * 100)}%
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.1"
+                value={volume}
+                onChange={(e) => setVolume(parseFloat(e.target.value))}
+                className="w-full"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-2 block">
+                Speech Rate: {speechRate}x
+              </label>
+              <input
+                type="range"
+                min="0.5"
+                max="2"
+                step="0.1"
+                value={speechRate}
+                onChange={(e) => setSpeechRate(parseFloat(e.target.value))}
+                className="w-full"
+              />
+            </div>
+            <div className="text-xs text-gray-600">
+              <p className="mb-1"><strong>Tips:</strong></p>
+              <ul className="space-y-1 text-xs">
+                <li>• Hover for instant guidance</li>
+                <li>• Press Escape to stop speech</li>
+                <li>• Click elements for confirmation</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

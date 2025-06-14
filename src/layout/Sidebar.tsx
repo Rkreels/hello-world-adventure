@@ -1,162 +1,228 @@
 
-import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
 import { 
   Home, 
+  Package, 
   ShoppingCart, 
   Users, 
-  Tag, 
-  Layers, 
-  Star, 
-  PlusCircle, 
-  Image, 
-  List, 
-  FileText,
+  BarChart3, 
   Settings, 
+  Tag,
+  Folder,
+  Star,
+  CreditCard,
+  UserCheck,
   Shield,
-  ChevronDown
+  PlusCircle,
+  TrendingUp,
+  Percent,
+  MessageSquare,
+  FileText,
+  Palette,
+  Search,
+  Bell,
+  Camera,
+  ChevronDown,
+  ChevronRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
-interface SidebarProps {
-  collapsed?: boolean;
-}
-
-interface MenuItem {
-  name: string;
-  icon: React.ElementType;
-  path: string;
-  submenu?: MenuItem[];
-}
-
-interface MenuSection {
-  section: string;
-  items: MenuItem[];
-}
-
-const Sidebar = ({ collapsed = false }: SidebarProps) => {
+const Sidebar = () => {
   const location = useLocation();
-  const [expandedSections, setExpandedSections] = useState<string[]>(['Main menu', 'Product']);
-  
-  const menuItems: MenuSection[] = [
-    { section: 'Main menu', items: [
-      { name: 'Dashboard', icon: Home, path: '/admin/dashboard' },
-      { name: 'Order Management', icon: ShoppingCart, path: '/admin/orders' },
-      { name: 'Customers', icon: Users, path: '/admin/customers' },
-      { name: 'Coupon Code', icon: Tag, path: '/admin/coupons' },
-      { name: 'Categories', icon: Layers, path: '/admin/categories' },
-      { name: 'Transaction', icon: ShoppingCart, path: '/admin/transactions' },
-      { name: 'Brand', icon: Star, path: '/admin/brands' },
-    ]},
-    { section: 'Product', items: [
-      { name: 'Add Products', icon: PlusCircle, path: '/admin/products/add' },
-      { name: 'Product Media', icon: Image, path: '/admin/products/media' },
-      { name: 'Product List', icon: List, path: '/admin/products/list' },
-      { name: 'Product Reviews', icon: FileText, path: '/admin/products/reviews' },
-    ]},
-    { section: 'Admin', items: [
-      { name: 'Admin role', icon: Settings, path: '/admin/role' },
-      { name: 'Control Authority', icon: Shield, path: '/admin/authority' },
-    ]},
-  ];
+  const [openSections, setOpenSections] = useState<string[]>(['products', 'orders']);
 
-  const userInfo = {
-    name: 'Dealport',
-    email: 'Mark@thedesigner.com'
-  };
-
-  const isActiveLink = (path: string) => {
-    return location.pathname === path;
-  };
-  
   const toggleSection = (section: string) => {
-    setExpandedSections(prev => 
+    setOpenSections(prev => 
       prev.includes(section) 
-        ? prev.filter(s => s !== section) 
+        ? prev.filter(s => s !== section)
         : [...prev, section]
     );
   };
-  
-  const isSectionExpanded = (section: string) => {
-    return expandedSections.includes(section);
+
+  const isActive = (path: string) => location.pathname === path;
+  const isParentActive = (basePath: string) => location.pathname.startsWith(basePath);
+
+  const menuItems = [
+    {
+      title: 'Dashboard',
+      icon: Home,
+      path: '/admin/dashboard',
+      badge: null
+    },
+    {
+      title: 'Products',
+      icon: Package,
+      section: 'products',
+      children: [
+        { title: 'All Products', path: '/admin/products', icon: Package },
+        { title: 'Add Product', path: '/admin/products/add', icon: PlusCircle },
+        { title: 'Categories', path: '/admin/categories', icon: Folder },
+        { title: 'Brands', path: '/admin/brands', icon: Tag },
+        { title: 'Product Media', path: '/admin/product-media', icon: Camera },
+        { title: 'Inventory', path: '/admin/inventory', icon: TrendingUp },
+        { title: 'Reviews', path: '/admin/product-reviews', icon: MessageSquare, badge: '12' }
+      ]
+    },
+    {
+      title: 'Orders',
+      icon: ShoppingCart,
+      section: 'orders',
+      children: [
+        { title: 'Order Management', path: '/admin/order-management', icon: ShoppingCart, badge: '8' },
+        { title: 'Transactions', path: '/admin/transactions', icon: CreditCard }
+      ]
+    },
+    {
+      title: 'Customers',
+      icon: Users,
+      section: 'customers',
+      children: [
+        { title: 'All Customers', path: '/admin/customers', icon: Users },
+        { title: 'Customer Management', path: '/admin/customer-management', icon: UserCheck }
+      ]
+    },
+    {
+      title: 'Marketing',
+      icon: TrendingUp,
+      section: 'marketing',
+      children: [
+        { title: 'Marketing Dashboard', path: '/admin/marketing', icon: TrendingUp },
+        { title: 'Coupons', path: '/admin/coupons', icon: Percent }
+      ]
+    },
+    {
+      title: 'Analytics',
+      icon: BarChart3,
+      path: '/admin/reports',
+      badge: null
+    },
+    {
+      title: 'Administration',
+      icon: Shield,
+      section: 'admin',
+      children: [
+        { title: 'Admin Roles', path: '/admin/admin-role', icon: Shield },
+        { title: 'Admin Authority', path: '/admin/admin-authority', icon: UserCheck },
+        { title: 'Settings', path: '/admin/settings', icon: Settings }
+      ]
+    }
+  ];
+
+  const NavItem = ({ item, isChild = false }: { item: any, isChild?: boolean }) => {
+    if (item.children) {
+      const isOpen = openSections.includes(item.section);
+      const hasActiveChild = item.children.some((child: any) => isActive(child.path));
+      
+      return (
+        <Collapsible open={isOpen} onOpenChange={() => toggleSection(item.section)}>
+          <CollapsibleTrigger asChild>
+            <Button
+              variant="ghost"
+              className={cn(
+                'w-full justify-between h-10 px-3 mb-1 transition-all duration-200',
+                (hasActiveChild || isParentActive(`/admin/${item.section}`)) 
+                  ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-500' 
+                  : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <item.icon className="h-4 w-4" />
+                <span className="font-medium">{item.title}</span>
+              </div>
+              {isOpen ? (
+                <ChevronDown className="h-4 w-4" />
+              ) : (
+                <ChevronRight className="h-4 w-4" />
+              )}
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-1 ml-4">
+            {item.children.map((child: any, index: number) => (
+              <NavItem key={index} item={child} isChild={true} />
+            ))}
+          </CollapsibleContent>
+        </Collapsible>
+      );
+    }
+
+    return (
+      <NavLink
+        to={item.path}
+        className={({ isActive: linkActive }) =>
+          cn(
+            'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 group',
+            isChild ? 'ml-2 py-1.5' : 'mb-1',
+            linkActive
+              ? 'bg-blue-100 text-blue-700 border-r-2 border-blue-500'
+              : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
+          )
+        }
+      >
+        <item.icon className={cn('h-4 w-4', isChild ? 'h-3 w-3' : '')} />
+        <span className="flex-1">{item.title}</span>
+        {item.badge && (
+          <Badge variant="secondary" className="ml-auto h-5 px-1.5 text-xs">
+            {item.badge}
+          </Badge>
+        )}
+      </NavLink>
+    );
   };
 
   return (
-    <div className={cn(
-      "flex flex-col h-screen bg-white border-r border-gray-100",
-      collapsed ? "w-[60px]" : "w-[220px]"
-    )}>
-      <div className="p-4 border-b">
-        <Link to="/" className="flex items-center">
-          <img src="/logo.svg" alt="Dealport" className="h-7" />
-        </Link>
-      </div>
-
-      <div className="flex-1 overflow-y-auto">
-        {menuItems.map((section, idx) => (
-          <div key={idx} className="mt-4">
-            {!collapsed && (
-              <div 
-                className="px-4 py-1 flex justify-between items-center cursor-pointer group"
-                onClick={() => toggleSection(section.section)}
-              >
-                <h2 className="text-xs font-semibold text-gray-500">{section.section}</h2>
-                <ChevronDown className={cn(
-                  "h-4 w-4 text-gray-400 transition-transform duration-200",
-                  isSectionExpanded(section.section) ? "transform rotate-180" : ""
-                )} />
-              </div>
-            )}
-            {(collapsed || isSectionExpanded(section.section)) && (
-              <ul className={cn(
-                "mt-1",
-                collapsed ? "" : "animate-accordion-down transition-all duration-300"
-              )}>
-                {section.items.map((item, itemIdx) => (
-                  <li key={itemIdx}>
-                    <Link
-                      to={item.path}
-                      className={cn(
-                        "flex items-center px-4 py-2 text-gray-600 hover:bg-gray-50",
-                        isActiveLink(item.path) && "bg-gray-50 text-emerald-600 font-medium"
-                      )}
-                    >
-                      <item.icon className={cn(
-                        "w-5 h-5 mr-3",
-                        isActiveLink(item.path) && "text-emerald-600"
-                      )} />
-                      {!collapsed && <span>{item.name}</span>}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
+    <div className="w-64 bg-white border-r border-gray-200 flex flex-col h-full">
+      {/* Header */}
+      <div className="p-4 border-b border-gray-200">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+            <Package className="h-5 w-5 text-white" />
           </div>
-        ))}
-      </div>
-
-      <div className="p-4 border-t mt-auto">
-        <div className="flex items-center">
-          <div className="w-8 h-8 rounded-full bg-gray-200 mr-3 overflow-hidden">
-            <img src="/avatar.png" alt="User" className="w-full h-full object-cover" />
+          <div>
+            <h1 className="text-lg font-bold text-gray-900">Admin Panel</h1>
+            <p className="text-xs text-gray-500">E-commerce CMS</p>
           </div>
-          {!collapsed && (
-            <div>
-              <div className="font-medium text-sm">{userInfo.name}</div>
-              <div className="text-xs text-gray-500">{userInfo.email}</div>
-            </div>
-          )}
         </div>
       </div>
 
-      <div className="p-4 border-t">
-        <Link
-          to="/shop"
-          className="flex items-center text-gray-600"
-        >
-          <ShoppingCart className="w-5 h-5 mr-3" />
-          {!collapsed && <span>Your Shop</span>}
-        </Link>
+      {/* Search */}
+      <div className="p-4 border-b border-gray-200">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <NavLink 
+            to="/admin/search"
+            className="w-full pl-10 pr-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors block"
+          >
+            Search...
+          </NavLink>
+        </div>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+        {menuItems.map((item, index) => (
+          <NavItem key={index} item={item} />
+        ))}
+      </nav>
+
+      {/* Footer */}
+      <div className="p-4 border-t border-gray-200">
+        <div className="flex items-center gap-3 text-sm text-gray-600">
+          <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+            <span className="text-xs text-white font-medium">A</span>
+          </div>
+          <div className="flex-1">
+            <p className="font-medium">Admin User</p>
+            <p className="text-xs text-gray-500">administrator@cms.com</p>
+          </div>
+          <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+            <Bell className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );
