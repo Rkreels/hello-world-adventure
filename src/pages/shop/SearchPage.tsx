@@ -1,338 +1,193 @@
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Slider } from '@/components/ui/slider';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Loader2, Filter, SortAsc, SortDesc } from 'lucide-react';
-import ProductCard from '@/components/shop/ProductCard';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 
-// Mock product type
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  discountPrice?: number;
-  image: string;
-  rating: number;
-  reviewsCount: number;
-  category: string;
-  inStock: boolean;
-}
+import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Search, Filter } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
 const SearchPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const query = searchParams.get('q') || '';
-  
-  const [loading, setLoading] = useState(true);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
-  const [sortOption, setSortOption] = useState<string>('relevance');
-  const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 12;
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+  const [results, setResults] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  // Fetch products on component mount and when search query changes
+  // Mock search results
+  const mockProducts = [
+    {
+      id: 1,
+      name: 'Wireless Bluetooth Headphones',
+      price: 89.99,
+      image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300',
+      category: 'Electronics',
+      rating: 4.5,
+      inStock: true
+    },
+    {
+      id: 2,
+      name: 'Smart Watch Series 8',
+      price: 399.99,
+      image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300',
+      category: 'Electronics',
+      rating: 4.8,
+      inStock: true
+    },
+    {
+      id: 3,
+      name: 'Organic Cotton T-Shirt',
+      price: 24.99,
+      image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300',
+      category: 'Fashion',
+      rating: 4.2,
+      inStock: false
+    }
+  ];
+
   useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true);
-      
-      try {
-        // Simulate API call with mock data
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Generate mock products
-        const mockProducts: Product[] = Array.from({ length: 50 }, (_, i) => {
-          const categories = ['Electronics', 'Clothing', 'Home', 'Sports', 'Beauty'];
-          const category = categories[Math.floor(Math.random() * categories.length)];
-          const price = Math.floor(Math.random() * 900) + 100;
-          const hasDiscount = Math.random() > 0.5;
-          
-          return {
-            id: i + 1,
-            name: `Product ${i + 1} ${query ? `matching "${query}"` : ''}`,
-            price,
-            discountPrice: hasDiscount ? Math.floor(price * 0.8) : undefined,
-            image: 'https://placehold.co/300x300',
-            rating: Math.floor(Math.random() * 5) + 1,
-            reviewsCount: Math.floor(Math.random() * 500),
-            category,
-            inStock: Math.random() > 0.2,
-          };
-        });
-        
-        setProducts(mockProducts);
-        
-        // Get unique categories
-        const uniqueCategories = [...new Set(mockProducts.map(product => product.category))];
-        setCategories(uniqueCategories);
-        
-        // Apply initial filters
-        filterAndSortProducts(mockProducts, selectedCategories, priceRange, sortOption);
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchProducts();
-  }, [query]);
-
-  // Filter and sort products
-  const filterAndSortProducts = (
-    productsList: Product[], 
-    categories: string[], 
-    price: [number, number], 
-    sort: string
-  ) => {
-    // Apply filters
-    let filtered = productsList;
-    
-    if (categories.length > 0) {
-      filtered = filtered.filter(product => categories.includes(product.category));
+    const query = searchParams.get('q');
+    if (query) {
+      setSearchQuery(query);
+      performSearch(query);
     }
-    
-    filtered = filtered.filter(product => {
-      const productPrice = product.discountPrice || product.price;
-      return productPrice >= price[0] && productPrice <= price[1];
-    });
-    
-    // Apply sorting
-    switch (sort) {
-      case 'price-asc':
-        filtered.sort((a, b) => (a.discountPrice || a.price) - (b.discountPrice || b.price));
-        break;
-      case 'price-desc':
-        filtered.sort((a, b) => (b.discountPrice || b.price) - (a.discountPrice || a.price));
-        break;
-      case 'rating':
-        filtered.sort((a, b) => b.rating - a.rating);
-        break;
-      case 'relevance':
-      default:
-        // Keep default order (relevance based on query match)
-        break;
+  }, [searchParams]);
+
+  const performSearch = (query: string) => {
+    setLoading(true);
+    // Simulate API call
+    setTimeout(() => {
+      const filtered = mockProducts.filter(product =>
+        product.name.toLowerCase().includes(query.toLowerCase()) ||
+        product.category.toLowerCase().includes(query.toLowerCase())
+      );
+      setResults(filtered);
+      setLoading(false);
+    }, 500);
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      setSearchParams({ q: searchQuery.trim() });
     }
-    
-    setFilteredProducts(filtered);
   };
-
-  // Handle filter changes
-  const handleCategoryChange = (category: string) => {
-    const updatedCategories = selectedCategories.includes(category)
-      ? selectedCategories.filter(c => c !== category)
-      : [...selectedCategories, category];
-    
-    setSelectedCategories(updatedCategories);
-    filterAndSortProducts(products, updatedCategories, priceRange, sortOption);
-  };
-
-  const handlePriceChange = (value: number[]) => {
-    const newRange: [number, number] = [value[0], value[1]];
-    setPriceRange(newRange);
-    filterAndSortProducts(products, selectedCategories, newRange, sortOption);
-  };
-
-  const handleSortChange = (sort: string) => {
-    setSortOption(sort);
-    filterAndSortProducts(products, selectedCategories, priceRange, sort);
-  };
-
-  // Pagination
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
-
-  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">
-        {query ? `Search Results for "${query}"` : 'All Products'}
-      </h1>
-      
-      <div className="flex flex-col md:flex-row gap-8">
-        {/* Filters Sidebar */}
-        <div className="w-full md:w-64">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="font-semibold">Filters</h2>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => {
-                    setSelectedCategories([]);
-                    setPriceRange([0, 1000]);
-                    filterAndSortProducts(products, [], [0, 1000], sortOption);
-                  }}
-                >
-                  Reset
-                </Button>
-              </div>
-              
-              {/* Categories */}
-              <div className="mb-6">
-                <h3 className="font-medium mb-2">Categories</h3>
-                <div className="space-y-2">
-                  {categories.map((category) => (
-                    <div key={category} className="flex items-center">
-                      <Checkbox
-                        id={`category-${category}`}
-                        checked={selectedCategories.includes(category)}
-                        onCheckedChange={() => handleCategoryChange(category)}
-                      />
-                      <label
-                        htmlFor={`category-${category}`}
-                        className="ml-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        {category}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Price Range */}
-              <div className="mb-6">
-                <h3 className="font-medium mb-2">Price Range</h3>
-                <Slider
-                  defaultValue={[0, 1000]}
-                  min={0}
-                  max={1000}
-                  step={10}
-                  value={[priceRange[0], priceRange[1]]}
-                  onValueChange={handlePriceChange}
-                />
-                <div className="flex justify-between mt-2 text-sm">
-                  <span>${priceRange[0]}</span>
-                  <span>${priceRange[1]}</span>
-                </div>
-              </div>
-              
-              {/* Availability */}
-              <div>
-                <h3 className="font-medium mb-2">Availability</h3>
-                <div className="flex items-center">
-                  <Checkbox id="inStock" />
-                  <label
-                    htmlFor="inStock"
-                    className="ml-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    In Stock Only
-                  </label>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+      {/* Search Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-4">Search Results</h1>
         
-        {/* Products Grid */}
-        <div className="flex-1">
-          {/* Sort and Result Count */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-            <p className="text-sm text-gray-600 mb-4 sm:mb-0">
-              {filteredProducts.length} products found
-            </p>
-            
-            <div className="flex items-center space-x-2">
-              <Filter className="h-4 w-4" />
-              <span className="text-sm font-medium mr-2">Sort by:</span>
-              <select
-                className="text-sm border rounded-md p-2"
-                value={sortOption}
-                onChange={(e) => handleSortChange(e.target.value)}
-              >
-                <option value="relevance">Relevance</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
-                <option value="rating">Rating</option>
-              </select>
-            </div>
+        {/* Search Form */}
+        <form onSubmit={handleSearch} className="flex gap-4 mb-4">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+            <Input
+              type="text"
+              placeholder="Search for products..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
           </div>
-          
-          {loading ? (
-            <div className="flex justify-center items-center h-64">
-              <Loader2 className="h-10 w-10 animate-spin text-green-600" />
-            </div>
-          ) : currentProducts.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-lg font-medium">No products found</p>
-              <p className="text-gray-600">Try changing your filters or search query</p>
-            </div>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {currentProducts.map((product) => (
-                  <div key={product.id}>
-                    <ProductCard product={product} />
-                  </div>
-                ))}
-              </div>
-              
-              {/* Pagination */}
-              <div className="mt-10">
-                <Pagination>
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious 
-                        onClick={() => currentPage > 1 && paginate(currentPage - 1)}
-                        className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
-                      />
-                    </PaginationItem>
-                    
-                    {Array.from({ length: totalPages }).map((_, index) => {
-                      // Show only a limited number of pages
-                      if (
-                        index === 0 ||
-                        index === totalPages - 1 ||
-                        (index >= currentPage - 2 && index <= currentPage + 2)
-                      ) {
-                        return (
-                          <PaginationItem key={index}>
-                            <PaginationLink
-                              isActive={currentPage === index + 1}
-                              onClick={() => paginate(index + 1)}
-                            >
-                              {index + 1}
-                            </PaginationLink>
-                          </PaginationItem>
-                        );
-                      }
-                      
-                      // Show ellipsis
-                      if (index === currentPage - 3 || index === currentPage + 3) {
-                        return (
-                          <PaginationItem key={index}>
-                            <span className="flex h-9 w-9 items-center justify-center text-sm">
-                              ...
-                            </span>
-                          </PaginationItem>
-                        );
-                      }
-                      
-                      return null;
-                    })}
-                    
-                    <PaginationItem>
-                      <PaginationNext 
-                        onClick={() => currentPage < totalPages && paginate(currentPage + 1)}
-                        className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
-                      />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
-              </div>
-            </>
-          )}
-        </div>
+          <Button type="submit">Search</Button>
+          <Button variant="outline">
+            <Filter className="h-4 w-4 mr-2" />
+            Filters
+          </Button>
+        </form>
+
+        {searchParams.get('q') && (
+          <p className="text-gray-600">
+            {loading ? 'Searching...' : `${results.length} results found for "${searchParams.get('q')}"`}
+          </p>
+        )}
       </div>
+
+      {/* Results */}
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map(i => (
+            <Card key={i} className="animate-pulse">
+              <div className="h-48 bg-gray-200"></div>
+              <CardContent className="p-4">
+                <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : results.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {results.map(product => (
+            <Card key={product.id} className="group hover:shadow-lg transition-shadow">
+              <div className="relative overflow-hidden">
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform"
+                />
+                {!product.inStock && (
+                  <Badge variant="destructive" className="absolute top-2 right-2">
+                    Out of Stock
+                  </Badge>
+                )}
+              </div>
+              <CardContent className="p-4">
+                <h3 className="font-semibold mb-2 group-hover:text-green-600 transition-colors">
+                  {product.name}
+                </h3>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-lg font-bold text-green-600">
+                    ${product.price}
+                  </span>
+                  <Badge variant="outline">{product.category}</Badge>
+                </div>
+                <div className="flex items-center gap-1 mb-3">
+                  {[...Array(5)].map((_, i) => (
+                    <span
+                      key={i}
+                      className={`text-sm ${
+                        i < Math.floor(product.rating) ? 'text-yellow-400' : 'text-gray-300'
+                      }`}
+                    >
+                      ★
+                    </span>
+                  ))}
+                  <span className="text-sm text-gray-600 ml-1">({product.rating})</span>
+                </div>
+                <Button 
+                  className="w-full" 
+                  disabled={!product.inStock}
+                  variant={product.inStock ? "default" : "secondary"}
+                >
+                  {product.inStock ? 'Add to Cart' : 'Out of Stock'}
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : searchParams.get('q') ? (
+        <div className="text-center py-12">
+          <div className="mb-4">
+            <Search className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold mb-2">No results found</h3>
+            <p className="text-gray-600">
+              We couldn't find any products matching "{searchParams.get('q')}". 
+              Try searching with different keywords.
+            </p>
+          </div>
+          <Button variant="outline" onClick={() => setSearchQuery('')}>
+            Clear Search
+          </Button>
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <Search className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold mb-2">Start your search</h3>
+          <p className="text-gray-600">Enter a search term to find products</p>
+        </div>
+      )}
     </div>
   );
 };

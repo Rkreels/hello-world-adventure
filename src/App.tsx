@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -16,6 +15,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 // Auth pages
 import Login from "./pages/auth/Login";
+import Register from "./pages/auth/Register";
 
 // Admin pages
 import Dashboard from "./pages/admin/Dashboard";
@@ -25,6 +25,7 @@ import Transactions from "./pages/admin/Transactions";
 import AdminCategories from "./pages/admin/Categories";
 import Customers from "./pages/admin/Customers";
 import OrderManagement from "./pages/admin/OrderManagement";
+import OrderDetail from "./pages/admin/OrderDetail";
 import SearchResults from "./pages/admin/SearchResults";
 import ProductsList from "./pages/admin/ProductsList";
 import ProductMedia from "./pages/admin/ProductMedia";
@@ -93,6 +94,7 @@ const App = () => (
               <Route path="category/:categoryId" element={<CategoryPage />} />
               <Route path="category/:categoryId/:subcategoryId" element={<CategoryPage />} />
               <Route path="login" element={<Login />} />
+              <Route path="register" element={<Register />} />
               <Route path="profile" element={<Profile />} />
               <Route path="orders" element={<OrderDetails />} />
               <Route path="search" element={<SearchPage />} />
@@ -137,6 +139,7 @@ const App = () => (
                 <Route path="customers" element={<Customers />} />
                 <Route path="customer-management" element={<CustomerManagement />} />
                 <Route path="orders" element={<OrderManagement />} />
+                <Route path="orders/:orderId" element={<OrderDetail />} />
                 <Route path="coupons" element={<Coupons />} />
                 <Route path="brands" element={<Brands />} />
                 <Route path="reports" element={<Reports />} />
