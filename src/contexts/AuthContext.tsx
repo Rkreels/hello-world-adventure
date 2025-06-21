@@ -1,129 +1,32 @@
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'sonner';
 
-type User = {
+interface User {
+  id: string;
   email: string;
-  role: 'admin' | 'customer';
   name: string;
-  photoURL?: string;
-} | null;
+  role: 'admin' | 'customer';
+}
 
-type AuthContextType = {
-  user: User;
-  login: (email: string, password: string) => void;
-  logout: () => void;
-  demoLogin: (role: 'admin' | 'customer') => void;
+interface AuthContextType {
+  user: User | null;
   isAuthenticated: boolean;
   isAdmin: boolean;
-  updateProfile: (data: Partial<Omit<User, 'role'>>) => void;
-};
+  isLoading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  register: (userData: RegisterData) => Promise<void>;
+}
+
+interface RegisterData {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User>(null);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    // Check if user is logged in on component mount
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
-
-  const login = (email: string, password: string) => {
-    try {
-      // Simple authentication logic
-      if (!email || !password) {
-        toast.error("Email and password are required");
-        return;
-      }
-      
-      const userRole: 'admin' | 'customer' = email.includes('admin') ? 'admin' : 'customer';
-      const firstName = email.split('@')[0];
-      const capitalizedName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
-      
-      const newUser = {
-        email,
-        role: userRole,
-        name: email.includes('admin') ? 'Admin User' : `${capitalizedName}`,
-        photoURL: `https://ui-avatars.com/api/?name=${encodeURIComponent(capitalizedName)}&background=random`,
-      };
-      
-      setUser(newUser);
-      localStorage.setItem('user', JSON.stringify(newUser));
-      
-      toast.success(`Welcome back, ${newUser.name}!`);
-      
-      if (newUser.role === 'admin') {
-        navigate('/admin/dashboard');
-      } else {
-        navigate('/');
-      }
-    } catch (error) {
-      toast.error("Login failed. Please try again.");
-      console.error("Login error:", error);
-    }
-  };
-
-  const demoLogin = (role: 'admin' | 'customer') => {
-    try {
-      const demoUser = {
-        email: role === 'admin' ? 'admin@example.com' : 'customer@example.com',
-        role: role,
-        name: role === 'admin' ? 'Admin Demo' : 'Customer Demo',
-        photoURL: `https://ui-avatars.com/api/?name=${encodeURIComponent(role === 'admin' ? 'Admin Demo' : 'Customer Demo')}&background=random`,
-      };
-      
-      setUser(demoUser);
-      localStorage.setItem('user', JSON.stringify(demoUser));
-      
-      toast.success(`Welcome, ${demoUser.name}!`);
-      
-      if (role === 'admin') {
-        navigate('/admin/dashboard');
-      } else {
-        navigate('/');
-      }
-    } catch (error) {
-      toast.error("Demo login failed. Please try again.");
-      console.error("Demo login error:", error);
-    }
-  };
-
-  const updateProfile = (data: Partial<Omit<User, 'role'>>) => {
-    if (!user) return;
-    
-    const updatedUser = { ...user, ...data };
-    setUser(updatedUser);
-    localStorage.setItem('user', JSON.stringify(updatedUser));
-    toast.success("Profile updated successfully");
-  };
-
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('user');
-    toast.success("You have been logged out");
-    navigate('/login');
-  };
-
-  return (
-    <AuthContext.Provider value={{ 
-      user, 
-      login, 
-      logout, 
-      demoLogin,
-      updateProfile,
-      isAuthenticated: !!user,
-      isAdmin: user?.role === 'admin'
-    }}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -131,4 +34,119 @@ export const useAuth = () => {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
+};
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Check for existing session
+    const checkAuth = async () => {
+      try {
+        const savedUser = localStorage.getItem('user');
+        if (savedUser) {
+          const userData = JSON.parse(savedUser);
+          setUser(userData);
+        }
+      } catch (error) {
+        console.error('Error checking auth:', error);
+        localStorage.removeItem('user');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  const login = async (email: string, password: string): Promise<void> => {
+    setIsLoading(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Mock authentication logic
+      let userData: User;
+      if (email === 'admin@example.com' && password === 'admin123') {
+        userData = {
+          id: '1',
+          email,
+          name: 'Admin User',
+          role: 'admin'
+        };
+      } else if (email === 'customer@example.com' && password === 'password123') {
+        userData = {
+          id: '2',
+          email,
+          name: 'Customer User',
+          role: 'customer'
+        };
+      } else {
+        throw new Error('Invalid credentials');
+      }
+
+      localStorage.setItem('user', JSON.stringify(userData));
+      setUser(userData);
+    } catch (error) {
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const logout = async (): Promise<void> => {
+    setIsLoading(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      localStorage.removeItem('user');
+      setUser(null);
+      toast.success('Logged out successfully');
+    } catch (error) {
+      toast.error('Error logging out');
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const register = async (userData: RegisterData): Promise<void> => {
+    setIsLoading(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const newUser: User = {
+        id: Date.now().toString(),
+        email: userData.email,
+        name: `${userData.firstName} ${userData.lastName}`,
+        role: 'customer'
+      };
+
+      localStorage.setItem('user', JSON.stringify(newUser));
+      setUser(newUser);
+    } catch (error) {
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const value: AuthContextType = {
+    user,
+    isAuthenticated: !!user,
+    isAdmin: user?.role === 'admin',
+    isLoading,
+    login,
+    logout,
+    register
+  };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
