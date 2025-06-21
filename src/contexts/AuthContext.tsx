@@ -1,13 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'sonner';
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: 'admin' | 'customer';
-}
+import { User } from '@/types';
 
 interface AuthContextType {
   user: User | null;
@@ -73,14 +67,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           id: '1',
           email,
           name: 'Admin User',
-          role: 'admin'
+          phone: '+1234567890',
+          role: 'admin',
+          status: 'active'
         };
       } else if (email === 'customer@example.com' && password === 'password123') {
         userData = {
           id: '2',
           email,
           name: 'Customer User',
-          role: 'customer'
+          phone: '+1234567890',
+          role: 'customer',
+          status: 'active'
         };
       } else {
         throw new Error('Invalid credentials');
@@ -122,7 +120,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: Date.now().toString(),
         email: userData.email,
         name: `${userData.firstName} ${userData.lastName}`,
-        role: 'customer'
+        phone: '',
+        role: 'customer',
+        status: 'active'
       };
 
       localStorage.setItem('user', JSON.stringify(newUser));
