@@ -33,7 +33,7 @@ const UserMenu = () => {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="p-1">
               <Avatar className="h-8 w-8">
-                <AvatarImage src={user?.photoURL || undefined} alt={user?.name || "User"} />
+                <AvatarImage src={user?.avatar || undefined} alt={user?.name || "User"} />
                 <AvatarFallback>{user?.name ? getInitials(user.name) : "U"}</AvatarFallback>
               </Avatar>
             </Button>

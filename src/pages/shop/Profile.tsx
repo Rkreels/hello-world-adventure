@@ -88,7 +88,7 @@ const Profile = () => {
             <CardContent className="pt-6">
               <div className="flex flex-col items-center">
                 <Avatar className="h-32 w-32 mb-4">
-                  <AvatarImage src={user?.photoURL || undefined} alt={user?.name || "User"} />
+                  <AvatarImage src={user?.avatar || undefined} alt={user?.name || "User"} />
                   <AvatarFallback className="text-2xl">
                     {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
                   </AvatarFallback>
