@@ -15,7 +15,21 @@ import {
 import { useCart } from '@/hooks/useCart';
 
 const UserMenu = () => {
-  const { user, isAuthenticated, logout } = useAuth();
+  // Add error boundary for auth context
+  let authData;
+  try {
+    authData = useAuth();
+  } catch (error) {
+    console.error('Auth context error:', error);
+    // Fallback when auth context is not available
+    authData = {
+      user: null,
+      isAuthenticated: false,
+      logout: () => {}
+    };
+  }
+
+  const { user, isAuthenticated, logout } = authData;
   const { items } = useCart();
   
   const getInitials = (name: string) => {
