@@ -87,12 +87,12 @@ const OrderManagement = () => {
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Order Management</h1>
-        <div className="flex items-center gap-4">
+    <div className="p-4 lg:p-6 space-y-4 lg:space-y-6" data-testid="order-management">
+      <div className="flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center">
+        <h1 className="text-2xl lg:text-3xl font-bold">Order Management</h1>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
           <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-            <SelectTrigger className="w-48">
+            <SelectTrigger className="w-full sm:w-48" data-testid="order-status-filter">
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
             <SelectContent>
@@ -108,80 +108,121 @@ const OrderManagement = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               placeholder="Search orders..."
-              className="pl-10 w-64"
+              className="pl-10 w-full sm:w-64"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              data-testid="order-search"
             />
           </div>
         </div>
       </div>
 
-      <Card>
+      <Card className="w-full" data-testid="orders-table-card">
         <CardHeader>
           <CardTitle>Orders</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0 sm:p-6">
           <Tabs value={selectedStatus} onValueChange={setSelectedStatus}>
-            <TabsList className="mb-4">
-              <TabsTrigger value="all">All ({ordersByStatus.all})</TabsTrigger>
-              <TabsTrigger value="Pending">Pending ({ordersByStatus.Pending})</TabsTrigger>
-              <TabsTrigger value="Processing">Processing ({ordersByStatus.Processing})</TabsTrigger>
-              <TabsTrigger value="Shipped">Shipped ({ordersByStatus.Shipped})</TabsTrigger>
-              <TabsTrigger value="Delivered">Delivered ({ordersByStatus.Delivered})</TabsTrigger>
-            </TabsList>
+            <div className="px-4 sm:px-0">
+              <TabsList className="w-full sm:w-auto grid grid-cols-2 sm:flex mb-4">
+                <TabsTrigger value="all" className="text-xs sm:text-sm">All ({ordersByStatus.all})</TabsTrigger>
+                <TabsTrigger value="Pending" className="text-xs sm:text-sm">Pending ({ordersByStatus.Pending})</TabsTrigger>
+                <TabsTrigger value="Processing" className="text-xs sm:text-sm hidden sm:inline-flex">Processing ({ordersByStatus.Processing})</TabsTrigger>
+                <TabsTrigger value="Shipped" className="text-xs sm:text-sm">Shipped ({ordersByStatus.Shipped})</TabsTrigger>
+                <TabsTrigger value="Delivered" className="text-xs sm:text-sm">Delivered ({ordersByStatus.Delivered})</TabsTrigger>
+              </TabsList>
+            </div>
 
-            <TabsContent value={selectedStatus}>
+            <TabsContent value={selectedStatus} className="mt-0">
               {filteredOrders.length === 0 ? (
-                <div className="text-center py-12">
+                <div className="text-center py-12 px-4">
                   <p className="text-gray-500 text-lg">No orders found</p>
                   <p className="text-gray-400 text-sm mt-2">
                     {searchQuery ? 'Try adjusting your search terms' : `No ${selectedStatus === 'all' ? '' : selectedStatus.toLowerCase()} orders at the moment`}
                   </p>
                 </div>
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Order ID</TableHead>
-                      <TableHead>Customer</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Tracking</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredOrders.map((order) => (
-                      <TableRow key={order.id}>
-                        <TableCell className="font-medium">#{order.id}</TableCell>
-                        <TableCell>{order.customer}</TableCell>
-                        <TableCell>${order.amount}</TableCell>
-                        <TableCell>{order.date}</TableCell>
-                        <TableCell>{getStatusBadge(order.status)}</TableCell>
-                        <TableCell>
-                          {order.trackingNumber ? (
-                            <code className="text-xs bg-gray-100 px-2 py-1 rounded">
-                              {order.trackingNumber}
-                            </code>
-                          ) : (
-                            <span className="text-gray-400">-</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            <Button size="sm" variant="ghost" onClick={() => handleViewOrder(order)}>
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button size="sm" variant="ghost" onClick={() => handleViewOrder(order)}>
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader className="hidden sm:table-header-group">
+                      <TableRow>
+                        <TableHead>Order ID</TableHead>
+                        <TableHead>Customer</TableHead>
+                        <TableHead>Amount</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Tracking</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredOrders.map((order) => (
+                        <TableRow key={order.id} className="border-b">
+                          {/* Mobile layout */}
+                          <TableCell className="sm:hidden p-4">
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <div className="font-medium">#{order.id}</div>
+                                  <div className="text-sm text-gray-600">{order.customer}</div>
+                                  <div className="text-sm text-gray-500">{order.date}</div>
+                                </div>
+                                <div className="text-right">
+                                  <div className="font-medium">${order.amount}</div>
+                                  {getStatusBadge(order.status)}
+                                </div>
+                              </div>
+                              {order.trackingNumber && (
+                                <div className="text-xs">
+                                  <span className="text-gray-500">Tracking: </span>
+                                  <code className="bg-gray-100 px-1 py-0.5 rounded">
+                                    {order.trackingNumber}
+                                  </code>
+                                </div>
+                              )}
+                              <div className="flex gap-2 pt-2">
+                                <Button size="sm" variant="ghost" onClick={() => handleViewOrder(order)} className="flex-1" data-testid="view-order-btn">
+                                  <Eye className="h-4 w-4 mr-1" />
+                                  View
+                                </Button>
+                                <Button size="sm" variant="ghost" onClick={() => handleViewOrder(order)} className="flex-1" data-testid="edit-order-btn">
+                                  <Edit className="h-4 w-4 mr-1" />
+                                  Edit
+                                </Button>
+                              </div>
+                            </div>
+                          </TableCell>
+                          
+                          {/* Desktop layout */}
+                          <TableCell className="font-medium hidden sm:table-cell">#{order.id}</TableCell>
+                          <TableCell className="hidden sm:table-cell">{order.customer}</TableCell>
+                          <TableCell className="hidden sm:table-cell">${order.amount}</TableCell>
+                          <TableCell className="hidden sm:table-cell">{order.date}</TableCell>
+                          <TableCell className="hidden sm:table-cell">{getStatusBadge(order.status)}</TableCell>
+                          <TableCell className="hidden sm:table-cell">
+                            {order.trackingNumber ? (
+                              <code className="text-xs bg-gray-100 px-2 py-1 rounded">
+                                {order.trackingNumber}
+                              </code>
+                            ) : (
+                              <span className="text-gray-400">-</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right hidden sm:table-cell">
+                            <div className="flex items-center justify-end gap-2">
+                              <Button size="sm" variant="ghost" onClick={() => handleViewOrder(order)} data-testid="view-order-btn">
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button size="sm" variant="ghost" onClick={() => handleViewOrder(order)} data-testid="edit-order-btn">
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               )}
             </TabsContent>
           </Tabs>
@@ -189,14 +230,14 @@ const OrderManagement = () => {
       </Card>
 
       <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
-        <DialogContent className="max-w-4xl">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" data-testid="order-detail-dialog">
           <DialogHeader>
             <DialogTitle>Order Details - #{selectedOrder?.id}</DialogTitle>
           </DialogHeader>
           {selectedOrder && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="space-y-4">
-                <Card>
+                <Card data-testid="order-info-card">
                   <CardHeader>
                     <CardTitle className="text-sm">Order Information</CardTitle>
                   </CardHeader>
@@ -233,7 +274,7 @@ const OrderManagement = () => {
                 </Card>
 
                 {selectedOrder.items && (
-                  <Card>
+                  <Card data-testid="order-items-card">
                     <CardHeader>
                       <CardTitle className="text-sm">Order Items</CardTitle>
                     </CardHeader>
@@ -251,7 +292,7 @@ const OrderManagement = () => {
                 )}
               </div>
 
-              <div>
+              <div data-testid="order-status-manager">
                 <OrderStatusManager
                   orderId={selectedOrder.id}
                   currentStatus={selectedOrder.status}

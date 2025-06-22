@@ -14,29 +14,26 @@ const VoiceTrainer = () => {
   const [speechRate, setSpeechRate] = useState(1.0);
   const [showSettings, setShowSettings] = useState(false);
   const lastElementRef = useRef<HTMLElement | null>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    // Check if speech synthesis is supported
     if (!('speechSynthesis' in window)) {
       toast.error('Text-to-speech is not supported in your browser');
       setIsVoiceEnabled(false);
       return;
     }
 
-    // Update playing state more frequently for better responsiveness
     const interval = setInterval(() => {
       const speaking = speechSynthesis.speaking;
       const paused = speechSynthesis.paused;
       setIsPlaying(speaking && !paused);
       setIsPaused(speaking && paused);
-    }, 100);
+    }, 150);
 
-    // Initialize page guidance immediately
     if (isVoiceEnabled) {
       voiceTrainer.initializePageGuidance();
     }
 
-    // Listen for Escape key to stop speech
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         voiceTrainer.stopCurrentSpeech();
@@ -50,11 +47,13 @@ const VoiceTrainer = () => {
     return () => {
       clearInterval(interval);
       document.removeEventListener('keydown', handleKeyDown);
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
     };
   }, [isVoiceEnabled]);
 
   useEffect(() => {
-    // Update voice trainer settings
     voiceTrainer.updateSettings({ volume, speechRate });
   }, [volume, speechRate]);
 
@@ -63,6 +62,11 @@ const VoiceTrainer = () => {
 
     const handleMouseMove = (e: MouseEvent) => {
       const element = e.target as HTMLElement;
+      
+      // Clear existing timeout
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
       
       // Skip if it's the same element or a child of the last element
       if (lastElementRef.current && 
@@ -75,43 +79,58 @@ const VoiceTrainer = () => {
         return;
       }
 
+      // Skip very small or insignificant elements
+      const rect = element.getBoundingClientRect();
+      if (rect.width < 20 || rect.height < 20) {
+        return;
+      }
+
       // Stop current speech immediately when hovering over a new element
       voiceTrainer.stopCurrentSpeech();
       setCurrentElement(null);
       
-      // Start guidance immediately without delay
-      const elementInfo = voiceTrainer.getElementInfo(element);
-      
-      if (elementInfo && elementInfo !== currentElement) {
-        setCurrentElement(elementInfo);
-        lastElementRef.current = element;
-        voiceTrainer.guideElement(element);
-      }
+      // Add small delay for smoother interaction
+      hoverTimeoutRef.current = setTimeout(() => {
+        const elementInfo = voiceTrainer.getElementInfo(element);
+        
+        if (elementInfo && elementInfo !== currentElement) {
+          setCurrentElement(elementInfo);
+          lastElementRef.current = element;
+          voiceTrainer.guideElement(element);
+        }
+      }, 100);
     };
 
     const handleClick = (e: MouseEvent) => {
       const element = e.target as HTMLElement;
       
-      // Skip voice trainer elements
       if (element.closest('.voice-trainer-controls')) {
         return;
+      }
+      
+      // Clear hover timeout on click
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
       }
       
       voiceTrainer.handleElementClick(element);
     };
 
     const handleLocationChange = () => {
-      // Stop current speech immediately and reset tracking when page changes
       voiceTrainer.stopCurrentSpeech();
       setCurrentElement(null);
       lastElementRef.current = null;
       
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+      
       setTimeout(() => {
         voiceTrainer.handlePageChange();
-      }, 100);
+      }, 150);
     };
 
-    // Add event listeners
+    // Add event listeners with passive option for better performance
     document.addEventListener('mousemove', handleMouseMove, { passive: true });
     document.addEventListener('click', handleClick);
     window.addEventListener('popstate', handleLocationChange);
@@ -144,11 +163,14 @@ const VoiceTrainer = () => {
       voiceTrainer.stopCurrentSpeech();
       setIsVoiceEnabled(false);
       setCurrentElement(null);
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
       toast.info('Voice guidance disabled');
     } else {
       setIsVoiceEnabled(true);
       voiceTrainer.initializePageGuidance();
-      toast.success('Voice guidance enabled - hover over elements for instant guidance');
+      toast.success('Voice guidance enabled - hover over elements for comprehensive guidance');
     }
   };
 
@@ -180,6 +202,7 @@ const VoiceTrainer = () => {
           size="sm"
           onClick={toggleVoice}
           className="h-8 w-8 p-0"
+          title={isVoiceEnabled ? "Disable voice guidance" : "Enable voice guidance"}
         >
           {isVoiceEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
         </Button>
@@ -194,6 +217,7 @@ const VoiceTrainer = () => {
                   size="sm"
                   onClick={pauseResumeSpeech}
                   className="h-8 w-8 p-0"
+                  title={isPaused ? "Resume speech" : "Pause speech"}
                 >
                   {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
                 </Button>
@@ -202,6 +226,7 @@ const VoiceTrainer = () => {
                   size="sm"
                   onClick={stopSpeech}
                   className="h-8 w-8 p-0"
+                  title="Stop speech"
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -214,6 +239,7 @@ const VoiceTrainer = () => {
               size="sm"
               onClick={() => setShowSettings(!showSettings)}
               className="h-8 w-8 p-0"
+              title="Voice settings"
             >
               <Settings className="h-4 w-4" />
             </Button>
@@ -226,12 +252,12 @@ const VoiceTrainer = () => {
             isPlaying ? (
               <div className="flex items-center gap-1">
                 <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-xs text-green-600">On</span>
+                <span className="text-xs text-green-600 font-medium">Speaking</span>
               </div>
             ) : (
               <div className="flex items-center gap-1">
                 <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-                <span className="text-xs text-blue-600">Ready</span>
+                <span className="text-xs text-blue-600 font-medium">Ready</span>
               </div>
             )
           ) : (
@@ -243,9 +269,9 @@ const VoiceTrainer = () => {
         </div>
       </div>
 
-      {/* Settings panel */}
+      {/* Enhanced settings panel */}
       {showSettings && isVoiceEnabled && (
-        <div className="absolute bottom-full right-0 mb-2 w-64 bg-white rounded-lg shadow-lg border p-4">
+        <div className="absolute bottom-full right-0 mb-2 w-72 bg-white rounded-lg shadow-lg border p-4">
           <div className="space-y-4">
             <div>
               <label className="text-sm font-medium mb-2 block">
@@ -258,7 +284,7 @@ const VoiceTrainer = () => {
                 step="0.1"
                 value={volume}
                 onChange={(e) => setVolume(parseFloat(e.target.value))}
-                className="w-full"
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
               />
             </div>
             <div>
@@ -272,15 +298,17 @@ const VoiceTrainer = () => {
                 step="0.1"
                 value={speechRate}
                 onChange={(e) => setSpeechRate(parseFloat(e.target.value))}
-                className="w-full"
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
               />
             </div>
-            <div className="text-xs text-gray-600">
-              <p className="mb-1"><strong>Tips:</strong></p>
+            <div className="text-xs text-gray-600 bg-gray-50 p-3 rounded">
+              <p className="mb-2 font-medium">Voice Training Features:</p>
               <ul className="space-y-1 text-xs">
-                <li>• Hover for instant guidance</li>
-                <li>• Press Escape to stop speech</li>
-                <li>• Click elements for confirmation</li>
+                <li>• Hover for instant, comprehensive guidance</li>
+                <li>• Press Escape to stop speech immediately</li>
+                <li>• Click elements for action confirmation</li>
+                <li>• Function-specific detailed instructions</li>
+                <li>• Context-aware business guidance</li>
               </ul>
             </div>
           </div>
