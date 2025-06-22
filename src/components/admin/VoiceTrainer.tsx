@@ -63,33 +63,27 @@ const VoiceTrainer = () => {
     const handleMouseMove = (e: MouseEvent) => {
       const element = e.target as HTMLElement;
       
-      // Clear existing timeout
       if (hoverTimeoutRef.current) {
         clearTimeout(hoverTimeoutRef.current);
       }
       
-      // Skip if it's the same element or a child of the last element
       if (lastElementRef.current && 
           (element === lastElementRef.current || lastElementRef.current.contains(element))) {
         return;
       }
 
-      // Skip voice trainer elements to avoid feedback loops
       if (element.closest('.voice-trainer-controls')) {
         return;
       }
 
-      // Skip very small or insignificant elements
       const rect = element.getBoundingClientRect();
       if (rect.width < 20 || rect.height < 20) {
         return;
       }
 
-      // Stop current speech immediately when hovering over a new element
       voiceTrainer.stopCurrentSpeech();
       setCurrentElement(null);
       
-      // Add small delay for smoother interaction
       hoverTimeoutRef.current = setTimeout(() => {
         const elementInfo = voiceTrainer.getElementInfo(element);
         
@@ -108,7 +102,6 @@ const VoiceTrainer = () => {
         return;
       }
       
-      // Clear hover timeout on click
       if (hoverTimeoutRef.current) {
         clearTimeout(hoverTimeoutRef.current);
       }
@@ -130,12 +123,10 @@ const VoiceTrainer = () => {
       }, 150);
     };
 
-    // Add event listeners with passive option for better performance
     document.addEventListener('mousemove', handleMouseMove, { passive: true });
     document.addEventListener('click', handleClick);
     window.addEventListener('popstate', handleLocationChange);
 
-    // Listen for React Router navigation
     const originalPushState = history.pushState;
     const originalReplaceState = history.replaceState;
     
@@ -194,9 +185,7 @@ const VoiceTrainer = () => {
 
   return (
     <div className="fixed bottom-4 right-4 z-50 voice-trainer-controls">
-      {/* Compact floating controls */}
       <div className="flex items-center gap-2 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border-2 border-green-200 p-2">
-        {/* Main toggle */}
         <Button
           variant={isVoiceEnabled ? "default" : "outline"}
           size="sm"
@@ -207,7 +196,6 @@ const VoiceTrainer = () => {
           {isVoiceEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
         </Button>
 
-        {/* Pause/Resume/Stop controls - only show when voice is enabled */}
         {isVoiceEnabled && (
           <>
             {(isPlaying || isPaused) && (
@@ -233,7 +221,6 @@ const VoiceTrainer = () => {
               </div>
             )}
 
-            {/* Settings toggle */}
             <Button
               variant="ghost"
               size="sm"
@@ -246,7 +233,6 @@ const VoiceTrainer = () => {
           </>
         )}
 
-        {/* Status indicator */}
         <div className="flex items-center gap-1">
           {isVoiceEnabled ? (
             isPlaying ? (
@@ -269,9 +255,8 @@ const VoiceTrainer = () => {
         </div>
       </div>
 
-      {/* Enhanced settings panel */}
       {showSettings && isVoiceEnabled && (
-        <div className="absolute bottom-full right-0 mb-2 w-72 bg-white rounded-lg shadow-lg border p-4">
+        <div className="absolute bottom-full right-0 mb-2 w-80 bg-white rounded-lg shadow-lg border p-4">
           <div className="space-y-4">
             <div>
               <label className="text-sm font-medium mb-2 block">
@@ -302,13 +287,15 @@ const VoiceTrainer = () => {
               />
             </div>
             <div className="text-xs text-gray-600 bg-gray-50 p-3 rounded">
-              <p className="mb-2 font-medium">Voice Training Features:</p>
+              <p className="mb-2 font-medium">Enhanced Voice Training Features:</p>
               <ul className="space-y-1 text-xs">
-                <li>• Hover for instant, comprehensive guidance</li>
-                <li>• Press Escape to stop speech immediately</li>
-                <li>• Click elements for action confirmation</li>
+                <li>• Comprehensive page-specific guidance</li>
                 <li>• Function-specific detailed instructions</li>
-                <li>• Context-aware business guidance</li>
+                <li>• Workflow-aware contextual help</li>
+                <li>• Component-level expert assistance</li>
+                <li>• Real-time action feedback</li>
+                <li>• Business process optimization</li>
+                <li>• Press Escape to stop speech</li>
               </ul>
             </div>
           </div>
