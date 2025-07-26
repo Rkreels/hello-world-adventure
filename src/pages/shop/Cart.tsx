@@ -1,65 +1,15 @@
 
-import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Trash, ShoppingBag, ChevronLeft, Minus, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { formatCurrency } from '@/lib/utils';
-import { toast } from '@/components/ui/use-toast';
-
-interface CartItem {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  quantity: number;
-}
+import { useCart } from '@/hooks/useCart';
+import { toast } from 'sonner';
 
 const Cart = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const { items: cartItems, updateQuantity, removeItem, clearCart } = useCart();
   const navigate = useNavigate();
-  
-  useEffect(() => {
-    // Load cart items from localStorage
-    const savedItems = localStorage.getItem('cart');
-    if (savedItems) {
-      setCartItems(JSON.parse(savedItems));
-    }
-  }, []);
-  
-  const updateCartStorage = (items: CartItem[]) => {
-    localStorage.setItem('cart', JSON.stringify(items));
-    setCartItems(items);
-  };
-  
-  const updateQuantity = (id: number, newQuantity: number) => {
-    if (newQuantity < 1) return;
-    
-    const updatedItems = cartItems.map(item => 
-      item.id === id ? { ...item, quantity: newQuantity } : item
-    );
-    
-    updateCartStorage(updatedItems);
-  };
-  
-  const removeItem = (id: number) => {
-    const updatedItems = cartItems.filter(item => item.id !== id);
-    updateCartStorage(updatedItems);
-    
-    toast({
-      title: "Item removed",
-      description: "Product removed from your cart",
-    });
-  };
-  
-  const clearCart = () => {
-    updateCartStorage([]);
-    
-    toast({
-      title: "Cart cleared",
-      description: "All items have been removed from your cart",
-    });
-  };
   
   const calculateSubtotal = () => {
     return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
@@ -115,7 +65,7 @@ const Cart = () => {
                   <div className="flex-1">
                     <div className="flex justify-between">
                       <Link 
-                        to={`/products/${item.id}`} 
+                        to={`/product-detail/${item.id}`} 
                         className="font-medium hover:text-primary transition-colors"
                       >
                         {item.name}

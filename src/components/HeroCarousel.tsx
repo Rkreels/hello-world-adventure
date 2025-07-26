@@ -73,19 +73,20 @@ const HeroCarousel = () => {
 
   return (
     <div className="relative bg-[#003742] h-[400px] md:h-[450px] overflow-hidden">
-      <AnimatePresence mode="wait">
-        {carouselItems.map((item, index) => (
-          <motion.div 
-            key={item.id} 
-            initial={{ opacity: 0 }}
-            animate={{ 
-              opacity: currentSlide === index ? 1 : 0,
-              zIndex: currentSlide === index ? 10 : 0
-            }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.7 }}
-            className="absolute inset-0"
-          >
+      <AnimatePresence>
+        {carouselItems.map((item, index) => 
+          currentSlide === index && (
+            <motion.div 
+              key={item.id} 
+              initial={{ opacity: 0 }}
+              animate={{ 
+                opacity: 1,
+                zIndex: 10
+              }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.7 }}
+              className="absolute inset-0"
+            >
             <div className="container mx-auto px-6 h-full flex items-center relative z-10 max-w-7xl">
               <motion.div 
                 className="max-w-lg text-white pl-12"
@@ -112,7 +113,8 @@ const HeroCarousel = () => {
               />
             </div>
           </motion.div>
-        ))}
+        )
+      )}
       </AnimatePresence>
       
       {/* Carousel Controls */}
