@@ -22,6 +22,8 @@ import Register from "./pages/auth/Register";
 import Dashboard from "./pages/admin/Dashboard";
 import AdminProfile from "./pages/admin/AdminProfile";
 import AddProduct from "./pages/admin/AddProduct";
+import Products from "./pages/admin/Products";
+import EditProduct from "./pages/admin/EditProduct";
 import Transactions from "./pages/admin/Transactions";
 import AdminCategories from "./pages/admin/Categories";
 import Customers from "./pages/admin/Customers";
