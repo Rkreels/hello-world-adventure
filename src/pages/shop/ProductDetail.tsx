@@ -13,7 +13,7 @@ import { Loading } from '@/components/ui/loading';
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const { addItem } = useCart();
   const { products, loading } = useProducts();
   
   const [product, setProduct] = useState<any>(null);
@@ -44,12 +44,13 @@ const ProductDetail = () => {
 
   const handleAddToCart = () => {
     const cartItem = {
-      ...product,
+      id: product.id,
+      name: product.name,
+      price: getCurrentPrice(),
+      image: product.images?.[0] || '/placeholder.svg',
       quantity,
-      selectedAttributes,
-      selectedVariant,
     };
-    addToCart(cartItem);
+    addItem(cartItem);
     toast.success('Added to cart!');
   };
 
