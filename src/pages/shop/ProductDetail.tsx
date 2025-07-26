@@ -1,359 +1,343 @@
-
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Star, Heart, ShoppingCart, Check, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Star, Heart, ShoppingCart, Plus, Minus, Share2, Truck, Shield, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { formatCurrency } from '@/lib/utils';
-import { toast } from '@/components/ui/use-toast';
+import { Separator } from '@/components/ui/separator';
+import { useCart } from '@/hooks/useCart';
+import { useProducts } from '@/hooks/useProducts';
+import { toast } from 'sonner';
+import { Loading } from '@/components/ui/loading';
 
 const ProductDetail = () => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { addToCart } = useCart();
+  const { products, loading } = useProducts();
+  
+  const [product, setProduct] = useState<any>(null);
+  const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [activeTab, setActiveTab] = useState("description");
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
-  
-  // Mock product data - in a real app this would come from an API
-  const product = {
-    id: Number(id),
-    name: "Premium Leather Wallet",
-    brand: "LeatherCraft",
-    price: 59.99,
-    oldPrice: 79.99,
-    discount: 25,
-    rating: 4.5,
-    reviews: 92,
-    description: "This genuine leather wallet features a sleek and minimalist design. Handcrafted with premium full-grain leather that develops a beautiful patina over time. Multiple card slots and a bill compartment provide ample storage without bulk.",
-    features: [
-      "Genuine full-grain leather",
-      "RFID blocking technology",
-      "6 card slots plus ID window",
-      "2 bill compartments",
-      "Slim profile design",
-      "Handcrafted with precision stitching"
-    ],
-    specifications: [
-      { name: "Material", value: "Full-grain leather" },
-      { name: "Dimensions", value: "4.5 × 3.5 × 0.5 inches" },
-      { name: "Weight", value: "85g" },
-      { name: "Color Options", value: "Black, Brown, Tan" },
-      { name: "Warranty", value: "1 year" }
-    ],
-    images: [
-      "https://images.unsplash.com/photo-1627123424574-724758594e93?q=80&w=1974&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1575602685837-5a0a12185e41?q=80&w=2070&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1627123423231-9399a53470fe?q=80&w=1974&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1606735584785-1853cba72136?q=80&w=2070&auto=format&fit=crop"
-    ],
-    colors: ["#000000", "#784212", "#A04000"],
-    inStock: true,
-    category: "Fashion",
-    tags: ["wallet", "leather", "accessories"]
-  };
-  
-  const relatedProducts = [
-    {
-      id: 5,
-      name: "Premium Leather Belt",
-      brand: "LeatherCraft",
-      price: 39.99,
-      image: "https://images.unsplash.com/photo-1570004143290-45bfd0278bdc?q=80&w=1779&auto=format&fit=crop"
-    },
-    {
-      id: 6,
-      name: "Leather Key Holder",
-      brand: "LeatherCraft",
-      price: 19.99,
-      image: "https://images.unsplash.com/photo-1601055903647-ddf1ee9701b7?q=80&w=1780&auto=format&fit=crop"
-    },
-    {
-      id: 7,
-      name: "Leather Card Case",
-      brand: "LeatherCraft",
-      price: 29.99,
-      image: "https://images.unsplash.com/photo-1618235277648-56ab8f7f5b1d?q=80&w=1780&auto=format&fit=crop"
-    },
-    {
-      id: 8,
-      name: "Bifold Wallet",
-      brand: "LeatherCraft",
-      price: 49.99,
-      image: "https://images.unsplash.com/photo-1591127069631-37f3221411a9?q=80&w=1780&auto=format&fit=crop"
+  const [selectedVariant, setSelectedVariant] = useState<any>(null);
+  const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
+  const [isWishlisted, setIsWishlisted] = useState(false);
+
+  useEffect(() => {
+    if (products && id) {
+      const foundProduct = products.find(p => p.id === id);
+      if (foundProduct) {
+        setProduct(foundProduct);
+      } else {
+        navigate('/404');
+      }
     }
-  ];
-  
-  const handleAddToCart = () => {
-    // Add to cart functionality
-    const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
-    
-    // Check if product is already in cart
-    const existingItemIndex = cartItems.findIndex((item: any) => item.id === product.id);
-    
-    if (existingItemIndex >= 0) {
-      // Update quantity if product already exists
-      cartItems[existingItemIndex].quantity += quantity;
-    } else {
-      // Add new product to cart
-      cartItems.push({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        image: product.images[0],
-        quantity: quantity
-      });
-    }
-    
-    localStorage.setItem('cart', JSON.stringify(cartItems));
-    
-    toast({
-      title: "Added to cart",
-      description: `${quantity} × ${product.name} added to your cart`,
-    });
-  };
-  
-  const handleBuyNow = () => {
-    handleAddToCart();
-    navigate('/checkout');
-  };
-  
-  const handleAddToWishlist = () => {
-    // Add to wishlist functionality
-    toast({
-      title: "Added to wishlist",
-      description: `${product.name} added to your wishlist`,
-    });
-  };
-  
-  const increaseQuantity = () => {
-    setQuantity(prev => prev + 1);
-  };
-  
-  const decreaseQuantity = () => {
-    setQuantity(prev => (prev > 1 ? prev - 1 : 1));
-  };
-  
-  const nextImage = () => {
-    setActiveImageIndex(prev => (prev + 1) % product.images.length);
-  };
-  
-  const prevImage = () => {
-    setActiveImageIndex(prev => (prev - 1 + product.images.length) % product.images.length);
-  };
-  
-  if (!product) {
-    return <div className="container mx-auto px-4 py-8 text-center">Product not found</div>;
+  }, [products, id, navigate]);
+
+  if (loading || !product) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Loading text="Loading product..." />
+      </div>
+    );
   }
-  
+
+  const handleAddToCart = () => {
+    const cartItem = {
+      ...product,
+      quantity,
+      selectedAttributes,
+      selectedVariant,
+    };
+    addToCart(cartItem);
+    toast.success('Added to cart!');
+  };
+
+  const handleQuantityChange = (change: number) => {
+    setQuantity(Math.max(1, quantity + change));
+  };
+
+  const handleAttributeChange = (type: string, value: string) => {
+    setSelectedAttributes(prev => ({
+      ...prev,
+      [type]: value
+    }));
+  };
+
+  const getCurrentPrice = () => {
+    return selectedVariant?.price || product.price;
+  };
+
+  const getCurrentStock = () => {
+    return selectedVariant?.stock || product.stock;
+  };
+
+  const isInStock = getCurrentStock() > 0;
+
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col lg:flex-row gap-8">
+      {/* Breadcrumb */}
+      <nav className="flex mb-6 text-sm">
+        <a href="/" className="text-gray-500 hover:text-gray-700">Home</a>
+        <span className="mx-2 text-gray-400">/</span>
+        <a href="/shop" className="text-gray-500 hover:text-gray-700">Products</a>
+        <span className="mx-2 text-gray-400">/</span>
+        <span className="text-gray-900">{product.name}</span>
+      </nav>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Product Images */}
-        <div className="w-full lg:w-1/2">
-          <div className="relative mb-4 h-96 bg-gray-100 rounded-lg overflow-hidden">
-            <img 
-              src={product.images[activeImageIndex]} 
-              alt={product.name} 
-              className="w-full h-full object-contain"
+        <div className="space-y-4">
+          <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+            <img
+              src={product.images?.[selectedImage] || '/placeholder.svg'}
+              alt={product.name}
+              className="w-full h-full object-cover"
             />
-            <Button 
-              variant="outline" 
-              size="icon" 
-              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white rounded-full"
-              onClick={prevImage}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button 
-              variant="outline" 
-              size="icon" 
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white rounded-full"
-              onClick={nextImage}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
           </div>
           
-          <div className="grid grid-cols-4 gap-2">
-            {product.images.map((image, index) => (
-              <div 
-                key={index}
-                className={`
-                  h-20 rounded-md overflow-hidden cursor-pointer border-2 
-                  ${activeImageIndex === index ? 'border-primary' : 'border-transparent'}
-                `}
-                onClick={() => setActiveImageIndex(index)}
-              >
-                <img 
-                  src={image} 
-                  alt={`${product.name} ${index+1}`} 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-        
-        {/* Product Info */}
-        <div className="w-full lg:w-1/2">
-          <div className="flex justify-between">
-            <div>
-              <h1 className="text-2xl font-bold mb-2">{product.name}</h1>
-              <p className="text-gray-500 mb-4">{product.brand}</p>
+          {product.images && product.images.length > 1 && (
+            <div className="grid grid-cols-4 gap-2">
+              {product.images.map((image: string, index: number) => (
+                <button
+                  key={index}
+                  onClick={() => setSelectedImage(index)}
+                  className={`aspect-square bg-gray-100 rounded border-2 overflow-hidden ${
+                    selectedImage === index ? 'border-blue-500' : 'border-transparent'
+                  }`}
+                >
+                  <img
+                    src={image}
+                    alt={`${product.name} ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
             </div>
-            <Button 
-              variant="outline" 
-              size="icon"
-              className="h-10 w-10 rounded-full"
-              onClick={handleAddToWishlist}
-            >
-              <Heart className="h-5 w-5" />
-            </Button>
+          )}
+        </div>
+
+        {/* Product Details */}
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">{product.name}</h1>
+            <p className="text-gray-600 mt-2">{product.description}</p>
           </div>
-          
-          <div className="flex items-center space-x-1 mb-4">
-            {[...Array(5)].map((_, i) => (
-              <Star 
-                key={i} 
-                className={`h-4 w-4 ${i < Math.floor(product.rating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} 
-              />
-            ))}
-            <span className="text-sm text-gray-500 ml-2">{product.rating} ({product.reviews} reviews)</span>
+
+          {/* Rating */}
+          <div className="flex items-center space-x-2">
+            <div className="flex text-yellow-400">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="h-5 w-5 fill-current" />
+              ))}
+            </div>
+            <span className="text-gray-600">(4.8) 247 reviews</span>
           </div>
-          
-          <div className="flex items-baseline mb-6">
-            <span className="text-3xl font-bold">{formatCurrency(product.price)}</span>
-            {product.oldPrice && (
-              <>
-                <span className="text-lg text-gray-500 line-through ml-2">{formatCurrency(product.oldPrice)}</span>
-                <span className="text-sm text-green-600 ml-2">-{product.discount}% OFF</span>
-              </>
+
+          {/* Price */}
+          <div className="flex items-center space-x-4">
+            <span className="text-3xl font-bold text-gray-900">
+              ${getCurrentPrice()}
+            </span>
+            {product.discountPrice && product.discountPrice > getCurrentPrice() && (
+              <span className="text-xl text-gray-500 line-through">
+                ${product.discountPrice}
+              </span>
+            )}
+            {product.discountPrice && (
+              <Badge variant="destructive">
+                Save ${(product.discountPrice - getCurrentPrice()).toFixed(2)}
+              </Badge>
             )}
           </div>
-          
-          {product.inStock ? (
-            <div className="flex items-center text-green-600 mb-6">
-              <Check className="h-4 w-4 mr-1" />
-              <span>In Stock</span>
-            </div>
-          ) : (
-            <div className="text-red-600 mb-6">Out of Stock</div>
-          )}
-          
+
+          {/* Stock Status */}
+          <div className="flex items-center space-x-2">
+            <div className={`w-3 h-3 rounded-full ${isInStock ? 'bg-green-500' : 'bg-red-500'}`} />
+            <span className={`font-medium ${isInStock ? 'text-green-600' : 'text-red-600'}`}>
+              {isInStock ? `In Stock (${getCurrentStock()} available)` : 'Out of Stock'}
+            </span>
+          </div>
+
           {/* Color Options */}
           {product.colors && product.colors.length > 0 && (
-            <div className="mb-6">
-              <h3 className="font-medium mb-2">Color</h3>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Color</label>
               <div className="flex space-x-2">
-                {product.colors.map((color, index) => (
-                  <div
-                    key={index}
-                    className="w-8 h-8 rounded-full cursor-pointer border-2 border-gray-300"
-                    style={{ backgroundColor: color }}
-                  ></div>
+                {product.colors.map((color: string) => (
+                  <button
+                    key={color}
+                    onClick={() => handleAttributeChange('color', color)}
+                    className={`w-8 h-8 rounded-full border-2 ${
+                      selectedAttributes.color === color ? 'border-gray-800' : 'border-gray-300'
+                    }`}
+                    style={{ backgroundColor: color.toLowerCase() }}
+                    title={color}
+                  />
                 ))}
               </div>
             </div>
           )}
-          
+
+          {/* Size Options */}
+          {product.sizes && product.sizes.length > 0 && (
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Size</label>
+              <div className="flex space-x-2">
+                {product.sizes.map((size: string) => (
+                  <button
+                    key={size}
+                    onClick={() => handleAttributeChange('size', size)}
+                    className={`px-4 py-2 border rounded-md text-sm font-medium ${
+                      selectedAttributes.size === size
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-300 hover:border-gray-400'
+                    }`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Quantity */}
-          <div className="mb-6">
-            <h3 className="font-medium mb-2">Quantity</h3>
-            <div className="flex items-center">
-              <Button 
-                variant="outline" 
-                size="icon" 
-                onClick={decreaseQuantity}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">Quantity</label>
+            <div className="flex items-center space-x-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleQuantityChange(-1)}
                 disabled={quantity <= 1}
               >
-                -
+                <Minus className="h-4 w-4" />
               </Button>
-              <span className="w-16 text-center">{quantity}</span>
-              <Button 
-                variant="outline" 
-                size="icon" 
-                onClick={increaseQuantity}
+              <span className="text-lg font-medium px-4">{quantity}</span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleQuantityChange(1)}
+                disabled={quantity >= getCurrentStock()}
               >
-                +
+                <Plus className="h-4 w-4" />
               </Button>
             </div>
           </div>
-          
-          {/* Buttons */}
-          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mb-6">
-            <Button 
-              className="flex-1 bg-green-500 hover:bg-green-600"
+
+          {/* Action Buttons */}
+          <div className="flex space-x-4">
+            <Button
               onClick={handleAddToCart}
+              disabled={!isInStock}
+              className="flex-1"
             >
               <ShoppingCart className="h-5 w-5 mr-2" />
               Add to Cart
             </Button>
-            <Button 
-              variant="secondary" 
-              className="flex-1"
-              onClick={handleBuyNow}
+            <Button
+              variant="outline"
+              onClick={() => setIsWishlisted(!isWishlisted)}
+              className={isWishlisted ? 'text-red-500 border-red-500' : ''}
             >
-              Buy Now
+              <Heart className={`h-5 w-5 ${isWishlisted ? 'fill-current' : ''}`} />
+            </Button>
+            <Button variant="outline">
+              <Share2 className="h-5 w-5" />
             </Button>
           </div>
-          
-          {/* Product Information Tabs */}
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="description">Description</TabsTrigger>
-              <TabsTrigger value="features">Features</TabsTrigger>
-              <TabsTrigger value="specifications">Specifications</TabsTrigger>
-            </TabsList>
-            <TabsContent value="description" className="mt-4">
-              <p className="text-gray-700">{product.description}</p>
-            </TabsContent>
-            <TabsContent value="features" className="mt-4">
-              <ul className="list-disc pl-5 space-y-1">
-                {product.features.map((feature, index) => (
-                  <li key={index} className="text-gray-700">{feature}</li>
-                ))}
-              </ul>
-            </TabsContent>
-            <TabsContent value="specifications" className="mt-4">
-              <div className="space-y-2">
-                {product.specifications.map((spec, index) => (
-                  <div key={index} className="grid grid-cols-2 border-b border-gray-100 py-2">
-                    <div className="font-medium">{spec.name}</div>
-                    <div className="text-gray-700">{spec.value}</div>
-                  </div>
-                ))}
-              </div>
-            </TabsContent>
-          </Tabs>
+
+          {/* Product Features */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="flex items-center space-x-2 text-sm text-gray-600">
+              <Truck className="h-5 w-5" />
+              <span>Free shipping</span>
+            </div>
+            <div className="flex items-center space-x-2 text-sm text-gray-600">
+              <Shield className="h-5 w-5" />
+              <span>1 year warranty</span>
+            </div>
+            <div className="flex items-center space-x-2 text-sm text-gray-600">
+              <RotateCcw className="h-5 w-5" />
+              <span>30-day returns</span>
+            </div>
+          </div>
         </div>
       </div>
-      
+
+      {/* Product Details Section */}
+      <div className="mt-12">
+        <div className="border-b">
+          <nav className="flex space-x-8">
+            <span className="border-b-2 border-blue-500 pb-2 text-sm font-medium text-blue-600">
+              Description
+            </span>
+          </nav>
+        </div>
+
+        <div className="py-8">
+          <div className="prose max-w-none">
+            <p className="text-gray-700 leading-relaxed">{product.description}</p>
+            
+            {/* Product Details Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+              {product.material && (
+                <div>
+                  <strong>Material:</strong> {product.material}
+                </div>
+              )}
+              {product.brand && (
+                <div>
+                  <strong>Brand:</strong> {product.brand}
+                </div>
+              )}
+              {product.weight && (
+                <div>
+                  <strong>Weight:</strong> {product.weight}kg
+                </div>
+              )}
+              {product.dimensions && (
+                <div>
+                  <strong>Dimensions:</strong> {product.dimensions}
+                </div>
+              )}
+              {product.careInstructions && (
+                <div>
+                  <strong>Care Instructions:</strong> {product.careInstructions}
+                </div>
+              )}
+              {product.warranty && (
+                <div>
+                  <strong>Warranty:</strong> {product.warranty}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Related Products */}
       <div className="mt-12">
-        <h2 className="text-xl font-bold mb-6">Related Products</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {relatedProducts.map(product => (
-            <Card key={product.id} className="overflow-hidden">
+        <h2 className="text-2xl font-bold mb-6">Related Products</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+          {products.slice(0, 4).map((relatedProduct: any) => (
+            <Card key={relatedProduct.id} className="group cursor-pointer">
               <CardContent className="p-4">
-                <div 
-                  className="h-40 mb-4 bg-gray-100 rounded overflow-hidden cursor-pointer"
-                  onClick={() => navigate(`/products/${product.id}`)}
-                >
-                  <img 
-                    src={product.image} 
-                    alt={product.name} 
-                    className="w-full h-full object-cover"
+                <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden mb-3">
+                  <img
+                    src={relatedProduct.images?.[0] || '/placeholder.svg'}
+                    alt={relatedProduct.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                   />
                 </div>
-                <h3 
-                  className="font-medium truncate cursor-pointer hover:text-primary"
-                  onClick={() => navigate(`/products/${product.id}`)}
-                >
-                  {product.name}
-                </h3>
-                <p className="text-sm text-gray-500">{product.brand}</p>
-                <p className="font-semibold mt-1">{formatCurrency(product.price)}</p>
+                <h3 className="font-medium text-gray-900 mb-1">{relatedProduct.name}</h3>
+                <p className="text-sm text-gray-600 mb-2">{relatedProduct.description}</p>
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-gray-900">${relatedProduct.price}</span>
+                  <Button size="sm" variant="outline">
+                    View
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}

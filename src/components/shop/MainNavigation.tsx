@@ -25,7 +25,7 @@ const MainNavigation = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-14">
           {/* Menu Button for Mobile */}
-          <Button variant="ghost" size="sm" className="md:flex items-center mr-4" onClick={toggleMobileMenu}>
+          <Button variant="ghost" size="sm" className="flex md:hidden items-center mr-4" onClick={toggleMobileMenu}>
             <Menu className="h-5 w-5 mr-2" />
             <span>Menu</span>
           </Button>

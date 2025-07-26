@@ -121,8 +121,9 @@ class VoiceTrainerService {
     }
 
     utterance.onerror = (event: any) => {
-      console.error('Speech synthesis error:', event.error);
-      toast.error('Voice guidance temporarily unavailable');
+      if (event.error !== 'interrupted') {
+        console.error('Speech synthesis error:', event.error);
+      }
     };
 
     this.currentUtterance = utterance;

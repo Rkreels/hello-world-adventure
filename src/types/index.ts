@@ -35,6 +35,31 @@ export interface Product {
   ratings?: number;
   reviewCount?: number;
   status?: 'active' | 'inactive' | 'draft';
+  // Enhanced Product Variations
+  brand?: string;
+  sku?: string;
+  weight?: number;
+  dimensions?: string;
+  material?: string;
+  sizes?: string[];
+  style?: string;
+  pattern?: string;
+  occasion?: string;
+  season?: string;
+  ageGroup?: string;
+  gender?: string;
+  careInstructions?: string;
+  warranty?: string;
+  variants?: ProductVariant[];
+}
+
+export interface ProductVariant {
+  id?: string;
+  name: string;
+  price?: number;
+  stock?: number;
+  sku?: string;
+  attributes: Record<string, string>;
 }
 
 export interface Category {
