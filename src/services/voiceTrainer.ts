@@ -161,39 +161,68 @@ class VoiceTrainerService {
       
       // Product Management
       '/admin/products': 'Product Management Center. Here you can view all products, add new items, edit existing products, and manage inventory. Use the search and filters to find specific products quickly.',
+      '/admin/products-list': 'Product Catalog Management. View and manage your complete product inventory with advanced filtering and sorting capabilities.',
       '/admin/add-product': 'Add New Product Form. Fill in all required fields including product name, description, price, and images. Configure product variations like colors, sizes, and materials. Set inventory levels and product categories.',
       '/admin/edit-product': 'Edit Product Form. Modify existing product details, update pricing, manage inventory, and adjust product variations. Save changes to update your catalog.',
       
+      // Admin Management
+      '/admin/admin-role': 'Admin Role Management. Create and manage administrative roles with specific permissions. Control who can access different sections of the admin panel by assigning appropriate roles to users.',
+      '/admin/admin-authority': 'Admin Authority Management. Configure administrative permissions and access levels. Define what actions different admin roles can perform throughout the platform.',
+      
       // Order Management
       '/admin/orders': 'Order Management System. View all customer orders, filter by status, and process orders. You can update order status, add tracking information, and manage fulfillment.',
+      '/admin/order-management': 'Comprehensive Order Processing. Handle order lifecycle from placement to delivery with advanced tracking and management tools.',
       '/admin/order-detail': 'Order Details View. See complete order information including customer details, items ordered, payment status, and shipping information. Update order status and add notes.',
       
       // Customer Management
       '/admin/customers': 'Customer Management Dashboard. View all registered customers, analyze customer data, and manage customer accounts. Access customer purchase history and communication tools.',
+      '/admin/customer-management': 'Advanced Customer Relationship Management. Analyze customer behavior, segment customers, and implement targeted marketing strategies.',
       
       // Inventory
       '/admin/inventory': 'Inventory Management System. Monitor stock levels, set low stock alerts, and manage product quantities. Restock items and track inventory movements.',
       
-      // Categories
+      // Categories and Brands
       '/admin/categories': 'Category Management. Organize your products by creating and managing categories. Set up category hierarchies and assign products to appropriate categories.',
+      '/admin/brands': 'Brand Management. Create and organize product brands for better catalog organization and customer navigation.',
       
       // Marketing
       '/admin/marketing': 'Marketing Tools. Create and manage promotional campaigns, discount codes, and special offers. Track campaign performance and customer engagement.',
       '/admin/coupons': 'Coupon Management System. Create discount codes, set usage limits, and track coupon performance. Configure percentage or fixed amount discounts.',
+      
+      // Financial Management
+      '/admin/transactions': 'Transaction Management. Monitor payment processing, refunds, and financial flows. Track revenue and payment method performance.',
+      
+      // Content Management
+      '/admin/product-media': 'Product Media Management. Upload and organize product images, videos, and other media assets for your catalog.',
+      '/admin/product-reviews': 'Product Review Management. Moderate customer reviews, respond to feedback, and maintain review quality standards.',
       
       // Reports
       '/admin/reports': 'Analytics and Reports Center. View comprehensive sales reports, customer analytics, and business insights. Export data for further analysis.',
       
       // Settings
       '/admin/settings': 'Admin Settings Panel. Configure store settings, payment methods, shipping options, and user permissions. Customize your platform preferences.',
+      '/admin/profile': 'Admin Profile Management. Update your administrative account settings, security preferences, and notification settings.',
       
       // Shop Pages
       '/shop': 'Shop Homepage. Browse products by category, view featured items, and discover new arrivals. Use filters to find exactly what you are looking for.',
       '/shop/categories': 'Product Categories. Explore different product categories to find items that interest you. Each category contains related products grouped for easy browsing.',
+      '/shop/category': 'Category Browse Page. View products within a specific category with filtering and sorting options.',
       '/shop/product': 'Product Details Page. View detailed product information including images, descriptions, specifications, and customer reviews. Add items to your cart and select product variations.',
       '/shop/cart': 'Shopping Cart. Review selected items, adjust quantities, and proceed to checkout. Apply discount codes and calculate shipping costs.',
       '/shop/checkout': 'Checkout Process. Enter shipping and payment information to complete your purchase. Review your order before final confirmation.',
       '/shop/profile': 'User Profile. Manage your account information, view order history, and update preferences. Track your orders and manage saved addresses.',
+      '/shop/deals': 'Special Deals and Offers. Discover limited-time promotions, clearance items, and exclusive discounts.',
+      '/shop/new-arrivals': 'New Product Arrivals. Explore the latest products added to our catalog.',
+      '/shop/search': 'Search Results. Find products based on your search terms with advanced filtering options.',
+      
+      // Legal and Info Pages
+      '/shop/about': 'About Us. Learn about our company, mission, and values.',
+      '/shop/contact': 'Contact Information. Get in touch with our customer service team.',
+      '/shop/faq': 'Frequently Asked Questions. Find answers to common questions about shopping, shipping, and returns.',
+      '/shop/privacy': 'Privacy Policy. Information about how we handle your personal data.',
+      '/shop/terms': 'Terms and Conditions. Legal terms governing the use of our platform.',
+      '/shop/returns': 'Returns and Refunds. Policy and process for returning products.',
+      '/shop/shipping-information': 'Shipping Information. Details about delivery options, costs, and timeframes.',
       
       // Authentication
       '/auth/login': 'Login Page. Enter your credentials to access your account. Use the Remember Me option for convenience on trusted devices.',
@@ -317,7 +346,7 @@ class VoiceTrainerService {
       case 'h4':
       case 'h5':
       case 'h6':
-        return `Page heading: ${elementText}. This section contains information about ${elementText.toLowerCase()}.`;
+        return this.getHeadingGuidance(elementText, currentPath);
 
       case 'p':
         if (elementText && elementText.length > 10) {
@@ -428,6 +457,34 @@ class VoiceTrainerService {
     const elementClass = element.className;
     const elementId = element.id;
     const dataTestId = element.getAttribute('data-testid');
+    const elementText = element.textContent?.trim();
+    
+    // Enhanced context-aware guidance
+    if (currentPath.includes('admin-role') && elementText) {
+      if (elementText.toLowerCase().includes('add new role') || elementText.toLowerCase().includes('create role')) {
+        return 'Create admin role button. Add new administrative roles with specific permissions to control access levels throughout the platform.';
+      } else if (elementText.toLowerCase().includes('role management') || elementText.toLowerCase().includes('admin role')) {
+        return 'Admin role management section. Define user permissions, create access levels, and control what different administrators can do on the platform.';
+      }
+    }
+    
+    if (currentPath.includes('admin-authority') && elementText) {
+      if (elementText.toLowerCase().includes('authority') || elementText.toLowerCase().includes('permissions')) {
+        return 'Administrative authority management. Configure detailed permissions and access controls for different user roles in the system.';
+      }
+    }
+    
+    if (currentPath.includes('categories') && elementText) {
+      if (elementText.toLowerCase().includes('add') && elementText.toLowerCase().includes('category')) {
+        return 'Add new product category. Create organizational categories to help customers find products and improve site navigation.';
+      }
+    }
+    
+    if (currentPath.includes('brands') && elementText) {
+      if (elementText.toLowerCase().includes('add') && elementText.toLowerCase().includes('brand')) {
+        return 'Add new brand. Register product manufacturers and brands for better catalog organization and customer trust.';
+      }
+    }
     
     // Navigation components
     if (elementClass.includes('sidebar') || elementId.includes('sidebar')) {
@@ -440,7 +497,8 @@ class VoiceTrainerService {
     
     // Search components
     if (elementClass.includes('search') || element.getAttribute('placeholder')?.toLowerCase().includes('search')) {
-      return 'Search functionality. Type product names, SKUs, or keywords to find items quickly. Advanced filters help narrow results by category, price range, or availability.';
+      const searchContext = this.getSearchContext(currentPath);
+      return `Search functionality. ${searchContext} Type keywords to find items quickly and use filters to narrow results.`;
     }
     
     // Cart components
@@ -453,9 +511,15 @@ class VoiceTrainerService {
       return 'Product display card. Shows product image, name, price, and rating. Click to view detailed specifications, reviews, and purchasing options.';
     }
     
-    // Form components
-    if (elementClass.includes('form') && currentPath.includes('add-product')) {
-      return 'Product creation form. Complete all sections including basic information, pricing, inventory, variations like colors and sizes, and upload high-quality images for better customer engagement.';
+    // Form components  
+    if (elementClass.includes('form')) {
+      if (currentPath.includes('add-product')) {
+        return 'Product creation form. Complete all sections including basic information, pricing, inventory, variations like colors and sizes, and upload high-quality images for better customer engagement.';
+      } else if (currentPath.includes('admin-role')) {
+        return 'Admin role creation form. Define role name, description, and specific permissions for new administrative positions.';
+      } else if (currentPath.includes('categories')) {
+        return 'Category management form. Enter category details, upload images, and set up hierarchy for product organization.';
+      }
     }
     
     // Statistics cards
@@ -465,16 +529,113 @@ class VoiceTrainerService {
     
     // Data tables
     if (elementClass.includes('table') || element.tagName.toLowerCase() === 'table') {
-      if (currentPath.includes('orders')) {
+      if (currentPath.includes('admin-role')) {
+        return 'Admin roles table. View all administrative roles, their permissions, and manage role assignments. Edit roles to modify access levels or delete unused roles.';
+      } else if (currentPath.includes('orders')) {
         return 'Order management table. Track order status, customer information, payment details, and fulfillment progress. Use sorting and filtering for efficient order processing.';
       } else if (currentPath.includes('products')) {
         return 'Product catalog management. Edit product details, update pricing, manage inventory levels, and organize categories for better customer navigation.';
       } else if (currentPath.includes('customers')) {
         return 'Customer relationship management. Access customer profiles, purchase history, preferences, and communication tools for personalized service.';
+      } else if (currentPath.includes('categories')) {
+        return 'Categories management table. Organize product categories, set up hierarchies, and manage category assignments for better product discovery.';
       }
     }
     
     return null;
+  }
+
+  private getSearchContext(currentPath: string): string {
+    if (currentPath.includes('admin-role')) {
+      return 'Search admin roles by name or permissions.';
+    } else if (currentPath.includes('products')) {
+      return 'Search products by name, SKU, category, or brand.';
+    } else if (currentPath.includes('orders')) {
+      return 'Search orders by customer name, order ID, or status.';
+    } else if (currentPath.includes('customers')) {
+      return 'Search customers by name, email, or phone number.';
+    } else if (currentPath.includes('categories')) {
+      return 'Search categories by name or description.';
+    }
+    return 'Search through available items.';
+  }
+
+  private getHeadingGuidance(elementText: string | undefined, currentPath: string): string {
+    if (!elementText) return 'Section heading. This organizes content into distinct areas.';
+    
+    const text = elementText.toLowerCase();
+    
+    // Context-specific heading guidance
+    if (currentPath.includes('admin-role')) {
+      if (text.includes('admin role management') || text.includes('role management')) {
+        return `${elementText} section. Here you can create, edit, and manage administrative roles that control user permissions throughout the platform. Define who can access what features.`;
+      } else if (text.includes('roles')) {
+        return `${elementText} section. View all existing administrative roles, their descriptions, and assigned permissions. Use this area to manage role-based access control.`;
+      } else if (text.includes('add') || text.includes('create')) {
+        return `${elementText} section. Create new administrative roles by defining role names, descriptions, and specific permissions for different types of admin users.`;
+      }
+    }
+    
+    if (currentPath.includes('dashboard')) {
+      if (text.includes('dashboard') || text.includes('overview')) {
+        return `${elementText} section. Your main control center showing key performance metrics, recent activities, and quick access to important functions.`;
+      } else if (text.includes('analytics') || text.includes('metrics')) {
+        return `${elementText} section. Monitor business performance with charts, statistics, and trend analysis to make informed decisions.`;
+      } else if (text.includes('recent') || text.includes('latest')) {
+        return `${elementText} section. View the most recent activities, orders, or updates that require your attention.`;
+      }
+    }
+    
+    if (currentPath.includes('products')) {
+      if (text.includes('product management') || text.includes('catalog')) {
+        return `${elementText} section. Manage your entire product inventory including adding new items, editing details, and organizing your catalog.`;
+      } else if (text.includes('inventory')) {
+        return `${elementText} section. Monitor stock levels, track inventory movements, and manage product availability.`;
+      }
+    }
+    
+    if (currentPath.includes('orders')) {
+      if (text.includes('order management') || text.includes('orders')) {
+        return `${elementText} section. Process customer orders, update statuses, manage fulfillment, and handle order-related customer service.`;
+      }
+    }
+    
+    if (currentPath.includes('customers')) {
+      if (text.includes('customer management') || text.includes('customers')) {
+        return `${elementText} section. Manage customer accounts, view purchase history, and handle customer relationships for better service.`;
+      }
+    }
+    
+    if (currentPath.includes('categories')) {
+      if (text.includes('category management') || text.includes('categories')) {
+        return `${elementText} section. Organize your products into categories and subcategories for better customer navigation and product discovery.`;
+      }
+    }
+    
+    if (currentPath.includes('marketing')) {
+      if (text.includes('marketing') || text.includes('campaigns')) {
+        return `${elementText} section. Create and manage promotional campaigns, discount codes, and marketing strategies to boost sales.`;
+      }
+    }
+    
+    if (currentPath.includes('reports')) {
+      if (text.includes('reports') || text.includes('analytics')) {
+        return `${elementText} section. Generate comprehensive business reports, analyze performance data, and export insights for decision making.`;
+      }
+    }
+    
+    // Generic guidance based on common heading patterns
+    if (text.includes('settings') || text.includes('configuration')) {
+      return `${elementText} section. Configure platform settings, preferences, and system parameters to customize your experience.`;
+    } else if (text.includes('add') || text.includes('create') || text.includes('new')) {
+      return `${elementText} section. Create new entries by filling out the required information and configuring appropriate settings.`;
+    } else if (text.includes('edit') || text.includes('modify') || text.includes('update')) {
+      return `${elementText} section. Modify existing information, update settings, and make changes to improve your data.`;
+    } else if (text.includes('list') || text.includes('table') || text.includes('overview')) {
+      return `${elementText} section. Browse through available items with options to search, filter, sort, and perform bulk actions.`;
+    }
+    
+    return `${elementText} section. This area contains related information and tools for ${elementText.toLowerCase()} management.`;
   }
 
   private getSelectGuidance(element: HTMLElement, currentPath: string): string {
