@@ -82,15 +82,63 @@ class VoiceTrainerService {
     if (!element) return;
 
     const tagName = element.tagName.toLowerCase();
+    const elementText = element.textContent?.trim();
+    const currentPath = window.location.pathname;
 
     if (tagName === 'a') {
       const href = element.getAttribute('href');
-      if (href) {
-        this.speak(`Navigating to ${href}`);
+      if (href && elementText) {
+        this.speak(`Navigating to ${elementText} section. Please wait while the page loads.`);
+      } else if (href) {
+        this.speak(`Navigating to ${href}. Please wait while the page loads.`);
       }
     } else if (tagName === 'button') {
-      const buttonText = element.textContent?.trim();
-      this.speak(`${buttonText} activated`);
+      if (elementText) {
+        const text = elementText.toLowerCase();
+        
+        // Provide contextual click feedback instead of just "activated"
+        if (text.includes('save')) {
+          this.speak(`Saving your changes. Please wait while the information is processed and stored.`);
+        } else if (text.includes('delete') || text.includes('remove')) {
+          this.speak(`Deleting item. This action will permanently remove the selected data.`);
+        } else if (text.includes('add') || text.includes('create')) {
+          this.speak(`Creating new item. Opening the creation form where you can enter the required information.`);
+        } else if (text.includes('edit') || text.includes('modify')) {
+          this.speak(`Opening editor. You can now modify the selected item's information and settings.`);
+        } else if (text.includes('search') || text.includes('filter')) {
+          this.speak(`Applying search criteria. Results will be filtered based on your selections.`);
+        } else if (text.includes('cart') || text.includes('add to cart')) {
+          this.speak(`Adding item to your shopping cart. You can review all items before checkout.`);
+        } else if (text.includes('checkout')) {
+          this.speak(`Proceeding to checkout. You'll enter payment and shipping information next.`);
+        } else if (text.includes('login') || text.includes('sign in')) {
+          this.speak(`Logging you in. Please wait while your credentials are verified.`);
+        } else if (text.includes('register') || text.includes('sign up')) {
+          this.speak(`Creating your account. Please wait while your information is processed.`);
+        } else if (text.includes('upload')) {
+          this.speak(`Opening file browser. Select the files you want to upload from your computer.`);
+        } else if (text.includes('cancel')) {
+          this.speak(`Cancelling operation. Any unsaved changes will be discarded.`);
+        } else if (text.includes('submit')) {
+          this.speak(`Submitting form. Please wait while your information is processed.`);
+        } else if (text.includes('export') || text.includes('download')) {
+          this.speak(`Preparing download. Your file will be ready shortly.`);
+        } else {
+          this.speak(`Executing ${elementText}. Please wait for the operation to complete.`);
+        }
+      } else {
+        this.speak('Button clicked. Performing the requested action.');
+      }
+    } else if (tagName === 'input') {
+      const inputType = element.getAttribute('type');
+      if (inputType === 'checkbox') {
+        const checked = (element as HTMLInputElement).checked;
+        this.speak(`Checkbox ${checked ? 'selected' : 'deselected'}. Option is now ${checked ? 'enabled' : 'disabled'}.`);
+      } else if (inputType === 'radio') {
+        this.speak(`Radio option selected. This choice will override other selections in this group.`);
+      }
+    } else if (tagName === 'select') {
+      this.speak('Dropdown menu opened. Use arrow keys or click to select an option from the list.');
     }
   }
 
@@ -219,6 +267,14 @@ class VoiceTrainerService {
     const componentGuidance = this.getComponentSpecificGuidance(element, currentPath);
     if (componentGuidance) return componentGuidance;
     
+    // Check for price, currency, and financial elements
+    const financialGuidance = this.getFinancialElementGuidance(element, elementText, elementClass);
+    if (financialGuidance) return financialGuidance;
+    
+    // Check for measurement and quantity elements
+    const measurementGuidance = this.getMeasurementElementGuidance(element, elementText, elementClass);
+    if (measurementGuidance) return measurementGuidance;
+    
     // Enhanced element-specific guidance without unnecessary context
     switch (tagName) {
       case 'button':
@@ -228,50 +284,32 @@ class VoiceTrainerService {
         return this.getInputGuidance(elementType, placeholder, elementText, currentPath);
 
       case 'select':
-        return `Dropdown menu`;
+        return this.getSelectGuidance(element, currentPath);
 
       case 'textarea':
-        return `Text area${placeholder ? `: ${placeholder}` : ''}`;
+        return `Text area${placeholder ? ` for ${placeholder}` : ''}. Click to enter detailed information or descriptions.`;
 
       case 'table':
-        if (currentPath.includes('/orders')) {
-          return `Orders table with sorting and filtering options`;
-        } else if (currentPath.includes('/products')) {
-          return `Products catalog table`;
-        } else if (currentPath.includes('/customers')) {
-          return `Customer data table`;
-        }
-        return `Data table`;
+        return this.getTableGuidance(currentPath);
 
       case 'form':
-        return `Input form`;
+        return this.getFormGuidance(currentPath);
 
       case 'nav':
-        return `Navigation menu`;
+        return `Navigation menu. Use these links to move between different sections of the platform.`;
 
       case 'a':
-        if (elementText) {
-          return `Link to ${elementText}`;
-        }
-        return `Navigation link`;
+        return this.getLinkGuidance(elementText, element.getAttribute('href'), currentPath);
 
       case 'div':
-        if (elementClass.includes('card')) {
-          return `Information card`;
-        } else if (elementClass.includes('modal') || elementClass.includes('dialog')) {
-          return `Dialog window`;
-        }
-        break;
+        return this.getDivGuidance(elementClass, elementText, currentPath);
 
       case 'span':
-        if (elementClass.includes('badge')) {
-          return `Status: ${elementText}`;
-        }
-        break;
+        return this.getSpanGuidance(elementClass, elementText);
 
       case 'img':
         const altText = element.getAttribute('alt');
-        return `Image${altText ? `: ${altText}` : ''}`;
+        return `Product image${altText ? `: ${altText}` : ''}. Click to view larger image or image gallery.`;
 
       case 'h1':
       case 'h2':
@@ -279,23 +317,110 @@ class VoiceTrainerService {
       case 'h4':
       case 'h5':
       case 'h6':
-        return `Heading: ${elementText}`;
+        return `Page heading: ${elementText}. This section contains information about ${elementText.toLowerCase()}.`;
+
+      case 'p':
+        if (elementText && elementText.length > 10) {
+          return `Text content: ${elementText.substring(0, 100)}${elementText.length > 100 ? '...' : ''}`;
+        }
+        break;
+
+      case 'li':
+        return `List item: ${elementText}. Part of a navigational or informational list.`;
+
+      case 'label':
+        return `Form label: ${elementText}. This describes the input field that follows.`;
 
       default:
         if (elementRole === 'button') {
-          return `${elementText}`;
+          return this.getButtonGuidance(elementText, elementClass, currentPath);
         } else if (elementRole === 'tab') {
-          return `Tab: ${elementText}`;
+          return `Tab: ${elementText}. Click to switch to the ${elementText.toLowerCase()} section.`;
         } else if (elementRole === 'menuitem') {
-          return `Menu: ${elementText}`;
+          return `Menu option: ${elementText}. Click to access ${elementText.toLowerCase()} functionality.`;
+        } else if (elementRole === 'dialog') {
+          return `Dialog window for ${elementText || 'additional options'}. Contains form fields or information that requires your attention.`;
         }
     }
 
-    // Simple fallback
+    // Enhanced fallback with context
     if (elementText && elementText.length > 0) {
-      return `${elementText}`;
+      if (elementText.includes('$') || elementText.toLowerCase().includes('price')) {
+        return `Price information: ${elementText}. This shows the cost or financial value.`;
+      } else if (elementText.toLowerCase().includes('quantity') || elementText.toLowerCase().includes('qty')) {
+        return `Quantity field: ${elementText}. Adjust the number of items.`;
+      } else if (elementText.toLowerCase().includes('total') || elementText.toLowerCase().includes('subtotal')) {
+        return `Total amount: ${elementText}. This is the calculated sum.`;
+      }
+      return `${elementText}. Interactive element on the page.`;
     }
 
+    return null;
+  }
+
+  private getFinancialElementGuidance(element: HTMLElement, elementText: string | undefined, elementClass: string): string | null {
+    if (!elementText) return null;
+    
+    const text = elementText.toLowerCase();
+    
+    // Price detection
+    if (elementText.includes('$') || text.includes('price') || text.includes('cost')) {
+      if (text.includes('total')) {
+        return `Total price: ${elementText}. This is the final amount including all charges and taxes.`;
+      } else if (text.includes('subtotal')) {
+        return `Subtotal: ${elementText}. This is the amount before taxes and additional fees.`;
+      } else if (text.includes('shipping')) {
+        return `Shipping cost: ${elementText}. Additional charge for product delivery.`;
+      } else if (text.includes('tax')) {
+        return `Tax amount: ${elementText}. Government tax applied to your purchase.`;
+      } else if (text.includes('discount')) {
+        return `Discount amount: ${elementText}. Savings applied to your order through coupons or promotions.`;
+      }
+      return `Price: ${elementText}. This shows the monetary value or cost.`;
+    }
+    
+    // Currency and financial terms
+    if (text.includes('usd') || text.includes('currency')) {
+      return `Currency setting: ${elementText}. This controls the monetary unit used throughout the platform.`;
+    }
+    
+    if (text.includes('revenue') || text.includes('sales')) {
+      return `Sales revenue: ${elementText}. Total income generated from product sales.`;
+    }
+    
+    if (text.includes('profit') || text.includes('margin')) {
+      return `Profit information: ${elementText}. Shows the financial gain after expenses.`;
+    }
+    
+    return null;
+  }
+  
+  private getMeasurementElementGuidance(element: HTMLElement, elementText: string | undefined, elementClass: string): string | null {
+    if (!elementText) return null;
+    
+    const text = elementText.toLowerCase();
+    
+    // Volume and measurements
+    if (text.includes('volume') || text.includes('vol')) {
+      return `Volume measurement: ${elementText}. Indicates the amount of space the product occupies.`;
+    }
+    
+    if (text.includes('weight') || text.includes('kg') || text.includes('lb') || text.includes('grams')) {
+      return `Weight specification: ${elementText}. Shows how heavy the product is for shipping calculations.`;
+    }
+    
+    if (text.includes('size') || text.includes('dimensions')) {
+      return `Size information: ${elementText}. Product dimensions for fit and space planning.`;
+    }
+    
+    if (text.includes('quantity') || text.includes('qty') || text.includes('stock')) {
+      return `Quantity indicator: ${elementText}. Shows available inventory or selected amount.`;
+    }
+    
+    if (text.includes('rating') || text.includes('stars') || text.includes('/5')) {
+      return `Product rating: ${elementText}. Customer satisfaction score based on reviews.`;
+    }
+    
     return null;
   }
 
@@ -306,98 +431,192 @@ class VoiceTrainerService {
     
     // Navigation components
     if (elementClass.includes('sidebar') || elementId.includes('sidebar')) {
-      return 'Sidebar navigation menu. Use these links to navigate between different sections of the admin panel. Click on categories to expand sub-menus.';
+      return 'Sidebar navigation menu. Use these links to navigate between different sections of the admin panel. Click on categories to expand sub-menus for detailed management options.';
     }
     
     if (elementClass.includes('main-nav') || elementClass.includes('navbar')) {
-      return 'Main navigation bar. Access different sections of the platform including shop, categories, and user account options.';
+      return 'Main navigation bar. Access different sections including shop browsing, product categories, user account management, and search functionality.';
     }
     
     // Search components
     if (elementClass.includes('search') || element.getAttribute('placeholder')?.toLowerCase().includes('search')) {
-      return 'Search functionality. Type keywords to find products, orders, or customers quickly. Use filters to narrow down results.';
+      return 'Search functionality. Type product names, SKUs, or keywords to find items quickly. Advanced filters help narrow results by category, price range, or availability.';
     }
     
     // Cart components
     if (elementClass.includes('cart') || elementId.includes('cart')) {
-      return 'Shopping cart. View selected items, adjust quantities, and proceed to checkout. Cart total is calculated automatically.';
+      return 'Shopping cart interface. Review selected items, modify quantities, apply discount codes, and calculate shipping costs before checkout.';
     }
     
     // Product cards
     if (elementClass.includes('product-card') || elementClass.includes('ProductCard')) {
-      return 'Product card. Click to view detailed product information, add to cart, or see more images. Shows price, rating, and key features.';
+      return 'Product display card. Shows product image, name, price, and rating. Click to view detailed specifications, reviews, and purchasing options.';
     }
     
     // Form components
     if (elementClass.includes('form') && currentPath.includes('add-product')) {
-      return 'Product creation form. Fill in all required fields to add a new product to your catalog. Include high-quality images and detailed descriptions for better sales.';
+      return 'Product creation form. Complete all sections including basic information, pricing, inventory, variations like colors and sizes, and upload high-quality images for better customer engagement.';
     }
     
     // Statistics cards
-    if (elementClass.includes('stat') || elementClass.includes('metric')) {
-      return 'Performance metric card. Shows key business indicators like sales, orders, and revenue. Click for detailed analytics.';
+    if (elementClass.includes('stat') || elementClass.includes('metric') || elementClass.includes('dashboard')) {
+      return 'Performance analytics dashboard. Monitor key business metrics including sales volume, revenue trends, customer acquisition, and inventory turnover rates.';
     }
     
     // Data tables
     if (elementClass.includes('table') || element.tagName.toLowerCase() === 'table') {
       if (currentPath.includes('orders')) {
-        return 'Orders data table. Sort by date, status, or customer. Use action buttons to process orders, update status, or view details.';
+        return 'Order management table. Track order status, customer information, payment details, and fulfillment progress. Use sorting and filtering for efficient order processing.';
       } else if (currentPath.includes('products')) {
-        return 'Products inventory table. Manage your catalog by editing prices, updating stock, or modifying product information.';
+        return 'Product catalog management. Edit product details, update pricing, manage inventory levels, and organize categories for better customer navigation.';
       } else if (currentPath.includes('customers')) {
-        return 'Customer database table. View customer information, purchase history, and manage customer accounts.';
+        return 'Customer relationship management. Access customer profiles, purchase history, preferences, and communication tools for personalized service.';
       }
     }
     
     return null;
   }
 
+  private getSelectGuidance(element: HTMLElement, currentPath: string): string {
+    const elementText = element.textContent?.trim();
+    const placeholder = element.getAttribute('placeholder');
+    
+    if (currentPath.includes('add-product')) {
+      if (elementText?.toLowerCase().includes('category')) {
+        return 'Product category selector. Choose the appropriate category to help customers find your product easily.';
+      } else if (elementText?.toLowerCase().includes('brand')) {
+        return 'Brand selection dropdown. Select the manufacturer or brand name for this product.';
+      } else if (elementText?.toLowerCase().includes('status')) {
+        return 'Product status dropdown. Set whether the product is active, draft, or discontinued.';
+      }
+    }
+    
+    return `Selection dropdown${placeholder ? ` for ${placeholder}` : ''}. Click to see available options and make a choice.`;
+  }
+  
+  private getTableGuidance(currentPath: string): string {
+    if (currentPath.includes('/orders')) {
+      return 'Orders management table with comprehensive order tracking. Sort by order date, customer name, status, or total amount. Use action buttons to update order status, add tracking information, or process refunds.';
+    } else if (currentPath.includes('/products')) {
+      return 'Product catalog table for inventory management. View product details, stock levels, pricing, and performance metrics. Edit products directly or manage bulk operations.';
+    } else if (currentPath.includes('/customers')) {
+      return 'Customer database with detailed customer profiles. Track purchase history, lifetime value, preferences, and communication history for personalized customer service.';
+    }
+    return 'Data table with sorting and filtering capabilities. Click column headers to sort, use search to find specific entries.';
+  }
+  
+  private getFormGuidance(currentPath: string): string {
+    if (currentPath.includes('add-product')) {
+      return 'Product creation form with multiple sections. Fill in basic information, set pricing and inventory, configure product variations, and upload images. All required fields must be completed.';
+    } else if (currentPath.includes('checkout')) {
+      return 'Checkout form for order completion. Enter shipping address, select payment method, and review order details before finalizing your purchase.';
+    } else if (currentPath.includes('profile')) {
+      return 'Profile management form. Update personal information, change password, manage addresses, and configure notification preferences.';
+    }
+    return 'Information input form. Complete all required fields marked with asterisks and ensure data accuracy before submission.';
+  }
+  
+  private getLinkGuidance(elementText: string | undefined, href: string | null, currentPath: string): string {
+    if (elementText) {
+      if (elementText.toLowerCase().includes('dashboard')) {
+        return `Dashboard navigation link: ${elementText}. Access your main admin dashboard with overview statistics and quick actions.`;
+      } else if (elementText.toLowerCase().includes('product')) {
+        return `Product management link: ${elementText}. Manage your product catalog, inventory, and product information.`;
+      } else if (elementText.toLowerCase().includes('order')) {
+        return `Order management link: ${elementText}. Process customer orders, track fulfillment, and manage order status.`;
+      } else if (elementText.toLowerCase().includes('customer')) {
+        return `Customer management link: ${elementText}. Manage customer accounts, view purchase history, and handle customer service.`;
+      }
+      return `Navigation link to ${elementText}. Click to access the ${elementText.toLowerCase()} section.`;
+    }
+    return 'Navigation link. Click to move to a different page or section.';
+  }
+  
+  private getDivGuidance(elementClass: string, elementText: string | undefined, currentPath: string): string | null {
+    if (elementClass.includes('card')) {
+      if (elementText?.includes('$')) {
+        return `Financial information card showing ${elementText}. Contains important monetary data and statistics.`;
+      }
+      return 'Information card containing organized data. Review the content for relevant details and available actions.';
+    } else if (elementClass.includes('modal') || elementClass.includes('dialog')) {
+      return 'Dialog window requiring your attention. Contains forms or information that needs review or action.';
+    } else if (elementClass.includes('sidebar')) {
+      return 'Sidebar panel with navigation options and additional tools. Use for quick access to different platform sections.';
+    }
+    return null;
+  }
+  
+  private getSpanGuidance(elementClass: string, elementText: string | undefined): string | null {
+    if (elementClass.includes('badge')) {
+      return `Status indicator: ${elementText}. Shows current state or category of the item.`;
+    } else if (elementText?.includes('$')) {
+      return `Price display: ${elementText}. Shows the monetary amount for this item or service.`;
+    } else if (elementText?.toLowerCase().includes('stock') || elementText?.toLowerCase().includes('qty')) {
+      return `Inventory information: ${elementText}. Indicates available quantity or stock status.`;
+    }
+    return null;
+  }
+
   private getButtonGuidance(elementText: string | undefined, elementClass: string, currentPath: string): string {
-    if (!elementText) return 'Interactive button element';
+    if (!elementText) return 'Interactive button. Click to perform an action on the page.';
     
     const text = elementText.toLowerCase();
     
     // Context-specific button guidance
     if (currentPath.includes('add-product') || currentPath.includes('edit-product')) {
       if (text.includes('save')) {
-        return 'Save product button. Saves all entered product information to your catalog. Ensure all required fields are completed before saving.';
+        return `Save product information. Review all entered data including name, description, pricing, inventory levels, and product variations before saving to your catalog.`;
       } else if (text.includes('upload')) {
-        return 'Upload images button. Add high-quality product photos. Multiple images help customers make informed purchase decisions.';
-      } else if (text.includes('add variation')) {
-        return 'Add product variation button. Create different options like colors, sizes, or styles for this product.';
+        return 'Upload product images. Add multiple high-quality photos showing different angles, colors, and product details to improve customer confidence and sales.';
+      } else if (text.includes('add variation') || text.includes('variation')) {
+        return 'Add product variation option. Create different choices like colors, sizes, materials, or styles to offer customers more selection.';
+      } else if (text.includes('preview')) {
+        return 'Preview product page. See how your product will appear to customers before publishing to the store.';
       }
     }
     
     if (currentPath.includes('orders')) {
-      if (text.includes('process')) {
-        return 'Process order button. Move order to next fulfillment stage. This will update the customer and trigger notifications.';
+      if (text.includes('process') || text.includes('fulfill')) {
+        return 'Process order for fulfillment. Move order to the next stage, update inventory, and notify customer of progress.';
       } else if (text.includes('ship')) {
-        return 'Mark as shipped button. Update order status to shipped and optionally add tracking information.';
+        return 'Mark order as shipped. Update delivery status, add tracking information, and send shipping confirmation to customer.';
+      } else if (text.includes('refund')) {
+        return 'Process refund request. Review order details and initiate refund process according to your return policy.';
       }
     }
     
-    // General button guidance
-    if (text.includes('delete') || text.includes('remove')) {
-      return `Delete button: ${elementText}. This action cannot be undone. Make sure you want to permanently remove this item.`;
-    } else if (text.includes('save') || text.includes('submit')) {
-      return `Save changes button: ${elementText}. This will save all modifications you have made to the form.`;
-    } else if (text.includes('cancel')) {
-      return `Cancel button: ${elementText}. Discard changes and return to previous page without saving.`;
-    } else if (text.includes('edit')) {
-      return `Edit button: ${elementText}. Opens editing interface where you can modify this item's details.`;
-    } else if (text.includes('add') || text.includes('create')) {
-      return `Add new item button: ${elementText}. Opens form to create a new record in the system.`;
-    } else if (text.includes('view') || text.includes('details')) {
-      return `View details button: ${elementText}. Opens detailed information page for this item.`;
-    } else if (text.includes('export')) {
-      return `Export data button: ${elementText}. Downloads current data in spreadsheet format for external analysis.`;
-    } else if (text.includes('filter')) {
-      return `Filter button: ${elementText}. Apply search criteria to narrow down displayed results.`;
-    } else if (text.includes('sort')) {
-      return `Sort button: ${elementText}. Reorder items by different criteria like date, name, or price.`;
+    if (currentPath.includes('dashboard')) {
+      if (text.includes('export')) {
+        return 'Export analytics data. Download reports and statistics in spreadsheet format for detailed business analysis.';
+      } else if (text.includes('refresh')) {
+        return 'Refresh dashboard data. Update all statistics and charts with the most recent information.';
+      }
     }
     
-    return `${elementText} button. Click to perform this action.`;
+    // General button guidance - more descriptive
+    if (text.includes('delete') || text.includes('remove')) {
+      return `Permanently delete item: ${elementText}. This action cannot be undone and will remove all associated data. Confirm you want to proceed.`;
+    } else if (text.includes('save') || text.includes('submit')) {
+      return `Save all changes: ${elementText}. Review your modifications and submit the form to update the system.`;
+    } else if (text.includes('cancel')) {
+      return `Cancel operation: ${elementText}. Discard any unsaved changes and return to the previous page without updating.`;
+    } else if (text.includes('edit') || text.includes('modify')) {
+      return `Edit item details: ${elementText}. Open editing interface to modify information, settings, or configurations.`;
+    } else if (text.includes('add') || text.includes('create') || text.includes('new')) {
+      return `Create new item: ${elementText}. Start the process to add a new record, product, or entry to the system.`;
+    } else if (text.includes('view') || text.includes('details') || text.includes('see more')) {
+      return `View detailed information: ${elementText}. Access comprehensive details, specifications, or expanded data view.`;
+    } else if (text.includes('download') || text.includes('export')) {
+      return `Download content: ${elementText}. Save data, reports, or files to your device for offline access or external use.`;
+    } else if (text.includes('filter') || text.includes('search')) {
+      return `Apply filters: ${elementText}. Narrow down results by specific criteria like date, category, status, or price range.`;
+    } else if (text.includes('sort') || text.includes('order')) {
+      return `Sort data: ${elementText}. Rearrange items by different criteria such as alphabetical order, date, price, or popularity.`;
+    } else if (text.includes('cart') || text.includes('add to cart')) {
+      return `Add to shopping cart: ${elementText}. Include this product in your cart for purchase. You can adjust quantity before checkout.`;
+    }
+    
+    return `${elementText}. Click this button to perform the ${elementText.toLowerCase()} action.`;
   }
 
   private getInputGuidance(elementType: string | null, placeholder: string | null, elementText: string | undefined, currentPath: string): string {
