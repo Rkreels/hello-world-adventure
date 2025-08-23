@@ -1,139 +1,108 @@
 
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { motion, AnimatePresence } from 'framer-motion';
-
-interface CarouselItem {
-  id: number;
-  title: string;
-  subtitle: string;
-  image: string;
-  buttonText: string;
-  buttonLink: string;
-}
-
-const carouselItems: CarouselItem[] = [
-  {
-    id: 1,
-    title: "Discover the Latest Deals –",
-    subtitle: "Up to 50% Off!",
-    image: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=2070&auto=format&fit=crop",
-    buttonText: "Shop Now",
-    buttonLink: "/shop"
-  },
-  {
-    id: 2,
-    title: "New Season Arrivals",
-    subtitle: "Fresh Collections at Great Prices",
-    image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=1971&auto=format&fit=crop",
-    buttonText: "Explore",
-    buttonLink: "/new-arrivals"
-  },
-  {
-    id: 3,
-    title: "Best Selling Electronics",
-    subtitle: "Premium Quality, Unbeatable Prices",
-    image: "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop",
-    buttonText: "View Products",
-    buttonLink: "/category/electronics"
-  },
-  {
-    id: 4,
-    title: "Summer Fashion Collection",
-    subtitle: "Stay Cool & Stylish This Season",
-    image: "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?q=80&w=2070&auto=format&fit=crop",
-    buttonText: "Shop Collection",
-    buttonLink: "/category/fashion"
-  },
-];
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const HeroCarousel = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  
+  const slides = [
+    {
+      id: 1,
+      title: "Summer Sale",
+      subtitle: "Up to 50% Off",
+      description: "Discover amazing deals on your favorite products",
+      image: "/lovable-uploads/01c6fb91-b0da-4976-81df-07a0dacddee3.png",
+      cta: "Shop Now"
+    },
+    {
+      id: 2,
+      title: "New Arrivals",
+      subtitle: "Fresh Collections",
+      description: "Check out our latest products and trends",
+      image: "/lovable-uploads/36d681be-b2a9-4d5a-9475-971eca401ba5.png",
+      cta: "Explore"
+    },
+    {
+      id: 3,
+      title: "Best Sellers",
+      subtitle: "Top Rated Items",
+      description: "Most popular products chosen by customers",
+      image: "/lovable-uploads/b23db856-6fa6-4310-bc20-061035de9d03.png",
+      cta: "View All"
+    }
+  ];
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev === carouselItems.length - 1 ? 0 : prev + 1));
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev === 0 ? carouselItems.length - 1 : prev - 1));
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      nextSlide();
-    }, 5000);
-    return () => clearInterval(interval);
+    const timer = setInterval(nextSlide, 5000);
+    return () => clearInterval(timer);
   }, []);
 
-  const goToSlide = (index: number) => {
-    setCurrentSlide(index);
-  };
-
   return (
-    <div className="relative bg-[#003742] h-[400px] md:h-[450px] overflow-hidden">
-      <AnimatePresence>
-        {carouselItems.map((item, index) => 
-          currentSlide === index && (
-            <motion.div 
-              key={item.id} 
-              initial={{ opacity: 0 }}
-              animate={{ 
-                opacity: 1,
-                zIndex: 10
-              }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.7 }}
-              className="absolute inset-0"
-            >
-            <div className="container mx-auto px-6 h-full flex items-center relative z-10 max-w-7xl">
-              <motion.div 
-                className="max-w-lg text-white pl-12"
-                initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.3, duration: 0.5 }}
-              >
-                <h1 className="text-3xl md:text-4xl font-medium mb-2 leading-tight">
-                  {item.title}
-                </h1>
-                <p className="text-3xl md:text-5xl font-bold mb-8 text-white">
-                  {item.subtitle}
-                </p>
-                <Button className="bg-white text-gray-800 hover:bg-gray-100 px-8 py-5 text-base rounded-md">
-                  <Link to={item.buttonLink}>{item.buttonText}</Link>
-                </Button>
-              </motion.div>
+    <div className="relative w-full h-96 md:h-[500px] overflow-hidden bg-gradient-to-r from-blue-600 to-purple-600">
+      {slides.map((slide, index) => (
+        <div
+          key={slide.id}
+          className={`absolute inset-0 transition-transform duration-500 ease-in-out ${
+            index === currentSlide ? 'translate-x-0' : 'translate-x-full'
+          }`}
+        >
+          <div className="relative h-full flex items-center justify-between px-4 md:px-8">
+            <div className="text-white max-w-lg">
+              <h1 className="text-4xl md:text-6xl font-bold mb-4">{slide.title}</h1>
+              <h2 className="text-2xl md:text-3xl font-semibold mb-4">{slide.subtitle}</h2>
+              <p className="text-lg mb-6">{slide.description}</p>
+              <Button className="bg-white text-gray-800 hover:bg-gray-100">
+                {slide.cta}
+              </Button>
             </div>
-            <div className="absolute inset-0 z-0">
-              <img 
-                src={item.image}
-                alt={item.title}
-                className="w-full h-full object-cover opacity-50"
-              />
-            </div>
-          </motion.div>
-        )
-      )}
-      </AnimatePresence>
+            
+            {slide.image && (
+              <div className="hidden md:block">
+                <img 
+                  src={slide.image} 
+                  alt={slide.title}
+                  className="w-64 h-64 object-contain"
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      ))}
       
-      {/* Carousel Controls */}
-      <Button 
-        variant="outline" 
-        size="icon" 
+      <button
         onClick={prevSlide}
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white rounded-full w-10 h-10 z-20 flex items-center justify-center p-0"
+        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full transition-colors"
       >
-        <ChevronLeft className="h-5 w-5" />
-      </Button>
-      <Button 
-        variant="outline" 
-        size="icon" 
+        <ChevronLeft size={24} />
+      </button>
+      
+      <button
         onClick={nextSlide}
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white rounded-full w-10 h-10 z-20 flex items-center justify-center p-0"
+        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full transition-colors"
       >
-        <ChevronRight className="h-5 w-5" />
-      </Button>
+        <ChevronRight size={24} />
+      </button>
+      
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
+        {slides.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentSlide(index)}
+            className={`w-3 h-3 rounded-full transition-colors ${
+              index === currentSlide ? 'bg-white' : 'bg-white/50'
+            }`}
+          />
+        ))}
+      </div>
     </div>
   );
 };

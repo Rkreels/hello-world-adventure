@@ -1,66 +1,70 @@
 
+import React from 'react';
 import { Link } from 'react-router-dom';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { motion } from 'framer-motion';
+import { ArrowRight, Zap, Shield, Truck } from 'lucide-react';
 
 const StartExploring = () => {
-  const items = [
+  const features = [
     {
-      id: 1,
-      name: "Headsets",
-      image: "https://images.unsplash.com/photo-1615655406736-b37c4fabf923?q=80&w=2070&auto=format&fit=crop",
-      link: "/category/headsets"
+      icon: <Zap className="w-6 h-6" />,
+      title: 'Fast Delivery',
+      description: 'Get your orders delivered within 24 hours'
     },
     {
-      id: 2,
-      name: "Mouse",
-      image: "https://images.unsplash.com/photo-1623820919239-0d0ff10797a1?q=80&w=2070&auto=format&fit=crop",
-      link: "/category/mouse"
+      icon: <Shield className="w-6 h-6" />,
+      title: 'Secure Payment',
+      description: 'Your payments are safe and secure with us'
     },
     {
-      id: 3,
-      name: "Controller",
-      image: "https://images.unsplash.com/photo-1606318801954-d46d46d3360a?q=80&w=2070&auto=format&fit=crop",
-      link: "/category/controller"
-    },
-    {
-      id: 4,
-      name: "Chair",
-      image: "https://images.unsplash.com/photo-1598550476439-6847785fcea6?q=80&w=2070&auto=format&fit=crop",
-      link: "/category/chair"
+      icon: <Truck className="w-6 h-6" />,
+      title: 'Free Shipping',
+      description: 'Free shipping on orders over $50'
     }
   ];
-  
+
   return (
-    <div className="bg-white rounded-md shadow hover:shadow-md transition-all duration-300">
-      <div className="flex items-center justify-between p-4 border-b">
-        <h2 className="text-lg font-medium text-gray-800">Gaming accessories</h2>
-        <Link to="/category/accessories" className="text-blue-600 text-sm hover:underline">
-          See more
-        </Link>
-      </div>
-      
-      <div className="grid grid-cols-2 gap-4 p-4">
-        {items.map(item => (
-          <Link key={item.id} to={item.link} className="group">
-            <motion.div 
-              className="bg-gray-50 p-3 rounded-md flex flex-col items-center"
-              whileHover={{ scale: 1.03 }}
-              transition={{ duration: 0.2 }}
-            >
-              <div className="h-32 mb-1 overflow-hidden flex items-center justify-center">
-                <img 
-                  src={item.image} 
-                  alt={item.name} 
-                  className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
-                />
+    <Card className="h-full">
+      <CardContent className="p-6 h-full flex flex-col">
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold mb-2">Start Exploring</h2>
+          <p className="text-gray-600">
+            Discover thousands of products from top brands and sellers worldwide.
+            Get the best deals and fastest delivery right to your door.
+          </p>
+        </div>
+        
+        <div className="space-y-4 mb-6 flex-1">
+          {features.map((feature, index) => (
+            <div key={index} className="flex items-start space-x-3">
+              <div className="text-blue-600 mt-1">
+                {feature.icon}
               </div>
-              <span className="text-xs font-medium text-gray-800">{item.name}</span>
-            </motion.div>
-          </Link>
-        ))}
-      </div>
-    </div>
+              <div>
+                <h3 className="font-semibold mb-1">{feature.title}</h3>
+                <p className="text-sm text-gray-600">{feature.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        <div className="space-y-3">
+          <Button asChild className="w-full">
+            <Link to="/shop">
+              Start Shopping
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Link>
+          </Button>
+          
+          <Button variant="outline" asChild className="w-full">
+            <Link to="/categories">
+              Browse Categories
+            </Link>
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

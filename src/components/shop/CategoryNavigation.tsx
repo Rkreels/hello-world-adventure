@@ -1,39 +1,43 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
 const CategoryNavigation = () => {
   const categories = [
-    { name: "Men", path: "/category/men" },
-    { name: "Women", path: "/category/women" },
-    { name: "Baby", path: "/category/baby" },
-    { name: "Grocery & Essentials", path: "/category/grocery-essentials" },
-    { name: "Streetwear", path: "/category/streetwear" },
-    { name: "Shoes", path: "/category/shoes" },
-    { name: "Accessories", path: "/category/accessories" },
-    { name: "Beauty", path: "/category/beauty" },
-    { name: "Electronics", path: "/category/electronics" },
-    { name: "Industrial equipment", path: "/category/industrial-equipment" }
+    { id: 'electronics', name: 'Electronics', path: '/category/electronics' },
+    { id: 'fashion', name: 'Fashion', path: '/category/fashion' },
+    { id: 'home', name: 'Home & Garden', path: '/category/home' },
+    { id: 'sports', name: 'Sports & Outdoors', path: '/category/sports' },
+    { id: 'books', name: 'Books', path: '/category/books' },
+    { id: 'toys', name: 'Toys & Games', path: '/category/toys' },
+    { id: 'beauty', name: 'Beauty', path: '/category/beauty' },
+    { id: 'automotive', name: 'Automotive', path: '/category/automotive' }
   ];
 
   return (
-    <div className="border-b border-gray-200 bg-white">
+    <div className="bg-gray-50 border-b">
       <div className="container mx-auto px-4">
-        <div className="overflow-x-auto">
-          <nav className="flex items-center space-x-6 py-3 whitespace-nowrap">
-            {categories.map((category) => (
-              <Link
-                key={category.name}
-                to={category.path}
-                className="text-gray-700 hover:text-green-600 transition-colors text-sm"
-              >
+        <div className="flex items-center space-x-1 py-3 overflow-x-auto">
+          <Button variant="ghost" size="sm" asChild>
+            <Link to="/deals" className="whitespace-nowrap">
+              🔥 Deals
+            </Link>
+          </Button>
+          
+          {categories.map((category) => (
+            <Button key={category.id} variant="ghost" size="sm" asChild>
+              <Link to={category.path} className="whitespace-nowrap">
                 {category.name}
               </Link>
-            ))}
-            <Link to="/categories" className="text-purple-600 hover:text-purple-700 text-sm">
-              See more
+            </Button>
+          ))}
+          
+          <Button variant="ghost" size="sm" asChild>
+            <Link to="/new-arrivals" className="whitespace-nowrap">
+              ✨ New Arrivals
             </Link>
-          </nav>
+          </Button>
         </div>
       </div>
     </div>

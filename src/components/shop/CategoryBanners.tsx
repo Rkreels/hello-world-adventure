@@ -1,74 +1,61 @@
 
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 const CategoryBanners = () => {
+  const banners = [
+    {
+      id: 1,
+      title: 'Gaming Zone',
+      subtitle: 'Level up your game',
+      description: 'Discover the latest gaming accessories and gear',
+      image: '/placeholder.svg',
+      link: '/category/gaming',
+      bgColor: 'bg-gradient-to-r from-purple-500 to-blue-600'
+    },
+    {
+      id: 2,
+      title: 'Fashion Forward',
+      subtitle: 'Style meets comfort',
+      description: 'Trending fashion for every season',
+      image: '/placeholder.svg',
+      link: '/category/fashion',
+      bgColor: 'bg-gradient-to-r from-pink-500 to-rose-600'
+    }
+  ];
+
   return (
-    <div className="container mx-auto px-6 max-w-7xl">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          transition={{ duration: 0.3 }}
-        >
-          <Link to="/category/trousers" className="relative h-32 rounded-md overflow-hidden group block shadow hover:shadow-md">
-            <img 
-              src="https://images.unsplash.com/photo-1566207474742-de921626a54d?q=80&w=2070&auto=format&fit=crop" 
-              alt="Trousers" 
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-            <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-              <span className="text-white font-medium text-lg">TROUSERS FASHION</span>
-            </div>
-          </Link>
-        </motion.div>
-        
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          transition={{ duration: 0.3 }}
-        >
-          <Link to="/category/mens" className="relative h-32 rounded-md overflow-hidden group block shadow hover:shadow-md">
-            <img 
-              src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=2099&auto=format&fit=crop" 
-              alt="Men's Fashion" 
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-            <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-              <span className="text-white font-medium text-lg">MEN'S FASHION</span>
-            </div>
-          </Link>
-        </motion.div>
-        
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          transition={{ duration: 0.3 }}
-        >
-          <Link to="/category/denim" className="relative h-32 rounded-md overflow-hidden group block shadow hover:shadow-md">
-            <img 
-              src="https://images.unsplash.com/photo-1565084888279-aca607ecce0c?q=80&w=2070&auto=format&fit=crop" 
-              alt="Denim" 
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-            <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-              <span className="text-white font-medium text-lg">DENIM</span>
-            </div>
-          </Link>
-        </motion.div>
-        
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          transition={{ duration: 0.3 }}
-        >
-          <Link to="/category/appliances" className="relative h-32 rounded-md overflow-hidden group block shadow hover:shadow-md">
-            <img 
-              src="https://images.unsplash.com/photo-1563245738-1a179bb42db4?q=80&w=1932&auto=format&fit=crop" 
-              alt="Philips Appliances" 
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-            <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-              <span className="text-white font-medium text-lg">PHILIPS APPLIANCES</span>
-            </div>
-          </Link>
-        </motion.div>
+    <div className="container mx-auto px-4 sm:px-6 max-w-7xl">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {banners.map((banner) => (
+          <Card key={banner.id} className="overflow-hidden">
+            <CardContent className="p-0">
+              <div className={`${banner.bgColor} text-white p-6 relative`}>
+                <div className="relative z-10">
+                  <h3 className="text-2xl font-bold mb-2">{banner.title}</h3>
+                  <h4 className="text-lg font-medium mb-2">{banner.subtitle}</h4>
+                  <p className="mb-4 opacity-90">{banner.description}</p>
+                  <Button
+                    asChild
+                    variant="secondary"
+                    className="bg-white text-gray-800 hover:bg-gray-100"
+                  >
+                    <Link to={banner.link}>Shop Now</Link>
+                  </Button>
+                </div>
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20">
+                  <img
+                    src={banner.image}
+                    alt={banner.title}
+                    className="w-32 h-32 object-contain"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
     </div>
   );

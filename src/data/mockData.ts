@@ -1,377 +1,190 @@
 
-import { User, Product, Category, Customer, Order, Transaction, Dashboard } from '../types';
+import { 
+  Product, 
+  Order, 
+  Customer, 
+  Transaction, 
+  Category, 
+  Brand,
+  DashboardStats,
+  SalesData,
+  TopProduct
+} from '@/types';
 
-export const currentUser: User = {
-  id: 'u1',
-  name: 'Wade Warren',
-  email: 'wade.warren@example.com',
-  phone: '(406) 555-0120',
-  avatar: '/avatar.png',
-  role: 'admin',
-  status: 'active',
-};
+export const mockData = {
+  products: [
+    {
+      id: '1',
+      name: 'Wireless Bluetooth Headphones',
+      description: 'High-quality wireless headphones with noise cancellation',
+      price: 79.99,
+      originalPrice: 99.99,
+      images: ['/placeholder.svg'],
+      category: 'electronics',
+      sku: 'WBH-001',
+      stock: 25,
+      rating: 4.5,
+      reviews: 128,
+      tags: ['wireless', 'bluetooth', 'headphones'],
+      isActive: true,
+      isFeatured: true,
+      createdAt: '2024-01-01T00:00:00Z',
+      updatedAt: '2024-01-01T00:00:00Z'
+    },
+    {
+      id: '2',
+      name: 'Smart Fitness Watch',
+      description: 'Advanced fitness tracking with heart rate monitor',
+      price: 199.99,
+      originalPrice: 249.99,
+      images: ['/placeholder.svg'],
+      category: 'electronics',
+      sku: 'SFW-002',
+      stock: 15,
+      rating: 4.8,
+      reviews: 256,
+      tags: ['smartwatch', 'fitness', 'health'],
+      isActive: true,
+      isFeatured: true,
+      createdAt: '2024-01-02T00:00:00Z',
+      updatedAt: '2024-01-02T00:00:00Z'
+    }
+  ] as Product[],
 
-export const categories: Category[] = [
-  { id: 'c1', name: 'Electronics', icon: '💻', productCount: 152 },
-  { id: 'c2', name: 'Fashion', icon: '👕', productCount: 284 },
-  { id: 'c3', name: 'Accessories', icon: '🎧', productCount: 95 },
-  { id: 'c4', name: 'Home & Kitchen', icon: '🏠', productCount: 132 },
-  { id: 'c5', name: 'Sports & Outdoors', icon: '⚽', productCount: 76 },
-  { id: 'c6', name: 'Toys & Games', icon: '🎮', productCount: 43 },
-  { id: 'c7', name: 'Health & Fitness', icon: '💪', productCount: 87 },
-  { id: 'c8', name: 'Books', icon: '📚', productCount: 112 },
-];
-
-export const products: Product[] = [
-  {
-    id: 'p1',
-    name: 'Wireless Bluetooth Headphones',
-    description: 'High-quality wireless headphones with noise cancellation and long battery life.',
-    price: 49.99,
-    images: ['/products/headphones.jpg'],
-    category: 'Electronics',
-    stock: 45,
-    stockStatus: 'In Stock',
-    isUnlimited: false,
-    isFeatured: true,
-    taxIncluded: true,
-    createdAt: '2023-01-01',
-    updatedAt: '2023-01-10',
-    rating: 4.8,
-    reviewCount: 124,
-  },
-  {
-    id: 'p2',
-    name: 'Men\'s T-Shirt',
-    description: 'Comfortable cotton t-shirt for everyday wear.',
-    price: 14.99,
-    images: ['/products/tshirt.jpg'],
-    category: 'Fashion',
-    stock: 100,
-    stockStatus: 'In Stock',
-    isUnlimited: true,
-    isFeatured: false,
-    taxIncluded: true,
-    createdAt: '2023-01-05',
-    updatedAt: '2023-01-15',
-    rating: 4.5,
-    reviewCount: 87,
-  },
-  {
-    id: 'p3',
-    name: 'Men\'s Leather Wallet',
-    description: 'Genuine leather wallet with multiple card slots and compartments.',
-    price: 49.99,
-    images: ['/products/wallet.jpg'],
-    category: 'Accessories',
-    stock: 30,
-    stockStatus: 'In Stock',
-    isUnlimited: false,
-    isFeatured: true,
-    taxIncluded: true,
-    createdAt: '2023-01-10',
-    updatedAt: '2023-01-20',
-    rating: 4.7,
-    reviewCount: 56,
-  },
-  {
-    id: 'p4',
-    name: 'Memory Foam Pillow',
-    description: 'Ergonomic memory foam pillow for better sleep and neck support.',
-    price: 39.99,
-    images: ['/products/pillow.jpg'],
-    category: 'Home & Kitchen',
-    stock: 25,
-    stockStatus: 'In Stock',
-    isUnlimited: false,
-    isFeatured: false,
-    taxIncluded: true,
-    createdAt: '2023-01-15',
-    updatedAt: '2023-01-25',
-    rating: 4.9,
-    reviewCount: 112,
-  },
-  {
-    id: 'p5',
-    name: 'Coffee Maker',
-    description: 'Programmable coffee maker with thermal carafe.',
-    price: 79.99,
-    images: ['/products/coffee-maker.jpg'],
-    category: 'Home & Kitchen',
-    stock: 15,
-    stockStatus: 'Low Stock',
-    isUnlimited: false,
-    isFeatured: true,
-    taxIncluded: true,
-    createdAt: '2023-01-20',
-    updatedAt: '2023-01-30',
-    rating: 4.6,
-    reviewCount: 78,
-  },
-  {
-    id: 'p6',
-    name: 'Casual Baseball Cap',
-    description: 'Adjustable baseball cap for casual wear and sun protection.',
-    price: 19.99,
-    discountPrice: 14.99,
-    images: ['/products/cap.jpg'],
-    category: 'Accessories',
-    stock: 50,
-    stockStatus: 'In Stock',
-    isUnlimited: false,
-    isFeatured: false,
-    taxIncluded: true,
-    createdAt: '2023-01-25',
-    updatedAt: '2023-02-05',
-    rating: 4.4,
-    reviewCount: 45,
-  },
-  {
-    id: 'p7',
-    name: 'Full HD Webcam',
-    description: '1080p webcam with microphone for video conferencing and streaming.',
-    price: 39.99,
-    images: ['/products/webcam.jpg'],
-    category: 'Electronics',
-    stock: 20,
-    stockStatus: 'In Stock',
-    isUnlimited: false,
-    isFeatured: true,
-    taxIncluded: true,
-    createdAt: '2023-02-01',
-    updatedAt: '2023-02-10',
-    rating: 4.3,
-    reviewCount: 67,
-  },
-  {
-    id: 'p8',
-    name: 'Smart LED Color Bulb',
-    description: 'Wi-Fi enabled color changing LED bulb controllable via app.',
-    price: 29.99,
-    discountPrice: 24.99,
-    images: ['/products/bulb.jpg'],
-    category: 'Electronics',
-    stock: 35,
-    stockStatus: 'In Stock',
-    isUnlimited: false,
-    isFeatured: false,
-    taxIncluded: true,
-    createdAt: '2023-02-05',
-    updatedAt: '2023-02-15',
-    rating: 4.7,
-    reviewCount: 92,
-  },
-];
-
-export const customers: Customer[] = [
-  {
-    id: 'cust1',
-    customerId: '#CUST001',
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    phone: '+1234567890',
-    avatar: '/customers/john.jpg',
-    address: '123 Main St, NY',
-    status: 'Active',
-    orders: 25,
-    totalSpend: 3450.00,
-    registrationDate: '2023-01-15',
-    lastPurchase: '2023-10-01',
-    socialMedia: ['facebook', 'twitter', 'instagram'],
-  },
-  {
-    id: 'cust2',
-    customerId: '#CUST002',
-    name: 'Jane Smith',
-    email: 'jane.smith@example.com',
-    phone: '+1234567890',
-    avatar: '/customers/jane.jpg',
-    address: '456 Elm St, CA',
-    status: 'Inactive',
-    orders: 5,
-    totalSpend: 250.00,
-    registrationDate: '2023-02-20',
-    lastPurchase: '2023-05-15',
-    socialMedia: ['facebook', 'instagram'],
-  },
-  {
-    id: 'cust3',
-    customerId: '#CUST003',
-    name: 'Emily Davis',
-    email: 'emily.davis@example.com',
-    phone: '+1234567890',
-    avatar: '/customers/emily.jpg',
-    address: '789 Oak St, TX',
-    status: 'VIP',
-    orders: 30,
-    totalSpend: 4600.00,
-    registrationDate: '2023-03-10',
-    lastPurchase: '2023-10-10',
-    socialMedia: ['twitter', 'instagram', 'linkedin'],
-  },
-];
-
-export const orders: Order[] = [
-  {
-    id: 'o1',
-    orderId: '#ORD0001',
-    customerId: 'cust1',
-    customerName: 'John Doe',
-    date: '2023-01-01',
-    products: [
-      {
-        id: 'op1',
-        productId: 'p1',
-        name: 'Wireless Bluetooth Headphones',
-        price: 49.99,
+  orders: [
+    {
+      id: '1',
+      userId: '1',
+      items: [{
+        id: '1',
+        productId: '1',
+        productName: 'Wireless Bluetooth Headphones',
+        productImage: '/placeholder.svg',
         quantity: 1,
-        image: '/products/headphones.jpg',
-      }
-    ],
-    total: 49.99,
-    status: 'Delivered',
-    paymentStatus: 'Paid',
-    paymentMethod: 'CC',
-  },
-  {
-    id: 'o2',
-    orderId: '#ORD0002',
-    customerId: 'cust1',
-    customerName: 'John Doe',
-    date: '2023-01-05',
-    products: [
-      {
-        id: 'op2',
-        productId: 'p2',
-        name: 'Men\'s T-Shirt',
-        price: 14.99,
-        quantity: 2,
-        image: '/products/tshirt.jpg',
-      }
-    ],
-    total: 29.98,
-    status: 'Pending',
-    paymentStatus: 'Unpaid',
-    paymentMethod: 'PayPal',
-  },
-  {
-    id: 'o3',
-    orderId: '#ORD0003',
-    customerId: 'cust2',
-    customerName: 'Jane Smith',
-    date: '2023-01-10',
-    products: [
-      {
-        id: 'op3',
-        productId: 'p3',
-        name: 'Men\'s Leather Wallet',
-        price: 49.99,
-        quantity: 1,
-        image: '/products/wallet.jpg',
-      }
-    ],
-    total: 49.99,
-    status: 'Cancelled',
-    paymentStatus: 'Unpaid',
-    paymentMethod: 'CC',
-  },
-  {
-    id: 'o4',
-    orderId: '#ORD0004',
-    customerId: 'cust3',
-    customerName: 'Emily Davis',
-    date: '2023-01-15',
-    products: [
-      {
-        id: 'op4',
-        productId: 'p4',
-        name: 'Memory Foam Pillow',
-        price: 39.99,
-        quantity: 1,
-        image: '/products/pillow.jpg',
-      }
-    ],
-    total: 39.99,
-    status: 'Shipped',
-    paymentStatus: 'Paid',
-    paymentMethod: 'Bank',
-  },
-];
+        price: 79.99,
+        total: 79.99
+      }],
+      total: 89.98,
+      subtotal: 79.99,
+      tax: 7.99,
+      shipping: 2.00,
+      status: 'delivered' as const,
+      paymentStatus: 'paid' as const,
+      paymentMethod: 'credit_card',
+      shippingAddress: {
+        street: '123 Main St',
+        city: 'New York',
+        state: 'NY',
+        zipCode: '10001',
+        country: 'USA'
+      },
+      billingAddress: {
+        street: '123 Main St',
+        city: 'New York',
+        state: 'NY',
+        zipCode: '10001',
+        country: 'USA'
+      },
+      createdAt: '2024-01-15T00:00:00Z',
+      updatedAt: '2024-01-20T00:00:00Z'
+    }
+  ] as Order[],
 
-export const transactions: Transaction[] = [
-  {
-    id: 't1',
-    orderId: '#ORD0001',
-    customerId: 'cust1',
-    customerName: 'John Doe',
-    date: '2023-01-01',
-    amount: 49.99,
-    status: 'Complete',
-    method: 'Credit Card',
-  },
-  {
-    id: 't2',
-    orderId: '#ORD0002',
-    customerId: 'cust1',
-    customerName: 'John Doe',
-    date: '2023-01-05',
-    amount: 29.98,
-    status: 'Pending',
-    method: 'PayPal',
-  },
-  {
-    id: 't3',
-    orderId: '#ORD0003',
-    customerId: 'cust2',
-    customerName: 'Jane Smith',
-    date: '2023-01-10',
-    amount: 49.99,
-    status: 'Canceled',
-    method: 'Credit Card',
-  },
-  {
-    id: 't4',
-    orderId: '#ORD0004',
-    customerId: 'cust3',
-    customerName: 'Emily Davis',
-    date: '2023-01-15',
-    amount: 39.99,
-    status: 'Complete',
-    method: 'Bank Transfer',
-  },
-];
+  customers: [
+    {
+      id: '1',
+      email: 'john.doe@example.com',
+      firstName: 'John',
+      lastName: 'Doe',
+      phone: '+1234567890',
+      addresses: [{
+        street: '123 Main St',
+        city: 'New York',
+        state: 'NY',
+        zipCode: '10001',
+        country: 'USA'
+      }],
+      totalOrders: 5,
+      totalSpent: 450.00,
+      status: 'active' as const,
+      createdAt: '2024-01-01T00:00:00Z'
+    }
+  ] as Customer[],
 
-export const dashboardData: Dashboard = {
-  totalSales: {
-    value: 350000,
-    percentage: 10.4,
-    previous: 235000,
-  },
-  totalOrders: {
-    value: 10700,
-    percentage: 14.4,
-    previous: 7600,
-  },
-  pendingOrders: 509,
-  canceledOrders: 94,
-  customerStats: {
-    total: 11040,
-    active: 25000,
-    repeat: 5600,
-    visitors: 250000,
-    conversionRate: 5.5,
-  },
-  topProducts: products.slice(0, 4),
-  recentTransactions: transactions,
-  bestSelling: [
-    { product: 'Apple iPhone 13', orders: 104, status: 'Stock', price: 999.00, image: '/products/iphone.jpg' },
-    { product: 'Nike Air Jordan', orders: 56, status: 'Stock out', price: 999.00, image: '/products/nike.jpg' },
-    { product: 'T-shirt', orders: 266, status: 'Stock', price: 999.00, image: '/products/tshirt.jpg' },
-    { product: 'Cross Bag', orders: 506, status: 'Stock', price: 999.00, image: '/products/bag.jpg' },
-  ],
-  salesByCountry: [
-    { country: 'US', value: 30000, percentage: 25.8 },
-    { country: 'Brazil', value: 30000, percentage: -19.8 },
-    { country: 'Australia', value: 25000, percentage: 35.8 },
-  ],
+  transactions: [
+    {
+      id: '1',
+      orderId: '1',
+      amount: 89.98,
+      type: 'payment' as const,
+      status: 'completed' as const,
+      paymentMethod: 'credit_card' as const,
+      createdAt: '2024-01-15T00:00:00Z'
+    }
+  ] as Transaction[],
+
+  categories: [
+    {
+      id: 'electronics',
+      name: 'Electronics',
+      description: 'Electronic devices and gadgets',
+      isActive: true,
+      sortOrder: 1,
+      createdAt: '2024-01-01T00:00:00Z',
+      updatedAt: '2024-01-01T00:00:00Z'
+    },
+    {
+      id: 'fashion',
+      name: 'Fashion',
+      description: 'Clothing and accessories',
+      isActive: true,
+      sortOrder: 2,
+      createdAt: '2024-01-01T00:00:00Z',
+      updatedAt: '2024-01-01T00:00:00Z'
+    }
+  ] as Category[],
+
+  brands: [
+    {
+      id: '1',
+      name: 'TechCorp',
+      description: 'Leading technology brand',
+      isActive: true,
+      createdAt: '2024-01-01T00:00:00Z'
+    }
+  ] as Brand[],
+
+  dashboardStats: {
+    totalRevenue: 125420.50,
+    totalOrders: 1247,
+    totalCustomers: 8934,
+    totalProducts: 456,
+    revenueGrowth: 15.2,
+    ordersGrowth: 8.7,
+    customersGrowth: 12.1,
+    productsGrowth: 3.4
+  } as DashboardStats,
+
+  salesData: Array.from({ length: 30 }, (_, i) => ({
+    date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    sales: Math.floor(Math.random() * 5000) + 1000,
+    orders: Math.floor(Math.random() * 50) + 10
+  })) as SalesData[],
+
+  topProducts: [
+    {
+      id: '1',
+      name: 'Wireless Bluetooth Headphones',
+      sales: 245,
+      revenue: 19599.55,
+      image: '/placeholder.svg'
+    },
+    {
+      id: '2',
+      name: 'Smart Fitness Watch',
+      sales: 189,
+      revenue: 37798.11,
+      image: '/placeholder.svg'
+    }
+  ] as TopProduct[]
 };

@@ -146,7 +146,7 @@ const App = () => {
                 </Route>
 
                 {/* Admin routes */}
-                <Route path="/admin" element={<ProtectedRoute adminOnly={true} />}>
+                <Route path="/admin/*" element={<ProtectedRoute adminOnly={true} />}>
                   <Route path="" element={
                     <ErrorBoundary>
                       <AdminLayout />
@@ -157,7 +157,6 @@ const App = () => {
                     <Route path="admin-role" element={<AdminRole />} />
                     <Route path="admin-authority" element={<AdminAuthority />} />
                     <Route path="products" element={<ProductsList />} />
-                    <Route path="products" element={<Products />} />
                     <Route path="products/add" element={<AddProduct />} />
                     <Route path="products/:id/edit" element={<EditProduct />} />
                     <Route path="products/list" element={<ProductsList />} />

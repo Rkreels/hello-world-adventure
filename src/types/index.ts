@@ -1,11 +1,14 @@
+
 export interface User {
   id: string;
-  name: string;
   email: string;
+  name: string;
   phone: string;
-  avatar?: string;
-  role: 'admin' | 'customer' | 'manager';
+  role: 'admin' | 'customer';
   status: 'active' | 'inactive';
+  avatar?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Product {
@@ -13,157 +16,150 @@ export interface Product {
   name: string;
   description: string;
   price: number;
-  discountPrice?: number;
-  discountedPrice?: number; // Added for compatibility
+  originalPrice?: number;
   images: string[];
   category: string;
-  categoryId?: string | number; // Added this field
-  categoryName?: string;
+  subcategory?: string;
+  brand?: string;
+  sku: string;
   stock: number;
-  stockStatus: 'In Stock' | 'Low Stock' | 'Out of Stock';
-  isUnlimited?: boolean;
-  isFeatured?: boolean;
-  featured?: boolean; // Added this field
-  taxIncluded?: boolean;
-  expirationStart?: string;
-  expirationEnd?: string;
+  rating: number;
+  reviews: number;
+  tags: string[];
+  isActive: boolean;
+  isFeatured: boolean;
   createdAt: string;
   updatedAt: string;
-  tags?: string[];
-  colors?: string[];
-  rating?: number;
-  ratings?: number;
-  reviewCount?: number;
-  status?: 'active' | 'inactive' | 'draft';
-  // Enhanced Product Variations
-  brand?: string;
-  sku?: string;
-  weight?: number;
-  dimensions?: string;
-  material?: string;
-  sizes?: string[];
-  style?: string;
-  pattern?: string;
-  occasion?: string;
-  season?: string;
-  ageGroup?: string;
-  gender?: string;
-  careInstructions?: string;
-  warranty?: string;
-  variants?: ProductVariant[];
-}
-
-export interface ProductVariant {
-  id?: string;
-  name: string;
-  price?: number;
-  stock?: number;
-  sku?: string;
-  attributes: Record<string, string>;
 }
 
 export interface Category {
   id: string;
   name: string;
-  description?: string; // Added this field
-  icon: string;
-  image?: string; // Added this field
-  productCount: number;
-  products?: number; // Added for compatibility
-  status?: 'active' | 'inactive'; // Added this field
-  createdAt?: string; // Added this field
-}
-
-export interface Brand {
-  id: number | string;
-  name: string;
-  products: number;
-  featured: boolean;
-  logo: string;
-  status: 'active' | 'inactive';
-}
-
-export interface Customer {
-  id: string;
-  customerId: string;
-  name: string;
-  email: string;
-  phone: string;
-  avatar?: string;
-  address?: string;
-  status: 'Active' | 'Inactive' | 'VIP';
-  orders: number;
-  totalSpend: number;
-  registrationDate: string;
-  lastPurchase?: string;
-  socialMedia?: string[];
+  description?: string;
+  image?: string;
+  parentId?: string;
+  isActive: boolean;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Order {
   id: string;
-  orderId: string;
-  customerId: string;
-  customerName: string;
-  date: string;
-  products: OrderProduct[];
+  userId: string;
+  items: OrderItem[];
   total: number;
-  status: 'Pending' | 'Completed' | 'Shipped' | 'Delivered' | 'Cancelled';
-  paymentStatus: 'Paid' | 'Unpaid';
-  paymentMethod: 'CC' | 'PayPal' | 'Bank' | 'Other';
+  subtotal: number;
+  tax: number;
+  shipping: number;
+  status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
+  paymentMethod: string;
+  shippingAddress: Address;
+  billingAddress: Address;
+  trackingNumber?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface OrderProduct {
+export interface OrderItem {
   id: string;
   productId: string;
-  name: string;
-  price: number;
+  productName: string;
+  productImage: string;
   quantity: number;
-  image?: string;
+  price: number;
+  total: number;
+}
+
+export interface Address {
+  street: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+}
+
+export interface Customer {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone?: string;
+  avatar?: string;
+  dateOfBirth?: string;
+  gender?: 'male' | 'female' | 'other';
+  addresses: Address[];
+  totalOrders: number;
+  totalSpent: number;
+  status: 'active' | 'inactive' | 'blocked';
+  createdAt: string;
+  lastLogin?: string;
 }
 
 export interface Transaction {
   id: string;
   orderId: string;
-  customerId: string;
-  customerName: string;
-  date: string;
   amount: number;
-  status: 'Complete' | 'Pending' | 'Canceled';
-  method: string;
+  type: 'payment' | 'refund';
+  status: 'pending' | 'completed' | 'failed';
+  paymentMethod: 'credit_card' | 'debit_card' | 'paypal' | 'bank_transfer' | 'cash';
+  transactionId?: string;
+  createdAt: string;
 }
 
-export interface Dashboard {
-  totalSales: {
-    value: number;
-    percentage: number;
-    previous: number;
-  };
-  totalOrders: {
-    value: number;
-    percentage: number;
-    previous: number;
-  };
-  pendingOrders: number;
-  canceledOrders: number;
-  customerStats: {
+export interface Brand {
+  id: string;
+  name: string;
+  description?: string;
+  logo?: string;
+  website?: string;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface ApiResponse<T> {
+  data: T;
+  message?: string;
+  success: boolean;
+  pagination?: {
+    page: number;
+    limit: number;
     total: number;
-    active: number;
-    repeat: number;
-    visitors: number;
-    conversionRate: number;
+    totalPages: number;
   };
-  topProducts: Product[];
-  recentTransactions: Transaction[];
-  bestSelling: {
-    product: string;
-    orders: number;
-    status: string;
-    price: number;
-    image?: string;
-  }[];
-  salesByCountry: {
-    country: string;
-    value: number;
-    percentage: number;
-  }[];
+}
+
+export interface PaginationParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface DashboardStats {
+  totalRevenue: number;
+  totalOrders: number;
+  totalCustomers: number;
+  totalProducts: number;
+  revenueGrowth: number;
+  ordersGrowth: number;
+  customersGrowth: number;
+  productsGrowth: number;
+}
+
+export interface SalesData {
+  date: string;
+  sales: number;
+  orders: number;
+}
+
+export interface TopProduct {
+  id: string;
+  name: string;
+  sales: number;
+  revenue: number;
+  image: string;
 }
