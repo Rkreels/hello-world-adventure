@@ -43,6 +43,7 @@ export const api = {
     return { data: product, success: true };
   },
 
+  // Products
   async createProduct(productData: Partial<Product>): Promise<ApiResponse<Product>> {
     await delay(800);
     const newProduct: Product = {
@@ -50,15 +51,43 @@ export const api = {
       name: productData.name || '',
       description: productData.description || '',
       price: productData.price || 0,
+      discountPrice: productData.discountPrice,
+      discountedPrice: productData.discountPrice, // Alias
+      originalPrice: productData.originalPrice,
       images: productData.images || ['/placeholder.svg'],
       category: productData.category || '',
+      categoryId: productData.categoryId,
+      subcategory: productData.subcategory,
+      brand: productData.brand,
       sku: productData.sku || `SKU-${Date.now()}`,
       stock: productData.stock || 0,
+      isUnlimited: productData.isUnlimited || false,
       rating: 0,
       reviews: 0,
+      reviewCount: 0, // Alias
       tags: productData.tags || [],
       isActive: productData.isActive !== false,
       isFeatured: productData.isFeatured || false,
+      featured: productData.isFeatured || false, // Alias
+      status: productData.status || 'active',
+      taxIncluded: productData.taxIncluded || true,
+      // Physical attributes
+      weight: productData.weight,
+      dimensions: productData.dimensions,
+      material: productData.material,
+      // Variants and options
+      colors: productData.colors || [],
+      sizes: productData.sizes || [],
+      style: productData.style,
+      pattern: productData.pattern,
+      occasion: productData.occasion,
+      season: productData.season,
+      ageGroup: productData.ageGroup,
+      gender: productData.gender,
+      // Care and warranty
+      careInstructions: productData.careInstructions,
+      warranty: productData.warranty,
+      variants: productData.variants || [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };

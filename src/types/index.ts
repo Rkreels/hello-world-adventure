@@ -17,17 +17,48 @@ export interface Product {
   description: string;
   price: number;
   originalPrice?: number;
+  discountPrice?: number;
+  discountedPrice?: number; // Alias for discountPrice
   images: string[];
   category: string;
+  categoryId?: string; // Alternative category reference
   subcategory?: string;
   brand?: string;
   sku: string;
   stock: number;
+  isUnlimited?: boolean;
   rating: number;
   reviews: number;
+  reviewCount?: number; // Alias for reviews
   tags: string[];
   isActive: boolean;
   isFeatured: boolean;
+  featured?: boolean; // Alias for isFeatured
+  status?: 'active' | 'inactive' | 'draft';
+  taxIncluded?: boolean;
+  // Physical attributes
+  weight?: number;
+  dimensions?: string;
+  material?: string;
+  // Variants and options
+  colors?: string[];
+  sizes?: string[];
+  style?: string;
+  pattern?: string;
+  occasion?: string;
+  season?: string;
+  ageGroup?: string;
+  gender?: string;
+  // Care and warranty
+  careInstructions?: string;
+  warranty?: string;
+  variants?: Array<{
+    name: string;
+    price?: number;
+    stock?: number;
+    sku?: string;
+    attributes: Record<string, string>;
+  }>;
   createdAt: string;
   updatedAt: string;
 }
@@ -39,9 +70,12 @@ export interface Category {
   image?: string;
   parentId?: string;
   isActive: boolean;
+  status?: 'active' | 'inactive';
   sortOrder: number;
+  products?: number; // Product count
+  productCount?: number; // Alias for products
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
 }
 
 export interface Order {
