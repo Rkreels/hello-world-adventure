@@ -201,6 +201,30 @@ export const mockData = {
       productCount: 0,
       createdAt: '2024-01-01T00:00:00Z',
       updatedAt: '2024-01-01T00:00:00Z'
+    },
+    {
+      id: 'home',
+      name: 'Home & Kitchen',
+      description: 'Home appliances and kitchen essentials',
+      isActive: true,
+      status: 'active' as const,
+      sortOrder: 3,
+      products: 0,
+      productCount: 0,
+      createdAt: '2024-01-01T00:00:00Z',
+      updatedAt: '2024-01-01T00:00:00Z'
+    },
+    {
+      id: 'sports',
+      name: 'Sports & Outdoors',
+      description: 'Sports equipment and outdoor gear',
+      isActive: true,
+      status: 'active' as const,
+      sortOrder: 4,
+      products: 0,
+      productCount: 0,
+      createdAt: '2024-01-01T00:00:00Z',
+      updatedAt: '2024-01-01T00:00:00Z'
     }
   ] as Category[],
 

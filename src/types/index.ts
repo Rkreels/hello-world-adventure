@@ -17,9 +17,11 @@ export interface Product {
   description: string;
   price: number;
   originalPrice?: number;
+  oldPrice?: number; // Alias for originalPrice
   discountPrice?: number;
   discountedPrice?: number; // Alias for discountPrice
   images: string[];
+  image?: string; // Single image alias
   category: string;
   categoryId?: string; // Alternative category reference
   subcategory?: string;
@@ -33,9 +35,11 @@ export interface Product {
   tags: string[];
   isActive: boolean;
   isFeatured: boolean;
+  isNew?: boolean; // New product indicator
   featured?: boolean; // Alias for isFeatured
   status?: 'active' | 'inactive' | 'draft';
   taxIncluded?: boolean;
+  discount?: number; // Discount percentage
   // Physical attributes
   weight?: number;
   dimensions?: string;

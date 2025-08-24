@@ -65,7 +65,7 @@ const Cart = () => {
                   <div className="flex-1">
                     <div className="flex justify-between">
                       <Link 
-                        to={`/product-detail/${item.id}`} 
+                        to={`/products/${item.id}`} 
                         className="font-medium hover:text-primary transition-colors"
                       >
                         {item.name}

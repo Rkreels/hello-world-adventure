@@ -13,7 +13,8 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { formatCurrency } from '@/lib/utils';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
+import { useProducts } from '@/hooks/useProducts';
 
 const productsData = [
   {
@@ -156,6 +157,7 @@ const brands = [
 ];
 
 const Shop = () => {
+  const { products: apiProducts, loading } = useProducts();
   const [searchParams, setSearchParams] = useSearchParams();
   const [view, setView] = useState<'grid' | 'list'>(searchParams.get('view') as 'grid' | 'list' || 'grid');
   const [priceRange, setPriceRange] = useState([
@@ -176,8 +178,11 @@ const Shop = () => {
   const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page') || '1'));
   const productsPerPage = 9;
   
+  // Use API products if available, otherwise fallback to static data
+  const allProducts = apiProducts.length > 0 ? apiProducts : productsData;
+  
   useEffect(() => {
-    let filtered = [...productsData];
+    let filtered = [...allProducts];
     
     if (selectedCategories.length > 0) {
       filtered = filtered.filter(product => 
@@ -207,7 +212,11 @@ const Shop = () => {
         filtered.sort((a, b) => b.price - a.price);
         break;
       case 'newest':
-        filtered.sort((a, b) => (a.isNew === b.isNew) ? 0 : a.isNew ? -1 : 1);
+        filtered.sort((a, b) => {
+          const aIsNew = (a as any).isNew || false;
+          const bIsNew = (b as any).isNew || false;
+          return (aIsNew === bIsNew) ? 0 : aIsNew ? -1 : 1;
+        });
         break;
       case 'rating':
         filtered.sort((a, b) => b.rating - a.rating);
@@ -217,7 +226,7 @@ const Shop = () => {
         break;
     }
     
-    setFilteredProducts(filtered);
+    setFilteredProducts(filtered as any);
     
     const params: Record<string, string> = {};
     
@@ -231,7 +240,7 @@ const Shop = () => {
     if (currentPage > 1) params.page = currentPage.toString();
     
     setSearchParams(params);
-  }, [view, priceRange, sortBy, selectedCategories, selectedBrands, minRating, currentPage]);
+  }, [view, priceRange, sortBy, selectedCategories, selectedBrands, minRating, currentPage, allProducts]);
   
   const handleCategoryChange = (category: string, checked: boolean) => {
     setSelectedCategories(prev => {
@@ -262,17 +271,11 @@ const Shop = () => {
   };
   
   const handleAddToCart = (productId: number) => {
-    toast({
-      title: "Added to cart",
-      description: "Product added to your cart successfully",
-    });
+    toast.success("Product added to cart successfully");
   };
   
   const handleAddToWishlist = (productId: number) => {
-    toast({
-      title: "Added to wishlist",
-      description: "Product added to your wishlist",
-    });
+    toast.success("Product added to wishlist");
   };
   
   const indexOfLastProduct = currentPage * productsPerPage;
@@ -448,7 +451,7 @@ const Shop = () => {
                         >
                           <Heart className="h-4 w-4" />
                         </Button>
-                        {product.isNew && (
+                        {(product as any).isNew && (
                           <div className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
                             New
                           </div>
@@ -469,11 +472,11 @@ const Shop = () => {
                         <p className="text-sm text-gray-500">{product.brand}</p>
                       </div>
                       
-                      <div className="flex items-center mb-3">
-                        <span className="text-lg font-semibold">{formatCurrency(product.price)}</span>
-                        <span className="text-sm text-gray-500 line-through ml-2">{formatCurrency(product.oldPrice)}</span>
-                        <span className="text-xs text-green-600 ml-2">-{product.discount}% OFF</span>
-                      </div>
+                       <div className="flex items-center mb-3">
+                         <span className="text-lg font-semibold">{formatCurrency(product.price)}</span>
+                         <span className="text-sm text-gray-500 line-through ml-2">{formatCurrency((product as any).oldPrice || 0)}</span>
+                         <span className="text-xs text-green-600 ml-2">-{(product as any).discount || 0}% OFF</span>
+                       </div>
                       
                       <div className="flex space-x-2">
                         <Button variant="outline" size="sm" className="flex-1">
@@ -532,7 +535,7 @@ const Shop = () => {
                           >
                             <Heart className="h-4 w-4" />
                           </Button>
-                          {product.isNew && (
+                          {(product as any).isNew && (
                             <div className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
                               New
                             </div>
@@ -559,11 +562,11 @@ const Shop = () => {
                             Perfect for everyday use with excellent customer reviews.
                           </p>
                           
-                          <div className="flex items-center mb-3">
-                            <span className="text-lg font-semibold">{formatCurrency(product.price)}</span>
-                            <span className="text-sm text-gray-500 line-through ml-2">{formatCurrency(product.oldPrice)}</span>
-                            <span className="text-xs text-green-600 ml-2">-{product.discount}% OFF</span>
-                          </div>
+                           <div className="flex items-center mb-3">
+                             <span className="text-lg font-semibold">{formatCurrency(product.price)}</span>
+                             <span className="text-sm text-gray-500 line-through ml-2">{formatCurrency((product as any).oldPrice || 0)}</span>
+                             <span className="text-xs text-green-600 ml-2">-{(product as any).discount || 0}% OFF</span>
+                           </div>
                           
                           <div className="flex space-x-2">
                             <Button variant="outline" size="sm">

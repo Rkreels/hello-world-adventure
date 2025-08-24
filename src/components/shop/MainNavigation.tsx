@@ -1,9 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { 
   Search, 
   ShoppingCart, 
@@ -11,15 +11,19 @@ import {
   User, 
   Menu,
   Phone,
-  Mail
+  Mail,
+  X
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/hooks/useCart';
+import SearchBar from './SearchBar';
+import UserMenu from './UserMenu';
 
 const MainNavigation = () => {
   const { isAuthenticated, user } = useAuth();
   const { items } = useCart();
   const navigate = useNavigate();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
@@ -59,20 +63,13 @@ const MainNavigation = () => {
 
             {/* Search Bar */}
             <div className="flex-1 max-w-xl mx-8 hidden md:block">
-              <div className="relative">
-                <Input
-                  type="text"
-                  placeholder="Search products..."
-                  className="pl-10 pr-4"
-                />
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              </div>
+              <SearchBar />
             </div>
 
             {/* Right Navigation */}
             <div className="flex items-center space-x-4">
-              {/* Wishlist */}
-              <Button variant="ghost" size="sm" className="relative">
+              {/* Wishlist - Hidden on mobile */}
+              <Button variant="ghost" size="sm" className="relative hidden md:flex">
                 <Heart className="w-5 h-5" />
                 <Badge 
                   variant="destructive" 
@@ -100,29 +97,83 @@ const MainNavigation = () => {
                 )}
               </Button>
 
-              {/* User Menu */}
-              {isAuthenticated ? (
-                <div className="flex items-center space-x-2">
-                  <Button variant="ghost" size="sm">
-                    <User className="w-5 h-5 mr-2" />
-                    {user?.name?.split(' ')[0] || 'Account'}
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-2">
-                  <Button variant="ghost" size="sm" asChild>
-                    <Link to="/login">Login</Link>
-                  </Button>
-                  <Button size="sm" asChild>
-                    <Link to="/register">Sign Up</Link>
-                  </Button>
-                </div>
-              )}
+              {/* Desktop User Menu */}
+              <div className="hidden md:block">
+                <UserMenu />
+              </div>
 
               {/* Mobile Menu */}
-              <Button variant="ghost" size="sm" className="md:hidden">
-                <Menu className="w-5 h-5" />
-              </Button>
+              <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="sm" className="md:hidden">
+                    <Menu className="w-5 h-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-80">
+                  <div className="flex flex-col h-full">
+                    <div className="flex items-center justify-between pb-4 border-b">
+                      <Link to="/" className="flex items-center space-x-2" onClick={() => setIsMobileMenuOpen(false)}>
+                        <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
+                          <span className="text-white font-bold">E</span>
+                        </div>
+                        <span className="text-xl font-bold">E-Commerce</span>
+                      </Link>
+                    </div>
+                    
+                    {/* Mobile Search */}
+                    <div className="py-4 border-b">
+                      <SearchBar />
+                    </div>
+                    
+                    {/* Mobile Navigation Links */}
+                    <nav className="flex-1 py-4">
+                      <div className="space-y-2">
+                        <Link 
+                          to="/shop" 
+                          className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          Shop
+                        </Link>
+                        <Link 
+                          to="/categories" 
+                          className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          Categories
+                        </Link>
+                        <Link 
+                          to="/deals" 
+                          className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          Deals
+                        </Link>
+                        <Link 
+                          to="/new-arrivals" 
+                          className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          New Arrivals
+                        </Link>
+                      </div>
+                      
+                      {/* Mobile Wishlist */}
+                      <div className="mt-4 px-4 py-2 border-t">
+                        <Button variant="ghost" className="w-full justify-start">
+                          <Heart className="w-5 h-5 mr-2" />
+                          Wishlist (0)
+                        </Button>
+                      </div>
+                    </nav>
+                    
+                    {/* Mobile User Section */}
+                    <div className="border-t pt-4">
+                      <UserMenu />
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
             </div>
           </div>
         </div>

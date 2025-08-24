@@ -29,10 +29,9 @@ const SearchBar = () => {
         <Button 
           type="submit" 
           size="sm"
-          className="absolute right-0 rounded-l-none bg-gray-100 hover:bg-gray-200 text-gray-700"
+          className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 px-3 bg-blue-600 hover:bg-blue-700"
         >
           <Search className="h-4 w-4" />
-          <span className="ml-1">Search</span>
         </Button>
       </div>
     </form>

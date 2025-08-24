@@ -59,7 +59,7 @@ const Index = () => {
           <CardContent className="p-0">
             <div className="p-4 flex justify-between items-center">
               <h2 className="text-xl font-bold">Gaming accessories</h2>
-              <Link to="/category/gaming" className="text-purple-600 text-sm">
+              <Link to="/category/electronics" className="text-purple-600 text-sm">
                 See more
               </Link>
             </div>
