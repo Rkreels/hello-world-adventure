@@ -86,11 +86,15 @@ const InventoryManagement = () => {
     return <Badge variant="default" className="bg-green-500">In Stock</Badge>;
   };
 
+  const handleAddStock = () => {
+    toast.info('Add stock functionality - Coming soon');
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">Inventory Management</h2>
-        <Button>
+        <Button onClick={handleAddStock}>
           <Plus className="h-4 w-4 mr-2" />
           Add Stock
         </Button>

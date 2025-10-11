@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,11 @@ import { toast } from 'sonner';
 const OrderDetail = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
-  const { orders, updateOrderStatus } = useAdminStore();
+  const { orders, updateOrderStatus, initializeData } = useAdminStore();
+
+  useEffect(() => {
+    initializeData();
+  }, [initializeData]);
   
   const order = orders.find(o => o.id === orderId);
   

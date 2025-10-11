@@ -172,12 +172,12 @@ const Products = () => {
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-2">
                       <Button variant="ghost" size="sm" asChild>
-                        <Link to={`/product-detail/${product.id}`}>
+                        <Link to={`/products/${product.id}`}>
                           <Eye className="h-4 w-4" />
                         </Link>
                       </Button>
                       <Button variant="ghost" size="sm" asChild>
-                        <Link to={`/admin/edit-product/${product.id}`}>
+                        <Link to={`/admin/products/${product.id}/edit`}>
                           <Edit className="h-4 w-4" />
                         </Link>
                       </Button>

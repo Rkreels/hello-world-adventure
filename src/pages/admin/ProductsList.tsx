@@ -216,7 +216,14 @@ const ProductsList = () => {
                     <TableCell>{getStatusBadge(product.status)}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Button size="sm" variant="ghost">
+                        <Button 
+                          size="sm" 
+                          variant="ghost"
+                          onClick={() => {
+                            toast.info(`Viewing ${product.name}`);
+                            // Navigate to product view or show details
+                          }}
+                        >
                           <Eye className="h-4 w-4" />
                         </Button>
                         <Button size="sm" variant="ghost" onClick={() => handleEditProduct(product)}>

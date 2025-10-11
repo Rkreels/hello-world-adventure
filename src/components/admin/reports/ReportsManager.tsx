@@ -145,6 +145,11 @@ const ReportsManager = () => {
               </ResponsiveContainer>
             </CardContent>
           </Card>
+
+          <Button onClick={() => handleExportReport('Product')} className="w-full">
+            <Download className="h-4 w-4 mr-2" />
+            Export Product Report
+          </Button>
         </TabsContent>
 
         <TabsContent value="customers" className="space-y-4">
@@ -157,6 +162,11 @@ const ReportsManager = () => {
               </div>
             </CardContent>
           </Card>
+
+          <Button onClick={() => handleExportReport('Customer')} className="w-full">
+            <Download className="h-4 w-4 mr-2" />
+            Export Customer Report
+          </Button>
         </TabsContent>
 
         <TabsContent value="inventory" className="space-y-4">
@@ -169,6 +179,11 @@ const ReportsManager = () => {
               </div>
             </CardContent>
           </Card>
+
+          <Button onClick={() => handleExportReport('Inventory')} className="w-full">
+            <Download className="h-4 w-4 mr-2" />
+            Export Inventory Report
+          </Button>
         </TabsContent>
       </Tabs>
     </div>
