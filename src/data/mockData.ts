@@ -21,7 +21,7 @@ export const mockData = {
       originalPrice: 99.99,
       discountPrice: 69.99,
       discountedPrice: 69.99,
-      images: ['/placeholder.svg'],
+      images: ['https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80'],
       category: 'Electronics',
       categoryId: 'electronics',
       brand: 'TechSound',
@@ -62,7 +62,7 @@ export const mockData = {
       originalPrice: 249.99,
       discountPrice: 179.99,
       discountedPrice: 179.99,
-      images: ['/placeholder.svg'],
+      images: ['https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80'],
       category: 'Electronics',
       categoryId: 'electronics',
       brand: 'FitTech',
@@ -113,7 +113,7 @@ export const mockData = {
         id: '1',
         productId: '1',
         productName: 'Wireless Bluetooth Headphones',
-        productImage: '/placeholder.svg',
+        productImage: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80',
         quantity: 1,
         price: 79.99,
         total: 79.99
@@ -261,14 +261,14 @@ export const mockData = {
       name: 'Wireless Bluetooth Headphones',
       sales: 245,
       revenue: 19599.55,
-      image: '/placeholder.svg'
+      image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80'
     },
     {
       id: '2',
       name: 'Smart Fitness Watch',
       sales: 189,
       revenue: 37798.11,
-      image: '/placeholder.svg'
+      image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80'
     }
   ] as TopProduct[]
 };

@@ -6,7 +6,7 @@ import { voiceTrainer } from '@/services/voiceTrainer';
 import { toast } from 'sonner';
 
 const VoiceTrainer = () => {
-  const [isVoiceEnabled, setIsVoiceEnabled] = useState(true);
+  const [isVoiceEnabled, setIsVoiceEnabled] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentElement, setCurrentElement] = useState<string | null>(null);
   const lastElementRef = useRef<HTMLElement | null>(null);

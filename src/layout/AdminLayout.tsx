@@ -47,6 +47,25 @@ const AdminLayout = () => {
           </div>
         </div>
         
+        {/* Desktop Header with Master Dashboard */}
+        <div className="hidden md:block bg-white border-b border-gray-200 p-4">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between gap-4">
+              <a 
+                href="https://skillsim.vercel.app/dashboard" 
+                target="_self"
+              >
+                <Button variant="default" size="sm" className="bg-primary hover:bg-primary/90">
+                  Master Dashboard
+                </Button>
+              </a>
+              <div className="text-sm text-gray-600">
+                Welcome, {user?.name || 'Admin'}
+              </div>
+            </div>
+          </div>
+        </div>
+        
         {/* Page content */}
         <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-auto">
           <div className="max-w-7xl mx-auto">

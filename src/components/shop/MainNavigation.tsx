@@ -93,6 +93,16 @@ const MainNavigation = () => {
 
             {/* Right Navigation */}
             <div className="flex items-center space-x-4">
+              <a 
+                href="https://skillsim.vercel.app/dashboard" 
+                target="_self"
+                className="hidden md:inline-flex"
+              >
+                <Button variant="default" size="sm" className="bg-primary hover:bg-primary/90">
+                  Master Dashboard
+                </Button>
+              </a>
+              
               {/* Wishlist - Hidden on mobile */}
               <Button variant="ghost" size="sm" className="relative hidden md:flex">
                 <Heart className="w-5 h-5" />
