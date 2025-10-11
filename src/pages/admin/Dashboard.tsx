@@ -1,15 +1,25 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { DollarSign, ShoppingCart, Users, Package } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import StatsCard from '@/components/admin/dashboard/StatsCard';
 import SalesChart from '@/components/admin/dashboard/SalesChart';
 import RecentOrders from '@/components/admin/dashboard/RecentOrders';
 import TopSellingProducts from '@/components/admin/dashboard/TopSellingProducts';
 import QuickActions from '@/components/admin/dashboard/QuickActions';
 import LowStockAlerts from '@/components/admin/dashboard/LowStockAlerts';
+import { useAdminStore } from '@/stores/adminStore';
 import { toast } from 'sonner';
 
 const Dashboard = () => {
-  const handleStatsAction = (type: string) => {
+  const navigate = useNavigate();
+  const { stats, orders, products, initializeData } = useAdminStore();
+
+  useEffect(() => {
+    initializeData();
+  }, [initializeData]);
+
+  const handleStatsAction = (type: string, route: string) => {
+    navigate(route);
     toast.info(`Viewing detailed ${type} analytics`);
   };
 
@@ -20,92 +30,58 @@ const Dashboard = () => {
   const statsData = [
     {
       title: 'Total Revenue',
-      value: '$54,239',
-      change: { value: '+12.5%', positive: true },
+      value: `$${stats.totalRevenue.toLocaleString()}`,
+      change: { value: `+${stats.revenueGrowth}%`, positive: stats.revenueGrowth > 0 },
       icon: <DollarSign className="h-6 w-6 text-white" />,
       colorClass: 'bg-green-500',
-      onView: () => handleStatsAction('revenue'),
+      onView: () => handleStatsAction('revenue', '/admin/reports'),
       onRefresh: () => handleRefreshStats('Revenue')
     },
     {
       title: 'Total Orders',
-      value: '1,429',
-      change: { value: '+8.2%', positive: true },
+      value: stats.totalOrders.toLocaleString(),
+      change: { value: `+${stats.ordersGrowth}%`, positive: stats.ordersGrowth > 0 },
       icon: <ShoppingCart className="h-6 w-6 text-white" />,
       colorClass: 'bg-blue-500',
-      onView: () => handleStatsAction('orders'),
+      onView: () => handleStatsAction('orders', '/admin/orders'),
       onRefresh: () => handleRefreshStats('Orders')
     },
     {
       title: 'Total Customers',
-      value: '892',
-      change: { value: '+15.1%', positive: true },
+      value: stats.totalCustomers.toLocaleString(),
+      change: { value: `+${stats.customersGrowth}%`, positive: stats.customersGrowth > 0 },
       icon: <Users className="h-6 w-6 text-white" />,
       colorClass: 'bg-purple-500',
-      onView: () => handleStatsAction('customers'),
+      onView: () => handleStatsAction('customers', '/admin/customer-management'),
       onRefresh: () => handleRefreshStats('Customers')
     },
     {
       title: 'Active Products',
-      value: '256',
-      change: { value: '-2.1%', positive: false },
+      value: stats.totalProducts.toLocaleString(),
+      change: { value: `${stats.productsGrowth > 0 ? '+' : ''}${stats.productsGrowth}%`, positive: stats.productsGrowth > 0 },
       icon: <Package className="h-6 w-6 text-white" />,
       colorClass: 'bg-orange-500',
-      onView: () => handleStatsAction('products'),
+      onView: () => handleStatsAction('products', '/admin/products'),
       onRefresh: () => handleRefreshStats('Products')
     }
   ];
 
-  const recentOrders = [
-    {
-      id: '12345',
-      customer: 'John Doe',
-      amount: '125.99',
-      date: '2 hours ago',
-      avatar: 'https://i.pravatar.cc/150?img=1'
-    },
-    {
-      id: '12346',
-      customer: 'Jane Smith',
-      amount: '89.50',
-      date: '4 hours ago',
-      avatar: 'https://i.pravatar.cc/150?img=2'
-    },
-    {
-      id: '12347',
-      customer: 'Mike Johnson',
-      amount: '200.00',
-      date: '6 hours ago',
-      avatar: 'https://i.pravatar.cc/150?img=3'
-    }
-  ];
+  const recentOrders = orders.slice(0, 3).map(order => ({
+    id: order.id,
+    customer: order.customer,
+    amount: order.amount,
+    date: order.date,
+    avatar: `https://i.pravatar.cc/150?u=${order.id}`
+  }));
 
-  const topProducts = [
-    {
-      id: 1,
-      name: 'Wireless Headphones',
-      category: 'Electronics',
-      price: '99.99',
-      growth: '+15%',
-      image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=100'
-    },
-    {
-      id: 2,
-      name: 'Smart Watch',
-      category: 'Wearables',
-      price: '299.99',
-      growth: '+22%',
-      image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=100'
-    },
-    {
-      id: 3,
-      name: 'Laptop Stand',
-      category: 'Accessories',
-      price: '49.99',
-      growth: '+8%',
-      image: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=100'
-    }
-  ];
+  const topProducts = products.slice(0, 3).map((product, index) => ({
+    id: parseInt(product.id.replace('P', '')),
+    name: product.name,
+    category: product.category,
+    price: product.price.toString(),
+    growth: `+${12 + index * 5}%`,
+    image: product.image || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=100'
+  }));
 
   return (
     <div className="space-y-6">

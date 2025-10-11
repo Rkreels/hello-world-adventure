@@ -3,7 +3,16 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { TrendingUp, MoreHorizontal } from 'lucide-react';
+import { TrendingUp, Eye } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { MoreHorizontal } from 'lucide-react';
 
 interface Product {
   id: number;
@@ -19,14 +28,43 @@ interface TopSellingProductsProps {
 }
 
 const TopSellingProducts = ({ products }: TopSellingProductsProps) => {
+  const navigate = useNavigate();
+
+  const handleViewAllProducts = () => {
+    navigate('/admin/products');
+    toast.info('Viewing all products');
+  };
+
+  const handleExportData = () => {
+    toast.info('Exporting product data...');
+  };
+
+  const handleProductClick = (productId: number, productName: string) => {
+    navigate(`/admin/products/P00${productId}/edit`);
+    toast.info(`Viewing ${productName}`);
+  };
+
   return (
     <Card>
       <CardContent className="p-6">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-medium">Top Products</h3>
-          <Button variant="ghost" size="sm">
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={handleViewAllProducts}>
+                <Eye className="mr-2 h-4 w-4" />
+                View All Products
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleExportData}>
+                Export Data
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         
         <Tabs defaultValue="weekly">
@@ -38,13 +76,17 @@ const TopSellingProducts = ({ products }: TopSellingProductsProps) => {
           
           <TabsContent value="weekly" className="space-y-4 mt-0">
             {products.map(product => (
-              <div key={product.id} className="flex items-center justify-between">
+              <div 
+                key={product.id} 
+                className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors"
+                onClick={() => handleProductClick(product.id, product.name)}
+              >
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded bg-gray-100 flex items-center justify-center">
+                  <div className="h-10 w-10 rounded bg-gray-100 flex items-center justify-center overflow-hidden">
                     <img 
                       src={product.image} 
                       alt={product.name} 
-                      className="h-8 w-8 object-cover" 
+                      className="h-full w-full object-cover" 
                     />
                   </div>
                   <div>

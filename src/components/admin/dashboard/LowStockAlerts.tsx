@@ -3,9 +3,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, Package, CheckCircle } from 'lucide-react';
 import { useAdminStore } from '@/stores/adminStore';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 const LowStockAlerts = () => {
+  const navigate = useNavigate();
   const { lowStockAlerts, removeLowStockAlert } = useAdminStore();
 
   const handleRestock = (productId: string, productName: string) => {
@@ -13,6 +15,11 @@ const LowStockAlerts = () => {
     toast.success(`${productName} restocked successfully`, {
       description: 'Stock levels have been updated and alert resolved'
     });
+  };
+
+  const handleViewAllAlerts = () => {
+    navigate('/admin/inventory');
+    toast.info('Viewing all inventory alerts');
   };
 
   if (lowStockAlerts.length === 0) {
@@ -82,7 +89,12 @@ const LowStockAlerts = () => {
               <p className="text-sm text-gray-500">
                 +{lowStockAlerts.length - 5} more items need restocking
               </p>
-              <Button variant="link" size="sm" className="text-orange-600 hover:text-orange-700">
+              <Button 
+                variant="link" 
+                size="sm" 
+                className="text-orange-600 hover:text-orange-700"
+                onClick={handleViewAllAlerts}
+              >
                 View all alerts
               </Button>
             </div>
