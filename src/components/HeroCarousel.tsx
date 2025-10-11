@@ -94,22 +94,6 @@ const HeroCarousel = () => {
         </div>
       ))}
       
-      {/* Navigation Buttons */}
-      <button
-        onClick={prevSlide}
-        className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 bg-white/30 backdrop-blur-sm hover:bg-white/50 text-white p-3 md:p-4 rounded-full transition-all hover-scale shadow-lg z-10"
-        aria-label="Previous slide"
-      >
-        <ChevronLeft size={28} />
-      </button>
-      
-      <button
-        onClick={nextSlide}
-        className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 bg-white/30 backdrop-blur-sm hover:bg-white/50 text-white p-3 md:p-4 rounded-full transition-all hover-scale shadow-lg z-10"
-        aria-label="Next slide"
-      >
-        <ChevronRight size={28} />
-      </button>
       
       {/* Slide Indicators */}
       <div className="absolute bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 flex space-x-3 z-10">
