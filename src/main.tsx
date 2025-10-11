@@ -4,6 +4,7 @@ import App from './App.tsx'
 import './index.css'
 
 // Add meta tags for SEO
+console.log('🌐 Setting up application metadata...');
 document.title = 'E-Commerce CMS - Admin Panel';
 const metaDescription = document.createElement('meta');
 metaDescription.name = 'description';
@@ -15,4 +16,5 @@ metaViewport.name = 'viewport';
 metaViewport.content = 'width=device-width, initial-scale=1.0';
 document.head.appendChild(metaViewport);
 
+console.log('🎯 Mounting React application...');
 createRoot(document.getElementById("root")!).render(<App />);

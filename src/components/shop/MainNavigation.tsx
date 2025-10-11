@@ -20,8 +20,33 @@ import SearchBar from './SearchBar';
 import UserMenu from './UserMenu';
 
 const MainNavigation = () => {
-  const { isAuthenticated, user } = useAuth();
-  const { items } = useCart();
+  console.log('🧭 MainNavigation: Rendering...');
+  
+  // Add error boundary for auth context
+  let authData;
+  try {
+    authData = useAuth();
+  } catch (error) {
+    console.error('❌ MainNavigation: Auth context error:', error);
+    // Fallback when auth context is not available
+    authData = {
+      user: null,
+      isAuthenticated: false,
+      isAdmin: false
+    };
+  }
+
+  const { isAuthenticated, user } = authData;
+  
+  let cartData;
+  try {
+    cartData = useCart();
+  } catch (error) {
+    console.error('❌ MainNavigation: Cart hook error:', error);
+    cartData = { items: [] };
+  }
+  
+  const { items } = cartData;
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);

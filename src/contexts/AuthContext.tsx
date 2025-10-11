@@ -35,19 +35,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    console.log('🔐 AuthProvider: Initializing...');
     // Check for existing session
-    const checkAuth = async () => {
+    const checkAuth = () => {
       try {
         const savedUser = localStorage.getItem('user');
         if (savedUser) {
           const userData = JSON.parse(savedUser);
+          console.log('✅ AuthProvider: User found in localStorage', userData);
           setUser(userData);
+        } else {
+          console.log('ℹ️ AuthProvider: No user in localStorage');
         }
       } catch (error) {
-        console.error('Error checking auth:', error);
+        console.error('❌ AuthProvider: Error checking auth:', error);
         localStorage.removeItem('user');
       } finally {
-        setIsLoading(false);
+        // Set a minimal timeout to ensure smooth loading
+        setTimeout(() => {
+          console.log('✅ AuthProvider: Initialization complete');
+          setIsLoading(false);
+        }, 100);
       }
     };
 
@@ -146,13 +154,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Don't render children until auth check is complete
   if (isLoading) {
+    console.log('⏳ AuthProvider: Showing loading screen...');
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600"></div>
+          <p className="text-gray-600 text-lg font-medium">Loading...</p>
+        </div>
       </div>
     );
   }
 
+  console.log('✅ AuthProvider: Rendering children');
   return (
     <AuthContext.Provider value={value}>
       {children}

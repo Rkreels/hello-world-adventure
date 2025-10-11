@@ -5,6 +5,8 @@ import CategoryNavigation from '@/components/shop/CategoryNavigation';
 import Footer from '@/components/shop/Footer';
 
 const ShopLayout = () => {
+  console.log('🏪 ShopLayout: Rendering...');
+  
   return (
     <div className="min-h-screen flex flex-col">
       <MainNavigation />

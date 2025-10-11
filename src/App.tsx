@@ -91,15 +91,19 @@ const ScrollToTop = () => {
 const App = () => {
   // Handle base path for production
   const basename = import.meta.env.PROD ? '/ecommerce' : '';
+  
+  console.log('🚀 App: Starting application...');
+  console.log('📁 Basename:', basename);
 
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <BrowserRouter basename={basename}>
-            <AuthProvider>
-              <ScrollToTop />
-              <Routes>
+            <ErrorBoundary>
+              <AuthProvider>
+                <ScrollToTop />
+                <Routes>
                 {/* Shop routes */}
                 <Route path="/" element={
                   <ErrorBoundary>
@@ -183,9 +187,10 @@ const App = () => {
                 {/* 404 route */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              <Toaster />
+              <Sonner />
             </AuthProvider>
-            <Toaster />
-            <Sonner />
+            </ErrorBoundary>
           </BrowserRouter>
         </TooltipProvider>
       </QueryClientProvider>
