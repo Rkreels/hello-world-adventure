@@ -12,7 +12,7 @@ const TrendingProducts = () => {
       name: 'Wireless Bluetooth Headphones',
       price: 79.99,
       originalPrice: 99.99,
-      image: '/placeholder.svg',
+      image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80',
       rating: 4.5,
       reviews: 128
     },
@@ -21,7 +21,7 @@ const TrendingProducts = () => {
       name: 'Smart Fitness Watch',
       price: 199.99,
       originalPrice: 249.99,
-      image: '/placeholder.svg',
+      image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80',
       rating: 4.8,
       reviews: 256
     },
@@ -30,7 +30,7 @@ const TrendingProducts = () => {
       name: 'Portable Bluetooth Speaker',
       price: 49.99,
       originalPrice: 69.99,
-      image: '/placeholder.svg',
+      image: 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=800&q=80',
       rating: 4.3,
       reviews: 89
     },
@@ -39,7 +39,7 @@ const TrendingProducts = () => {
       name: 'USB-C Fast Charger',
       price: 24.99,
       originalPrice: 34.99,
-      image: '/placeholder.svg',
+      image: 'https://images.unsplash.com/photo-1591290619762-cfc9cd7e67e6?w=800&q=80',
       rating: 4.6,
       reviews: 145
     }

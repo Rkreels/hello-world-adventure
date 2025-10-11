@@ -9,7 +9,7 @@ const CustomerReviews = () => {
     {
       id: 1,
       name: 'Sarah Johnson',
-      avatar: '/placeholder.svg',
+      avatar: 'https://i.pravatar.cc/150?img=1',
       rating: 5,
       comment: 'Amazing products and fast delivery! Highly recommend this store.',
       product: 'Wireless Headphones',
@@ -18,7 +18,7 @@ const CustomerReviews = () => {
     {
       id: 2,
       name: 'Mike Chen',
-      avatar: '/placeholder.svg',
+      avatar: 'https://i.pravatar.cc/150?img=12',
       rating: 5,
       comment: 'Great customer service and quality products. Will shop again!',
       product: 'Smart Watch',
@@ -27,7 +27,7 @@ const CustomerReviews = () => {
     {
       id: 3,
       name: 'Emily Davis',
-      avatar: '/placeholder.svg',
+      avatar: 'https://i.pravatar.cc/150?img=5',
       rating: 4,
       comment: 'Good value for money. The item arrived exactly as described.',
       product: 'Bluetooth Speaker',

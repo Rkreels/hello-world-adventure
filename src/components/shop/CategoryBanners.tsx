@@ -11,7 +11,7 @@ const CategoryBanners = () => {
       title: 'Gaming Zone',
       subtitle: 'Level up your game',
       description: 'Discover the latest gaming accessories and gear',
-      image: '/placeholder.svg',
+      image: 'https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?w=400&q=80',
       link: '/category/gaming',
       bgColor: 'bg-gradient-to-r from-purple-500 to-blue-600'
     },
@@ -20,7 +20,7 @@ const CategoryBanners = () => {
       title: 'Fashion Forward',
       subtitle: 'Style meets comfort',
       description: 'Trending fashion for every season',
-      image: '/placeholder.svg',
+      image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&q=80',
       link: '/category/fashion',
       bgColor: 'bg-gradient-to-r from-pink-500 to-rose-600'
     }

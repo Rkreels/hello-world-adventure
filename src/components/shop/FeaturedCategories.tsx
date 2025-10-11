@@ -8,25 +8,25 @@ const FeaturedCategories = () => {
     {
       id: 'electronics',
       name: 'Electronics',
-      image: '/placeholder.svg',
+      image: 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=400&q=80',
       itemCount: 245
     },
     {
       id: 'fashion',
       name: 'Fashion',
-      image: '/placeholder.svg',
+      image: 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&q=80',
       itemCount: 180
     },
     {
       id: 'home',
       name: 'Home & Garden',
-      image: '/placeholder.svg',
+      image: 'https://images.unsplash.com/photo-1556912173-46c336c7fd55?w=400&q=80',
       itemCount: 120
     },
     {
       id: 'sports',
       name: 'Sports',
-      image: '/placeholder.svg',
+      image: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=400&q=80',
       itemCount: 95
     }
   ];

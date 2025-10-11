@@ -35,7 +35,7 @@ const LimitedTimeDeals = () => {
       name: 'Gaming Laptop RTX 4060',
       price: 899.99,
       originalPrice: 1299.99,
-      image: '/placeholder.svg',
+      image: 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=800&q=80',
       discount: 31,
       stock: 5
     },
@@ -44,7 +44,7 @@ const LimitedTimeDeals = () => {
       name: '4K Webcam Pro',
       price: 129.99,
       originalPrice: 199.99,
-      image: '/placeholder.svg',
+      image: 'https://images.unsplash.com/photo-1585792180666-f7347c490ee2?w=800&q=80',
       discount: 35,
       stock: 12
     }

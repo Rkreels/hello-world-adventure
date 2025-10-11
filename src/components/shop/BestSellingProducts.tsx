@@ -12,7 +12,7 @@ const BestSellingProducts = () => {
       id: '5',
       name: 'Premium Coffee Maker',
       price: 159.99,
-      image: '/placeholder.svg',
+      image: 'https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?w=800&q=80',
       rating: 4.7,
       reviews: 89,
       badge: '#1 Best Seller'
@@ -21,7 +21,7 @@ const BestSellingProducts = () => {
       id: '6',
       name: 'Ergonomic Office Chair',
       price: 299.99,
-      image: '/placeholder.svg',
+      image: 'https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=800&q=80',
       rating: 4.6,
       reviews: 156,
       badge: 'Popular'
@@ -30,7 +30,7 @@ const BestSellingProducts = () => {
       id: '7',
       name: 'LED Desk Lamp',
       price: 39.99,
-      image: '/placeholder.svg',
+      image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=800&q=80',
       rating: 4.4,
       reviews: 67,
       badge: 'Top Rated'
