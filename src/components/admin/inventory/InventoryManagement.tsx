@@ -5,99 +5,96 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Search, Plus, AlertTriangle, Package } from 'lucide-react';
 import { useAdminStore } from '@/stores/adminStore';
 import { toast } from 'sonner';
 
 const InventoryManagement = () => {
-  const { inventory, updateInventory } = useAdminStore();
+  const { inventory, restockProduct, initializeData } = useAdminStore();
   const [searchQuery, setSearchQuery] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
+  const [restockDialogOpen, setRestockDialogOpen] = useState(false);
+  const [restockProductId, setRestockProductId] = useState('');
+  const [restockProductName, setRestockProductName] = useState('');
+  const [restockQty, setRestockQty] = useState(50);
 
   useEffect(() => {
-    // Simulate loading inventory data
-    setTimeout(() => {
-      const mockInventory = [
-        {
-          productId: '1',
-          productName: 'Wireless Earbuds Pro',
-          currentStock: 15,
-          lowStockThreshold: 20,
-          isLowStock: true,
-          lastRestocked: '2025-01-15'
-        },
-        {
-          productId: '2',
-          productName: 'Smart Watch Series X',
-          currentStock: 45,
-          lowStockThreshold: 25,
-          isLowStock: false,
-          lastRestocked: '2025-01-10'
-        },
-        {
-          productId: '3',
-          productName: 'USB-C Cable',
-          currentStock: 8,
-          lowStockThreshold: 15,
-          isLowStock: true,
-          lastRestocked: '2025-01-05'
-        },
-        {
-          productId: '4',
-          productName: 'Laptop Stand',
-          currentStock: 32,
-          lowStockThreshold: 20,
-          isLowStock: false,
-          lastRestocked: '2025-01-12'
-        }
-      ];
-      updateInventory(mockInventory);
-      setIsLoading(false);
-    }, 1000);
-  }, [updateInventory]);
+    initializeData();
+  }, [initializeData]);
 
   const filteredInventory = inventory.filter(item =>
-    item.productName.toLowerCase().includes(searchQuery.toLowerCase())
+    item.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    item.sku.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleRestockProduct = (productId: string, productName: string) => {
-    // Simulate restocking
-    const updatedInventory = inventory.map(item => 
-      item.productId === productId 
-        ? { 
-            ...item, 
-            currentStock: item.currentStock + 50,
-            isLowStock: (item.currentStock + 50) <= item.lowStockThreshold,
-            lastRestocked: new Date().toISOString().split('T')[0]
-          }
-        : item
-    );
-    updateInventory(updatedInventory);
-    toast.success(`${productName} restocked successfully`);
+  const handleOpenRestock = (productId: string, productName: string) => {
+    setRestockProductId(productId);
+    setRestockProductName(productName);
+    setRestockQty(50);
+    setRestockDialogOpen(true);
   };
 
-  const getStockStatus = (item: any) => {
-    if (item.isLowStock) {
-      return <Badge variant="destructive" className="flex items-center gap-1">
-        <AlertTriangle className="h-3 w-3" />
-        Low Stock
-      </Badge>;
+  const handleRestock = () => {
+    if (restockQty <= 0) {
+      toast.error('Please enter a valid quantity');
+      return;
     }
-    return <Badge variant="default" className="bg-green-500">In Stock</Badge>;
+    restockProduct(restockProductId, restockQty);
+    toast.success(`${restockProductName} restocked with ${restockQty} units`);
+    setRestockDialogOpen(false);
   };
 
-  const handleAddStock = () => {
-    toast.info('Add stock functionality - Coming soon');
+  const getStockStatus = (item: { isLowStock: boolean; currentStock: number }) => {
+    if (item.currentStock === 0) {
+      return <Badge variant="destructive">Out of Stock</Badge>;
+    }
+    if (item.isLowStock) {
+      return (
+        <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 flex items-center gap-1 w-fit">
+          <AlertTriangle className="h-3 w-3" />
+          Low Stock
+        </Badge>
+      );
+    }
+    return <Badge variant="default" className="bg-green-100 text-green-800">In Stock</Badge>;
   };
+
+  const lowStockCount = inventory.filter(i => i.isLowStock).length;
+  const outOfStockCount = inventory.filter(i => i.currentStock === 0).length;
+  const totalUnits = inventory.reduce((sum, i) => sum + i.currentStock, 0);
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">Inventory Management</h2>
-        <Button onClick={handleAddStock}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Stock
-        </Button>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-sm text-muted-foreground">Total Products</p>
+            <p className="text-2xl font-bold">{inventory.length}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-sm text-muted-foreground">Total Units</p>
+            <p className="text-2xl font-bold">{totalUnits.toLocaleString()}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-sm text-yellow-600">Low Stock</p>
+            <p className="text-2xl font-bold text-yellow-600">{lowStockCount}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-sm text-destructive">Out of Stock</p>
+            <p className="text-2xl font-bold text-destructive">{outOfStockCount}</p>
+          </CardContent>
+        </Card>
       </div>
 
       <Card>
@@ -108,9 +105,9 @@ const InventoryManagement = () => {
               Stock Levels
             </CardTitle>
             <div className="relative max-w-sm">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
-                placeholder="Search products..."
+                placeholder="Search by name or SKU..."
                 className="pl-10"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -119,56 +116,77 @@ const InventoryManagement = () => {
           </div>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
-            <div className="space-y-4">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-16 bg-gray-100 animate-pulse rounded"></div>
-              ))}
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Product</TableHead>
+                <TableHead>SKU</TableHead>
+                <TableHead>Warehouse</TableHead>
+                <TableHead>Stock</TableHead>
+                <TableHead>Threshold</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Last Restocked</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredInventory.length === 0 ? (
                 <TableRow>
-                  <TableHead>Product Name</TableHead>
-                  <TableHead>Current Stock</TableHead>
-                  <TableHead>Low Stock Threshold</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Last Restocked</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                    No inventory items found
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredInventory.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-gray-500">
-                      No inventory items found
+              ) : (
+                filteredInventory.map((item) => (
+                  <TableRow key={item.productId}>
+                    <TableCell className="font-medium">{item.productName}</TableCell>
+                    <TableCell><code className="text-xs bg-muted px-1.5 py-0.5 rounded">{item.sku}</code></TableCell>
+                    <TableCell>{item.warehouse}</TableCell>
+                    <TableCell>{item.currentStock} units</TableCell>
+                    <TableCell>{item.lowStockThreshold} units</TableCell>
+                    <TableCell>{getStockStatus(item)}</TableCell>
+                    <TableCell>{item.lastRestocked}</TableCell>
+                    <TableCell className="text-right">
+                      <Button 
+                        size="sm" 
+                        variant={item.isLowStock ? 'default' : 'outline'}
+                        onClick={() => handleOpenRestock(item.productId, item.productName)}
+                      >
+                        <Plus className="h-4 w-4 mr-1" />
+                        Restock
+                      </Button>
                     </TableCell>
                   </TableRow>
-                ) : (
-                  filteredInventory.map((item) => (
-                    <TableRow key={item.productId}>
-                      <TableCell className="font-medium">{item.productName}</TableCell>
-                      <TableCell>{item.currentStock} units</TableCell>
-                      <TableCell>{item.lowStockThreshold} units</TableCell>
-                      <TableCell>{getStockStatus(item)}</TableCell>
-                      <TableCell>{item.lastRestocked}</TableCell>
-                      <TableCell className="text-right">
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => handleRestockProduct(item.productId, item.productName)}
-                        >
-                          Restock
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          )}
+                ))
+              )}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
+
+      {/* Restock Dialog */}
+      <Dialog open={restockDialogOpen} onOpenChange={setRestockDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Restock - {restockProductName}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium">Quantity to add</label>
+              <Input
+                type="number"
+                min={1}
+                value={restockQty}
+                onChange={(e) => setRestockQty(parseInt(e.target.value) || 0)}
+              />
+            </div>
+            <div className="flex justify-end gap-3">
+              <Button variant="outline" onClick={() => setRestockDialogOpen(false)}>Cancel</Button>
+              <Button onClick={handleRestock}>Confirm Restock</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

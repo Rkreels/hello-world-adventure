@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Package, User, CreditCard, MapPin } from 'lucide-react';
+import { ArrowLeft, Package, User, CreditCard, MapPin, Truck } from 'lucide-react';
 import { useAdminStore } from '@/stores/adminStore';
 import { toast } from 'sonner';
 
@@ -31,7 +31,7 @@ const OrderDetail = () => {
         <Card>
           <CardContent className="p-6 text-center">
             <h2 className="text-xl font-semibold mb-2">Order Not Found</h2>
-            <p className="text-gray-600">The order #{orderId} could not be found.</p>
+            <p className="text-muted-foreground">The order #{orderId} could not be found.</p>
           </CardContent>
         </Card>
       </div>
@@ -41,6 +41,17 @@ const OrderDetail = () => {
   const handleStatusChange = (newStatus: string) => {
     updateOrderStatus(order.id, newStatus as any);
     toast.success(`Order status updated to ${newStatus}`);
+  };
+
+  const getStatusColor = (status: string) => {
+    const colors: Record<string, string> = {
+      Pending: 'bg-yellow-100 text-yellow-800',
+      Processing: 'bg-blue-100 text-blue-800',
+      Shipped: 'bg-purple-100 text-purple-800',
+      Delivered: 'bg-green-100 text-green-800',
+      Cancelled: 'bg-red-100 text-red-800',
+    };
+    return colors[status] || '';
   };
 
   return (
@@ -53,16 +64,13 @@ const OrderDetail = () => {
           </Button>
           <div>
             <h1 className="text-2xl font-bold">Order #{order.id}</h1>
-            <p className="text-gray-600">{order.date}</p>
+            <p className="text-muted-foreground">{order.date}</p>
           </div>
         </div>
-        <Badge variant={order.status === 'Delivered' ? 'default' : 'secondary'}>
-          {order.status}
-        </Badge>
+        <Badge className={getStatusColor(order.status)}>{order.status}</Badge>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Order Summary */}
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -72,19 +80,18 @@ const OrderDetail = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {order.items?.map((item, index) => (
-                <div key={index} className="flex items-center justify-between py-2 border-b last:border-0">
+              {order.items.map((item, index) => (
+                <div key={index} className="flex items-center justify-between py-3 border-b last:border-0">
                   <div>
-                    <h4 className="font-medium">{item}</h4>
-                    <p className="text-sm text-gray-600">Quantity: 1</p>
+                    <h4 className="font-medium">{item.name}</h4>
+                    <p className="text-sm text-muted-foreground">Qty: {item.qty}</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">$49.99</p>
+                    <p className="font-medium">${item.price.toFixed(2)}</p>
+                    <p className="text-sm text-muted-foreground">${(item.price * item.qty).toFixed(2)} total</p>
                   </div>
                 </div>
-              )) || (
-                <p className="text-gray-600">No items found</p>
-              )}
+              ))}
               <div className="pt-4 border-t">
                 <div className="flex justify-between items-center text-lg font-bold">
                   <span>Total:</span>
@@ -95,9 +102,7 @@ const OrderDetail = () => {
           </CardContent>
         </Card>
 
-        {/* Order Actions & Info */}
         <div className="space-y-6">
-          {/* Customer Info */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -108,20 +113,36 @@ const OrderDetail = () => {
             <CardContent>
               <div className="space-y-2">
                 <p className="font-medium">{order.customer}</p>
-                <p className="text-sm text-gray-600">customer@example.com</p>
-                <p className="text-sm text-gray-600">+1 234-567-8900</p>
+                <p className="text-sm text-muted-foreground">{order.email}</p>
               </div>
             </CardContent>
           </Card>
 
-          {/* Status Management */}
           <Card>
             <CardHeader>
-              <CardTitle>Order Status</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <MapPin className="h-5 w-5" />
+                Shipping Address
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm">{order.shippingAddress}</p>
+              {order.trackingNumber && (
+                <div className="mt-3 flex items-center gap-2">
+                  <Truck className="h-4 w-4 text-muted-foreground" />
+                  <code className="text-xs bg-muted px-2 py-1 rounded">{order.trackingNumber}</code>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Update Status</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="grid grid-cols-2 gap-2">
-                {['Pending', 'Processing', 'Shipped', 'Delivered'].map(status => (
+                {['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'].map(status => (
                   <Button
                     key={status}
                     variant={order.status === status ? 'default' : 'outline'}
@@ -136,7 +157,6 @@ const OrderDetail = () => {
             </CardContent>
           </Card>
 
-          {/* Payment Info */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -146,9 +166,9 @@ const OrderDetail = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <p className="text-sm">Method: Credit Card</p>
-                <p className="text-sm">Status: Paid</p>
-                <p className="text-sm">Amount: ${order.amount}</p>
+                <p className="text-sm">Method: {order.paymentMethod}</p>
+                <p className="text-sm">Status: {order.status === 'Cancelled' ? 'Refunded' : 'Paid'}</p>
+                <p className="text-sm font-medium">Amount: ${order.amount}</p>
               </div>
             </CardContent>
           </Card>
