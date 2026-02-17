@@ -4,46 +4,19 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Star, ShoppingCart } from 'lucide-react';
+import { toast } from 'sonner';
+import { shopProducts } from '@/data/shopProducts';
 
 const TrendingProducts = () => {
-  const products = [
-    {
-      id: '1',
-      name: 'Wireless Bluetooth Headphones',
-      price: 79.99,
-      originalPrice: 99.99,
-      image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80',
-      rating: 4.5,
-      reviews: 128
-    },
-    {
-      id: '2',
-      name: 'Smart Fitness Watch',
-      price: 199.99,
-      originalPrice: 249.99,
-      image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80',
-      rating: 4.8,
-      reviews: 256
-    },
-    {
-      id: '3',
-      name: 'Portable Bluetooth Speaker',
-      price: 49.99,
-      originalPrice: 69.99,
-      image: 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=800&q=80',
-      rating: 4.3,
-      reviews: 89
-    },
-    {
-      id: '4',
-      name: 'USB-C Fast Charger',
-      price: 24.99,
-      originalPrice: 34.99,
-      image: 'https://images.unsplash.com/photo-1591290619762-cfc9cd7e67e6?w=800&q=80',
-      rating: 4.6,
-      reviews: 145
-    }
-  ];
+  // Pick top-rated products as trending
+  const products = shopProducts
+    .filter(p => p.rating >= 4)
+    .sort((a, b) => b.reviews - a.reviews)
+    .slice(0, 4);
+
+  const handleAddToCart = (name: string) => {
+    toast.success(`${name} added to cart!`);
+  };
 
   return (
     <div className="container mx-auto px-4 sm:px-6 max-w-7xl">
@@ -56,23 +29,29 @@ const TrendingProducts = () => {
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {products.map((product) => (
-          <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+          <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow group">
             <CardContent className="p-0">
               <div className="aspect-square bg-gray-100 relative overflow-hidden">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform"
-                />
-                <div className="absolute top-2 right-2">
-                  <span className="bg-red-500 text-white text-xs px-2 py-1 rounded">
-                    Sale
-                  </span>
-                </div>
+                <Link to={`/products/${product.id}`}>
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                  />
+                </Link>
+                {product.discount > 0 && (
+                  <div className="absolute top-2 right-2">
+                    <span className="bg-red-500 text-white text-xs px-2 py-1 rounded">
+                      -{product.discount}%
+                    </span>
+                  </div>
+                )}
               </div>
               
               <div className="p-4">
-                <h3 className="font-medium mb-2 line-clamp-2">{product.name}</h3>
+                <Link to={`/products/${product.id}`}>
+                  <h3 className="font-medium mb-2 line-clamp-2 hover:text-blue-600">{product.name}</h3>
+                </Link>
                 
                 <div className="flex items-center mb-2">
                   <div className="flex items-center">
@@ -85,13 +64,11 @@ const TrendingProducts = () => {
                 <div className="flex items-center justify-between mb-3">
                   <div>
                     <span className="text-lg font-bold">${product.price}</span>
-                    <span className="text-sm text-gray-500 line-through ml-2">
-                      ${product.originalPrice}
-                    </span>
+                    <span className="text-sm text-gray-500 line-through ml-2">${product.oldPrice}</span>
                   </div>
                 </div>
                 
-                <Button className="w-full" size="sm">
+                <Button className="w-full" size="sm" onClick={() => handleAddToCart(product.name)}>
                   <ShoppingCart className="w-4 h-4 mr-2" />
                   Add to Cart
                 </Button>

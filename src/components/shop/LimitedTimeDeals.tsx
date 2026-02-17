@@ -1,54 +1,37 @@
 
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Clock, ShoppingCart } from 'lucide-react';
+import { toast } from 'sonner';
+import { shopProducts } from '@/data/shopProducts';
 
 const LimitedTimeDeals = () => {
-  const [timeLeft, setTimeLeft] = useState({
-    hours: 23,
-    minutes: 45,
-    seconds: 30
-  });
+  const [timeLeft, setTimeLeft] = useState({ hours: 23, minutes: 45, seconds: 30 });
 
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft(prev => {
-        if (prev.seconds > 0) {
-          return { ...prev, seconds: prev.seconds - 1 };
-        } else if (prev.minutes > 0) {
-          return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
-        } else if (prev.hours > 0) {
-          return { hours: prev.hours - 1, minutes: 59, seconds: 59 };
-        }
+        if (prev.seconds > 0) return { ...prev, seconds: prev.seconds - 1 };
+        if (prev.minutes > 0) return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
+        if (prev.hours > 0) return { hours: prev.hours - 1, minutes: 59, seconds: 59 };
         return prev;
       });
     }, 1000);
-
     return () => clearInterval(timer);
   }, []);
 
-  const deals = [
-    {
-      id: '8',
-      name: 'Gaming Laptop RTX 4060',
-      price: 899.99,
-      originalPrice: 1299.99,
-      image: 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=800&q=80',
-      discount: 31,
-      stock: 5
-    },
-    {
-      id: '9',
-      name: '4K Webcam Pro',
-      price: 129.99,
-      originalPrice: 199.99,
-      image: 'https://images.unsplash.com/photo-1585792180666-f7347c490ee2?w=800&q=80',
-      discount: 35,
-      stock: 12
-    }
-  ];
+  // Pick highest discount products as deals
+  const deals = shopProducts
+    .sort((a, b) => b.discount - a.discount)
+    .slice(0, 2)
+    .map(p => ({ ...p, stock: Math.floor(Math.random() * 10) + 3 }));
+
+  const handleGrabDeal = (name: string) => {
+    toast.success(`${name} added to cart!`);
+  };
 
   return (
     <div>
@@ -70,11 +53,9 @@ const LimitedTimeDeals = () => {
             <CardContent className="p-0">
               <div className="relative">
                 <div className="aspect-video bg-gray-100">
-                  <img
-                    src={deal.image}
-                    alt={deal.name}
-                    className="w-full h-full object-cover"
-                  />
+                  <Link to={`/products/${deal.id}`}>
+                    <img src={deal.image} alt={deal.name} className="w-full h-full object-cover" />
+                  </Link>
                 </div>
                 <div className="absolute top-2 left-2">
                   <Badge className="bg-red-500">{deal.discount}% OFF</Badge>
@@ -85,24 +66,22 @@ const LimitedTimeDeals = () => {
               </div>
               
               <div className="p-4">
-                <h3 className="font-bold text-lg mb-2">{deal.name}</h3>
+                <Link to={`/products/${deal.id}`}>
+                  <h3 className="font-bold text-lg mb-2 hover:text-blue-600">{deal.name}</h3>
+                </Link>
                 
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <span className="text-2xl font-bold text-red-600">${deal.price}</span>
-                    <span className="text-lg text-gray-500 line-through ml-2">
-                      ${deal.originalPrice}
-                    </span>
+                    <span className="text-lg text-gray-500 line-through ml-2">${deal.oldPrice}</span>
                   </div>
                   <div className="text-right">
                     <div className="text-sm text-gray-600">You save</div>
-                    <div className="font-bold text-green-600">
-                      ${(deal.originalPrice - deal.price).toFixed(2)}
-                    </div>
+                    <div className="font-bold text-green-600">${(deal.oldPrice - deal.price).toFixed(2)}</div>
                   </div>
                 </div>
                 
-                <Button className="w-full bg-red-600 hover:bg-red-700">
+                <Button className="w-full bg-red-600 hover:bg-red-700" onClick={() => handleGrabDeal(deal.name)}>
                   <ShoppingCart className="w-4 h-4 mr-2" />
                   Grab This Deal
                 </Button>

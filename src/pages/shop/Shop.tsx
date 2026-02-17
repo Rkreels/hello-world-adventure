@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Star, Filter, Grid3X3, LayoutList, ChevronDown, Heart, ShoppingCart } from 'lucide-react';
+import { Star, Filter, Grid3X3, LayoutList, Heart, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
@@ -14,175 +14,31 @@ import {
 } from '@/components/ui/select';
 import { formatCurrency } from '@/lib/utils';
 import { toast } from 'sonner';
-import { useProducts } from '@/hooks/useProducts';
-
-const productsData = [
-  {
-    id: 1,
-    name: "Radiant Glow Hydrating Serum",
-    brand: "SaltForm",
-    price: 29.99,
-    oldPrice: 39.99,
-    image: "https://images.unsplash.com/photo-1615900119312-2acd3a71f3aa?q=80&w=1964&auto=format&fit=crop",
-    rating: 5,
-    reviews: 287,
-    isNew: true,
-    discount: 25,
-    category: "Beauty",
-  },
-  {
-    id: 2,
-    name: "Modern Minimalist Vase",
-    brand: "Design Denmark",
-    price: 49.99,
-    oldPrice: 69.99,
-    image: "https://images.unsplash.com/photo-1602746588630-8ce6147c406c?q=80&w=1964&auto=format&fit=crop",
-    rating: 4,
-    reviews: 186,
-    isNew: false,
-    discount: 30,
-    category: "Home",
-  },
-  {
-    id: 3,
-    name: "FitPro 3000 Smartwatch",
-    brand: "GadgetPro",
-    price: 119.99,
-    oldPrice: 149.99,
-    image: "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?q=80&w=2044&auto=format&fit=crop",
-    rating: 5,
-    reviews: 152,
-    isNew: false,
-    discount: 20,
-    category: "Electronics",
-  },
-  {
-    id: 4,
-    name: "Wireless Noise Cancelling Headphones",
-    brand: "AudioTech",
-    price: 189.99,
-    oldPrice: 249.99,
-    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2070&auto=format&fit=crop",
-    rating: 4,
-    reviews: 215,
-    isNew: false,
-    discount: 24,
-    category: "Electronics",
-  },
-  {
-    id: 5,
-    name: "Premium Leather Wallet",
-    brand: "LeatherCraft",
-    price: 59.99,
-    oldPrice: 79.99,
-    image: "https://images.unsplash.com/photo-1627123424574-724758594e93?q=80&w=1974&auto=format&fit=crop",
-    rating: 4,
-    reviews: 92,
-    isNew: true,
-    discount: 25,
-    category: "Fashion",
-  },
-  {
-    id: 6,
-    name: "Stainless Steel Water Bottle",
-    brand: "EcoLife",
-    price: 24.99,
-    oldPrice: 34.99,
-    image: "https://images.unsplash.com/photo-1602143407151-7111542de6e8?q=80&w=1887&auto=format&fit=crop",
-    rating: 5,
-    reviews: 178,
-    isNew: false,
-    discount: 28,
-    category: "Home",
-  },
-  {
-    id: 7,
-    name: "Organic Cotton T-Shirt",
-    brand: "EcoWear",
-    price: 19.99,
-    oldPrice: 29.99,
-    image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=1780&auto=format&fit=crop",
-    rating: 4,
-    reviews: 124,
-    isNew: false,
-    discount: 33,
-    category: "Fashion",
-  },
-  {
-    id: 8,
-    name: "Portable Bluetooth Speaker",
-    brand: "SoundWave",
-    price: 79.99,
-    oldPrice: 99.99,
-    image: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?q=80&w=2069&auto=format&fit=crop",
-    rating: 4,
-    reviews: 86,
-    isNew: true,
-    discount: 20,
-    category: "Electronics",
-  },
-  {
-    id: 9,
-    name: "Ceramic Coffee Mug Set",
-    brand: "HomeStyle",
-    price: 34.99,
-    oldPrice: 49.99,
-    image: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?q=80&w=2070&auto=format&fit=crop",
-    rating: 5,
-    reviews: 142,
-    isNew: false,
-    discount: 30,
-    category: "Home",
-  },
-];
-
-const categories = [
-  { id: 'electronics', name: 'Electronics' },
-  { id: 'fashion', name: 'Fashion' },
-  { id: 'home', name: 'Home & Kitchen' },
-  { id: 'beauty', name: 'Beauty & Personal Care' },
-  { id: 'sports', name: 'Sports & Outdoors' },
-];
-
-const brands = [
-  { id: 'saltform', name: 'SaltForm' },
-  { id: 'design-denmark', name: 'Design Denmark' },
-  { id: 'gadgetpro', name: 'GadgetPro' },
-  { id: 'audiotech', name: 'AudioTech' },
-  { id: 'leathercraft', name: 'LeatherCraft' },
-  { id: 'ecolife', name: 'EcoLife' },
-  { id: 'ecowear', name: 'EcoWear' },
-  { id: 'soundwave', name: 'SoundWave' },
-  { id: 'homestyle', name: 'HomeStyle' },
-];
+import { shopProducts, shopBrands, shopCategories } from '@/data/shopProducts';
 
 const Shop = () => {
-  const { products: apiProducts, loading } = useProducts();
   const [searchParams, setSearchParams] = useSearchParams();
   const [view, setView] = useState<'grid' | 'list'>(searchParams.get('view') as 'grid' | 'list' || 'grid');
   const [priceRange, setPriceRange] = useState([
     parseInt(searchParams.get('minPrice') || '0'),
-    parseInt(searchParams.get('maxPrice') || '300')
+    parseInt(searchParams.get('maxPrice') || '1500')
   ]);
   const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'featured');
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
-    searchParams.get('categories')?.split(',') || []
+    searchParams.get('categories')?.split(',').filter(Boolean) || []
   );
   const [selectedBrands, setSelectedBrands] = useState<string[]>(
-    searchParams.get('brands')?.split(',') || []
+    searchParams.get('brands')?.split(',').filter(Boolean) || []
   );
   const [minRating, setMinRating] = useState<number>(
     parseInt(searchParams.get('rating') || '0')
   );
-  const [filteredProducts, setFilteredProducts] = useState(productsData);
+  const [filteredProducts, setFilteredProducts] = useState(shopProducts);
   const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page') || '1'));
-  const productsPerPage = 9;
-  
-  // Use API products if available, otherwise fallback to static data
-  const allProducts = apiProducts.length > 0 ? apiProducts : productsData;
+  const productsPerPage = 12;
   
   useEffect(() => {
-    let filtered = [...allProducts];
+    let filtered = [...shopProducts];
     
     if (selectedCategories.length > 0) {
       filtered = filtered.filter(product => 
@@ -212,27 +68,21 @@ const Shop = () => {
         filtered.sort((a, b) => b.price - a.price);
         break;
       case 'newest':
-        filtered.sort((a, b) => {
-          const aIsNew = (a as any).isNew || false;
-          const bIsNew = (b as any).isNew || false;
-          return (aIsNew === bIsNew) ? 0 : aIsNew ? -1 : 1;
-        });
+        filtered.sort((a, b) => (a.isNew === b.isNew) ? 0 : a.isNew ? -1 : 1);
         break;
       case 'rating':
         filtered.sort((a, b) => b.rating - a.rating);
         break;
-      case 'featured':
       default:
         break;
     }
     
-    setFilteredProducts(filtered as any);
+    setFilteredProducts(filtered);
     
     const params: Record<string, string> = {};
-    
     if (view !== 'grid') params.view = view;
     if (priceRange[0] > 0) params.minPrice = priceRange[0].toString();
-    if (priceRange[1] < 300) params.maxPrice = priceRange[1].toString();
+    if (priceRange[1] < 1500) params.maxPrice = priceRange[1].toString();
     if (sortBy !== 'featured') params.sort = sortBy;
     if (selectedCategories.length > 0) params.categories = selectedCategories.join(',');
     if (selectedBrands.length > 0) params.brands = selectedBrands.join(',');
@@ -240,42 +90,29 @@ const Shop = () => {
     if (currentPage > 1) params.page = currentPage.toString();
     
     setSearchParams(params);
-  }, [view, priceRange, sortBy, selectedCategories, selectedBrands, minRating, currentPage, allProducts]);
+  }, [view, priceRange, sortBy, selectedCategories, selectedBrands, minRating, currentPage]);
   
   const handleCategoryChange = (category: string, checked: boolean) => {
-    setSelectedCategories(prev => {
-      if (checked) {
-        return [...prev, category];
-      } else {
-        return prev.filter(c => c !== category);
-      }
-    });
+    setSelectedCategories(prev => checked ? [...prev, category] : prev.filter(c => c !== category));
+    setCurrentPage(1);
   };
   
   const handleBrandChange = (brand: string, checked: boolean) => {
-    setSelectedBrands(prev => {
-      if (checked) {
-        return [...prev, brand];
-      } else {
-        return prev.filter(b => b !== brand);
-      }
-    });
+    setSelectedBrands(prev => checked ? [...prev, brand] : prev.filter(b => b !== brand));
+    setCurrentPage(1);
   };
   
   const handleRatingChange = (rating: number, checked: boolean) => {
-    if (checked) {
-      setMinRating(rating);
-    } else if (minRating === rating) {
-      setMinRating(0);
-    }
+    setMinRating(checked ? rating : 0);
+    setCurrentPage(1);
   };
   
-  const handleAddToCart = (productId: number) => {
-    toast.success("Product added to cart successfully");
+  const handleAddToCart = (product: typeof shopProducts[0]) => {
+    toast.success(`${product.name} added to cart!`);
   };
   
-  const handleAddToWishlist = (productId: number) => {
-    toast.success("Product added to wishlist");
+  const handleAddToWishlist = (product: typeof shopProducts[0]) => {
+    toast.success(`${product.name} added to wishlist!`);
   };
   
   const indexOfLastProduct = currentPage * productsPerPage;
@@ -283,39 +120,36 @@ const Shop = () => {
   const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
   
+  const [showAllBrands, setShowAllBrands] = useState(false);
+  const visibleBrands = showAllBrands ? shopBrands : shopBrands.slice(0, 5);
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row gap-8">
+        {/* Sidebar Filters */}
         <div className="w-full md:w-1/4">
           <div className="sticky top-4 space-y-6">
             <div className="bg-white rounded-lg shadow p-5">
               <h3 className="font-medium text-lg mb-4">Categories</h3>
               <div className="space-y-2">
-                {categories.map((category) => (
+                {shopCategories.map((category) => (
                   <div key={category.id} className="flex items-center">
                     <Checkbox 
                       id={`cat-${category.id}`} 
                       checked={selectedCategories.includes(category.id)}
-                      onCheckedChange={(checked) => 
-                        handleCategoryChange(category.id, checked === true)
-                      }
+                      onCheckedChange={(checked) => handleCategoryChange(category.id, checked === true)}
                     />
-                    <label htmlFor={`cat-${category.id}`} className="ml-2 text-sm">
-                      {category.name}
-                    </label>
+                    <label htmlFor={`cat-${category.id}`} className="ml-2 text-sm">{category.name}</label>
                   </div>
                 ))}
               </div>
-              <Button variant="link" className="mt-2 px-0 text-sm text-blue-600">
-                Show more
-              </Button>
             </div>
             
             <div className="bg-white rounded-lg shadow p-5">
               <h3 className="font-medium text-lg mb-4">Price Range</h3>
               <Slider 
                 value={priceRange} 
-                max={500} 
+                max={1500} 
                 step={10}
                 onValueChange={setPriceRange}
                 className="my-6"
@@ -323,16 +157,12 @@ const Shop = () => {
               <div className="flex items-center justify-between">
                 <div className="w-[45%]">
                   <label className="text-xs text-gray-500 mb-1 block">Min</label>
-                  <div className="border rounded px-3 py-2 text-sm">
-                    ${priceRange[0]}
-                  </div>
+                  <div className="border rounded px-3 py-2 text-sm">${priceRange[0]}</div>
                 </div>
                 <span className="text-gray-400">-</span>
                 <div className="w-[45%]">
                   <label className="text-xs text-gray-500 mb-1 block">Max</label>
-                  <div className="border rounded px-3 py-2 text-sm">
-                    ${priceRange[1]}
-                  </div>
+                  <div className="border rounded px-3 py-2 text-sm">${priceRange[1]}</div>
                 </div>
               </div>
             </div>
@@ -345,17 +175,12 @@ const Shop = () => {
                     <Checkbox 
                       id={`rating-${rating}`}
                       checked={minRating === rating}
-                      onCheckedChange={(checked) => 
-                        handleRatingChange(rating, checked === true)
-                      }
+                      onCheckedChange={(checked) => handleRatingChange(rating, checked === true)}
                     />
                     <label htmlFor={`rating-${rating}`} className="ml-2 text-sm flex items-center">
                       <div className="flex text-yellow-400 mr-2">
                         {[...Array(5)].map((_, i) => (
-                          <Star 
-                            key={i} 
-                            className={`h-4 w-4 ${i < rating ? 'fill-yellow-400' : ''}`} 
-                          />
+                          <Star key={i} className={`h-4 w-4 ${i < rating ? 'fill-yellow-400' : ''}`} />
                         ))}
                       </div>
                       <span>& Up</span>
@@ -368,32 +193,31 @@ const Shop = () => {
             <div className="bg-white rounded-lg shadow p-5">
               <h3 className="font-medium text-lg mb-4">Brands</h3>
               <div className="space-y-2">
-                {brands.slice(0, 5).map((brand) => (
+                {visibleBrands.map((brand) => (
                   <div key={brand.id} className="flex items-center">
                     <Checkbox 
                       id={`brand-${brand.id}`}
                       checked={selectedBrands.includes(brand.id)}
-                      onCheckedChange={(checked) => 
-                        handleBrandChange(brand.id, checked === true)
-                      }
+                      onCheckedChange={(checked) => handleBrandChange(brand.id, checked === true)}
                     />
                     <label htmlFor={`brand-${brand.id}`} className="ml-2 text-sm">{brand.name}</label>
                   </div>
                 ))}
               </div>
-              <Button variant="link" className="mt-2 px-0 text-sm text-blue-600">
-                Show more
+              <Button variant="link" className="mt-2 px-0 text-sm text-blue-600" onClick={() => setShowAllBrands(!showAllBrands)}>
+                {showAllBrands ? 'Show less' : `Show all (${shopBrands.length})`}
               </Button>
             </div>
           </div>
         </div>
         
+        {/* Products */}
         <div className="w-full md:w-3/4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
             <div className="flex items-center gap-2">
               <Filter className="h-5 w-5 text-gray-500" />
               <span className="text-sm text-gray-500">
-                Showing {indexOfFirstProduct + 1}-{Math.min(indexOfLastProduct, filteredProducts.length)} of {filteredProducts.length} products
+                Showing {filteredProducts.length > 0 ? indexOfFirstProduct + 1 : 0}-{Math.min(indexOfLastProduct, filteredProducts.length)} of {filteredProducts.length} products
               </span>
             </div>
             
@@ -415,16 +239,10 @@ const Shop = () => {
               </div>
               
               <div className="flex items-center border rounded">
-                <button 
-                  className={`px-3 py-1.5 ${view === 'grid' ? 'bg-gray-100' : ''}`}
-                  onClick={() => setView('grid')}
-                >
+                <button className={`px-3 py-1.5 ${view === 'grid' ? 'bg-gray-100' : ''}`} onClick={() => setView('grid')}>
                   <Grid3X3 className="h-4 w-4" />
                 </button>
-                <button 
-                  className={`px-3 py-1.5 ${view === 'list' ? 'bg-gray-100' : ''}`}
-                  onClick={() => setView('list')}
-                >
+                <button className={`px-3 py-1.5 ${view === 'list' ? 'bg-gray-100' : ''}`} onClick={() => setView('list')}>
                   <LayoutList className="h-4 w-4" />
                 </button>
               </div>
@@ -432,62 +250,51 @@ const Shop = () => {
           </div>
           
           {view === 'grid' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {currentProducts.length > 0 ? (
                 currentProducts.map((product) => (
-                  <Card key={product.id}>
-                    <CardContent className="p-4">
-                      <div className="relative mb-4">
-                        <img 
-                          src={product.image} 
-                          alt={product.name} 
-                          className="w-full h-48 object-cover rounded"
-                        />
+                  <Card key={product.id} className="overflow-hidden group">
+                    <CardContent className="p-0">
+                      <div className="relative">
+                        <Link to={`/products/${product.id}`}>
+                          <img src={product.image} alt={product.name} className="w-full h-48 object-cover group-hover:scale-105 transition-transform" />
+                        </Link>
                         <Button 
                           variant="outline" 
                           size="sm" 
                           className="absolute top-2 right-2 h-8 w-8 rounded-full p-0 bg-white"
-                          onClick={() => handleAddToWishlist(product.id)}
+                          onClick={() => handleAddToWishlist(product)}
                         >
                           <Heart className="h-4 w-4" />
                         </Button>
-                        {(product as any).isNew && (
-                          <div className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
-                            New
-                          </div>
+                        {product.isNew && (
+                          <div className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">New</div>
+                        )}
+                        {product.discount > 0 && (
+                          <div className="absolute bottom-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded">-{product.discount}%</div>
                         )}
                       </div>
                       
-                      <div className="mb-2">
+                      <div className="p-4">
                         <div className="flex text-yellow-400 mb-1">
                           {[...Array(5)].map((_, i) => (
-                            <Star 
-                              key={i} 
-                              className={`h-4 w-4 ${i < product.rating ? 'fill-yellow-400' : ''}`} 
-                            />
+                            <Star key={i} className={`h-4 w-4 ${i < product.rating ? 'fill-yellow-400' : ''}`} />
                           ))}
-                          <span className="text-xs text-gray-500 ml-1">({product.reviews} reviews)</span>
+                          <span className="text-xs text-gray-500 ml-1">({product.reviews})</span>
                         </div>
-                        <h3 className="font-medium">{product.name}</h3>
+                        <Link to={`/products/${product.id}`}>
+                          <h3 className="font-medium hover:text-blue-600 transition-colors line-clamp-2">{product.name}</h3>
+                        </Link>
                         <p className="text-sm text-gray-500">{product.brand}</p>
-                      </div>
-                      
-                       <div className="flex items-center mb-3">
-                         <span className="text-lg font-semibold">{formatCurrency(product.price)}</span>
-                         <span className="text-sm text-gray-500 line-through ml-2">{formatCurrency((product as any).oldPrice || 0)}</span>
-                         <span className="text-xs text-green-600 ml-2">-{(product as any).discount || 0}% OFF</span>
-                       </div>
-                      
-                      <div className="flex space-x-2">
-                        <Button variant="outline" size="sm" className="flex-1">
-                          <Link to={`/products/${product.id}`}>View Details</Link>
-                        </Button>
-                        <Button 
-                          className="bg-green-500 hover:bg-green-600"
-                          onClick={() => handleAddToCart(product.id)}
-                        >
+                        
+                        <div className="flex items-center mt-2 mb-3">
+                          <span className="text-lg font-semibold">{formatCurrency(product.price)}</span>
+                          <span className="text-sm text-gray-500 line-through ml-2">{formatCurrency(product.oldPrice)}</span>
+                        </div>
+                        
+                        <Button className="w-full" size="sm" onClick={() => handleAddToCart(product)}>
                           <ShoppingCart className="h-4 w-4 mr-2" />
-                          Add to cart
+                          Add to Cart
                         </Button>
                       </div>
                     </CardContent>
@@ -496,17 +303,13 @@ const Shop = () => {
               ) : (
                 <div className="col-span-3 py-10 text-center">
                   <p className="text-gray-500">No products match your filters.</p>
-                  <Button 
-                    variant="outline" 
-                    className="mt-4"
-                    onClick={() => {
-                      setSelectedCategories([]);
-                      setSelectedBrands([]);
-                      setPriceRange([0, 300]);
-                      setMinRating(0);
-                      setSortBy('featured');
-                    }}
-                  >
+                  <Button variant="outline" className="mt-4" onClick={() => {
+                    setSelectedCategories([]);
+                    setSelectedBrands([]);
+                    setPriceRange([0, 1500]);
+                    setMinRating(0);
+                    setSortBy('featured');
+                  }}>
                     Clear all filters
                   </Button>
                 </div>
@@ -522,62 +325,47 @@ const Shop = () => {
                     <CardContent className="p-4">
                       <div className="flex flex-col md:flex-row gap-4">
                         <div className="relative md:w-1/4">
-                          <img 
-                            src={product.image} 
-                            alt={product.name} 
-                            className="w-full h-48 md:h-full object-cover rounded"
-                          />
+                          <Link to={`/products/${product.id}`}>
+                            <img src={product.image} alt={product.name} className="w-full h-48 md:h-full object-cover rounded" />
+                          </Link>
                           <Button 
                             variant="outline" 
                             size="sm" 
                             className="absolute top-2 right-2 h-8 w-8 rounded-full p-0 bg-white"
-                            onClick={() => handleAddToWishlist(product.id)}
+                            onClick={() => handleAddToWishlist(product)}
                           >
                             <Heart className="h-4 w-4" />
                           </Button>
-                          {(product as any).isNew && (
-                            <div className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
-                              New
-                            </div>
-                          )}
                         </div>
                         
                         <div className="md:w-3/4">
-                          <div className="mb-2">
-                            <div className="flex text-yellow-400 mb-1">
-                              {[...Array(5)].map((_, i) => (
-                                <Star 
-                                  key={i} 
-                                  className={`h-4 w-4 ${i < product.rating ? 'fill-yellow-400' : ''}`} 
-                                />
-                              ))}
-                              <span className="text-xs text-gray-500 ml-1">({product.reviews} reviews)</span>
-                            </div>
-                            <h3 className="font-medium text-lg">{product.name}</h3>
-                            <p className="text-sm text-gray-500">{product.brand}</p>
+                          <div className="flex text-yellow-400 mb-1">
+                            {[...Array(5)].map((_, i) => (
+                              <Star key={i} className={`h-4 w-4 ${i < product.rating ? 'fill-yellow-400' : ''}`} />
+                            ))}
+                            <span className="text-xs text-gray-500 ml-1">({product.reviews} reviews)</span>
                           </div>
-                          
-                          <p className="text-gray-600 mb-4 text-sm">
-                            A high-quality {product.name.toLowerCase()} from {product.brand}. 
-                            Perfect for everyday use with excellent customer reviews.
+                          <Link to={`/products/${product.id}`}>
+                            <h3 className="font-medium text-lg hover:text-blue-600">{product.name}</h3>
+                          </Link>
+                          <p className="text-sm text-gray-500">{product.brand}</p>
+                          <p className="text-gray-600 mt-2 text-sm">
+                            A high-quality {product.name.toLowerCase()} from {product.brand}. Perfect for everyday use with excellent customer reviews.
                           </p>
                           
-                           <div className="flex items-center mb-3">
-                             <span className="text-lg font-semibold">{formatCurrency(product.price)}</span>
-                             <span className="text-sm text-gray-500 line-through ml-2">{formatCurrency((product as any).oldPrice || 0)}</span>
-                             <span className="text-xs text-green-600 ml-2">-{(product as any).discount || 0}% OFF</span>
-                           </div>
+                          <div className="flex items-center mt-2 mb-3">
+                            <span className="text-lg font-semibold">{formatCurrency(product.price)}</span>
+                            <span className="text-sm text-gray-500 line-through ml-2">{formatCurrency(product.oldPrice)}</span>
+                            <span className="text-xs text-green-600 ml-2">-{product.discount}% OFF</span>
+                          </div>
                           
                           <div className="flex space-x-2">
-                            <Button variant="outline" size="sm">
+                            <Button variant="outline" size="sm" asChild>
                               <Link to={`/products/${product.id}`}>View Details</Link>
                             </Button>
-                            <Button 
-                              className="bg-green-500 hover:bg-green-600"
-                              onClick={() => handleAddToCart(product.id)}
-                            >
+                            <Button size="sm" onClick={() => handleAddToCart(product)}>
                               <ShoppingCart className="h-4 w-4 mr-2" />
-                              Add to cart
+                              Add to Cart
                             </Button>
                           </div>
                         </div>
@@ -588,17 +376,13 @@ const Shop = () => {
               ) : (
                 <div className="py-10 text-center">
                   <p className="text-gray-500">No products match your filters.</p>
-                  <Button 
-                    variant="outline" 
-                    className="mt-4"
-                    onClick={() => {
-                      setSelectedCategories([]);
-                      setSelectedBrands([]);
-                      setPriceRange([0, 300]);
-                      setMinRating(0);
-                      setSortBy('featured');
-                    }}
-                  >
+                  <Button variant="outline" className="mt-4" onClick={() => {
+                    setSelectedCategories([]);
+                    setSelectedBrands([]);
+                    setPriceRange([0, 1500]);
+                    setMinRating(0);
+                    setSortBy('featured');
+                  }}>
                     Clear all filters
                   </Button>
                 </div>
@@ -606,19 +390,12 @@ const Shop = () => {
             </div>
           )}
           
-          {filteredProducts.length > 0 && (
+          {totalPages > 1 && (
             <div className="flex justify-center mt-8">
               <nav className="flex items-center space-x-1">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="px-2"
-                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
-                >
+                <Button variant="outline" size="sm" className="px-2" onClick={() => setCurrentPage(p => Math.max(p - 1, 1))} disabled={currentPage === 1}>
                   Previous
                 </Button>
-                
                 {[...Array(Math.min(totalPages, 5))].map((_, i) => {
                   const pageNumber = i + 1;
                   return (
@@ -626,25 +403,14 @@ const Shop = () => {
                       key={i}
                       variant="outline" 
                       size="sm" 
-                      className={`w-9 h-9 ${
-                        currentPage === pageNumber 
-                          ? 'bg-emerald-50 border-emerald-200' 
-                          : ''
-                      }`}
+                      className={`w-9 h-9 ${currentPage === pageNumber ? 'bg-emerald-50 border-emerald-200' : ''}`}
                       onClick={() => setCurrentPage(pageNumber)}
                     >
                       {pageNumber}
                     </Button>
                   );
                 })}
-                
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="px-2"
-                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
-                >
+                <Button variant="outline" size="sm" className="px-2" onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))} disabled={currentPage === totalPages}>
                   Next
                 </Button>
               </nav>

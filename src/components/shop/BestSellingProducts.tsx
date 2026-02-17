@@ -5,37 +5,22 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Star, ShoppingCart } from 'lucide-react';
+import { toast } from 'sonner';
+import { shopProducts } from '@/data/shopProducts';
 
 const BestSellingProducts = () => {
-  const products = [
-    {
-      id: '5',
-      name: 'Premium Coffee Maker',
-      price: 159.99,
-      image: 'https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?w=800&q=80',
-      rating: 4.7,
-      reviews: 89,
-      badge: '#1 Best Seller'
-    },
-    {
-      id: '6',
-      name: 'Ergonomic Office Chair',
-      price: 299.99,
-      image: 'https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=800&q=80',
-      rating: 4.6,
-      reviews: 156,
-      badge: 'Popular'
-    },
-    {
-      id: '7',
-      name: 'LED Desk Lamp',
-      price: 39.99,
-      image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=800&q=80',
-      rating: 4.4,
-      reviews: 67,
-      badge: 'Top Rated'
-    }
-  ];
+  // Pick most-reviewed products as best sellers
+  const products = shopProducts
+    .sort((a, b) => b.reviews - a.reviews)
+    .slice(0, 3)
+    .map((p, i) => ({
+      ...p,
+      badge: i === 0 ? '#1 Best Seller' : i === 1 ? 'Popular' : 'Top Rated'
+    }));
+
+  const handleAddToCart = (name: string) => {
+    toast.success(`${name} added to cart!`);
+  };
 
   return (
     <div className="container mx-auto px-4 sm:px-6 max-w-7xl">
@@ -48,35 +33,38 @@ const BestSellingProducts = () => {
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {products.map((product) => (
-          <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+          <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow group">
             <CardContent className="p-0">
               <div className="aspect-square bg-gray-100 relative overflow-hidden">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform"
-                />
+                <Link to={`/products/${product.id}`}>
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                  />
+                </Link>
                 <div className="absolute top-2 left-2">
                   <Badge variant="secondary">{product.badge}</Badge>
                 </div>
               </div>
               
               <div className="p-4">
-                <h3 className="font-medium mb-2">{product.name}</h3>
+                <Link to={`/products/${product.id}`}>
+                  <h3 className="font-medium mb-2 hover:text-blue-600">{product.name}</h3>
+                </Link>
                 
                 <div className="flex items-center mb-2">
-                  <div className="flex items-center">
-                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                    <span className="text-sm ml-1">{product.rating}</span>
-                  </div>
+                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                  <span className="text-sm ml-1">{product.rating}</span>
                   <span className="text-sm text-gray-600 ml-2">({product.reviews})</span>
                 </div>
                 
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xl font-bold">${product.price}</span>
+                  <span className="text-sm text-gray-500 line-through">${product.oldPrice}</span>
                 </div>
                 
-                <Button className="w-full" size="sm">
+                <Button className="w-full" size="sm" onClick={() => handleAddToCart(product.name)}>
                   <ShoppingCart className="w-4 h-4 mr-2" />
                   Add to Cart
                 </Button>
