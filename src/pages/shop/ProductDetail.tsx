@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Star, Heart, ShoppingCart, Plus, Minus, Share2, Truck, Shield, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -321,8 +321,11 @@ const ProductDetail = () => {
       <div className="mt-12">
         <h2 className="text-2xl font-bold mb-6">Related Products</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-          {products.slice(0, 4).map((relatedProduct: any) => (
-            <Card key={relatedProduct.id} className="group cursor-pointer">
+          {products
+            .filter((p: any) => p.id !== id)
+            .slice(0, 4)
+            .map((relatedProduct: any) => (
+            <Card key={relatedProduct.id} className="group cursor-pointer" onClick={() => navigate(`/products/${relatedProduct.id}`)}>
               <CardContent className="p-4">
                 <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden mb-3">
                   <img
@@ -331,12 +334,12 @@ const ProductDetail = () => {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                   />
                 </div>
-                <h3 className="font-medium text-gray-900 mb-1">{relatedProduct.name}</h3>
-                <p className="text-sm text-gray-600 mb-2">{relatedProduct.description}</p>
+                <h3 className="font-medium text-gray-900 mb-1 line-clamp-2">{relatedProduct.name}</h3>
+                <p className="text-sm text-gray-600 mb-2 line-clamp-1">{relatedProduct.description}</p>
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-gray-900">${relatedProduct.price}</span>
-                  <Button size="sm" variant="outline">
-                    View
+                  <Button size="sm" variant="outline" asChild>
+                    <Link to={`/products/${relatedProduct.id}`}>View</Link>
                   </Button>
                 </div>
               </CardContent>
