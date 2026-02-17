@@ -72,7 +72,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 3,
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 5 * 60 * 1000,
     },
   },
 });
@@ -89,17 +89,11 @@ const ScrollToTop = () => {
 };
 
 const App = () => {
-  // Handle base path for production
-  const basename = import.meta.env.PROD ? '/ecommerce' : '';
-  
-  console.log('🚀 App: Starting application...');
-  console.log('📁 Basename:', basename);
-
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <BrowserRouter basename={basename}>
+          <BrowserRouter>
             <ErrorBoundary>
               <AuthProvider>
                 <ScrollToTop />
@@ -141,7 +135,6 @@ const App = () => {
                   <Route path="new-arrivals" element={<NewArrivals />} />
                   <Route path="accessibility" element={<Accessibility />} />
                   
-                  {/* Aliases for SEO purposes */}
                   <Route path="returns-and-refunds" element={<Returns />} />
                   <Route path="shipping" element={<ShippingInformation />} />
                   <Route path="all-categories" element={<ShopCategories />} />

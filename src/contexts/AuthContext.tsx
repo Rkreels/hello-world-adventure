@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
 import { toast } from 'sonner';
 import { User } from '@/types';
 
@@ -30,84 +30,54 @@ export const useAuth = () => {
   return context;
 };
 
+// Demo users for the application
+const DEMO_USERS: Record<string, User> = {
+  'admin@example.com': {
+    id: '1',
+    email: 'admin@example.com',
+    name: 'Admin User',
+    phone: '+1234567890',
+    role: 'admin',
+    status: 'active',
+  },
+  'customer@example.com': {
+    id: '2',
+    email: 'customer@example.com',
+    name: 'Sarah Johnson',
+    phone: '+1234567891',
+    role: 'customer',
+    status: 'active',
+  },
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  // Start with admin user logged in for demo purposes
+  const [user, setUser] = useState<User | null>(DEMO_USERS['admin@example.com']);
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    console.log('🔐 AuthProvider: Initializing...');
-    // Check for existing session
-    const checkAuth = () => {
-      try {
-        const savedUser = localStorage.getItem('user');
-        if (savedUser) {
-          const userData = JSON.parse(savedUser);
-          console.log('✅ AuthProvider: User found in localStorage', userData);
-          setUser(userData);
-        } else {
-          console.log('ℹ️ AuthProvider: No user in localStorage');
-        }
-      } catch (error) {
-        console.error('❌ AuthProvider: Error checking auth:', error);
-        localStorage.removeItem('user');
-      } finally {
-        // Set a minimal timeout to ensure smooth loading
-        setTimeout(() => {
-          console.log('✅ AuthProvider: Initialization complete');
-          setIsLoading(false);
-        }, 100);
-      }
-    };
-
-    checkAuth();
-  }, []);
-
-  const login = async (email: string, password: string): Promise<void> => {
+  const login = useCallback(async (email: string, password: string): Promise<void> => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mock authentication logic
-      let userData: User;
-      if (email === 'admin@example.com' && password === 'admin123') {
-        userData = {
-          id: '1',
-          email,
-          name: 'Admin User',
-          phone: '+1234567890',
-          role: 'admin',
-          status: 'active'
-        };
-      } else if (email === 'customer@example.com' && password === 'password123') {
-        userData = {
-          id: '2',
-          email,
-          name: 'Customer User',
-          phone: '+1234567890',
-          role: 'customer',
-          status: 'active'
-        };
-      } else {
-        throw new Error('Invalid credentials');
-      }
+      await new Promise(resolve => setTimeout(resolve, 800));
 
-      localStorage.setItem('user', JSON.stringify(userData));
-      setUser(userData);
+      const demoUser = DEMO_USERS[email];
+      if (demoUser && password.length >= 6) {
+        setUser(demoUser);
+        toast.success(`Welcome back, ${demoUser.name}!`);
+      } else {
+        throw new Error('Invalid credentials. Try admin@example.com / admin123');
+      }
     } catch (error) {
       throw error;
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const logout = async (): Promise<void> => {
+  const logout = useCallback(async (): Promise<void> => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      localStorage.removeItem('user');
+      await new Promise(resolve => setTimeout(resolve, 300));
       setUser(null);
       toast.success('Logged out successfully');
     } catch (error) {
@@ -116,31 +86,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const register = async (userData: RegisterData): Promise<void> => {
+  const register = useCallback(async (userData: RegisterData): Promise<void> => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise(resolve => setTimeout(resolve, 800));
+
       const newUser: User = {
         id: Date.now().toString(),
         email: userData.email,
         name: `${userData.firstName} ${userData.lastName}`,
         phone: '',
         role: 'customer',
-        status: 'active'
+        status: 'active',
       };
 
-      localStorage.setItem('user', JSON.stringify(newUser));
       setUser(newUser);
+      toast.success(`Welcome, ${newUser.name}! Account created successfully.`);
     } catch (error) {
       throw error;
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   const value: AuthContextType = {
     user,
@@ -149,23 +118,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isLoading,
     login,
     logout,
-    register
+    register,
   };
 
-  // Don't render children until auth check is complete
-  if (isLoading) {
-    console.log('⏳ AuthProvider: Showing loading screen...');
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600"></div>
-          <p className="text-gray-600 text-lg font-medium">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  console.log('✅ AuthProvider: Rendering children');
   return (
     <AuthContext.Provider value={value}>
       {children}
