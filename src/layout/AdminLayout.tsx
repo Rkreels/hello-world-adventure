@@ -53,7 +53,7 @@ const AdminLayout = () => {
             <div className="flex items-center justify-between gap-4">
               <a href="https://careertodo.com/practice-lab">
                 <Button variant="default" size="sm" className="bg-primary hover:bg-primary/90">
-                  Master Dashboard
+                  Lab Dashboard
                 </Button>
               </a>
               <div className="text-sm text-gray-600">

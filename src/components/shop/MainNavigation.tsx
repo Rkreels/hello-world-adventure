@@ -94,7 +94,7 @@ const MainNavigation = () => {
             {/* Right Navigation */}
             <div className="flex items-center space-x-4">
               <Button variant="default" size="sm" className="bg-primary hover:bg-primary/90 hidden md:inline-flex" asChild>
-                <a href="https://careertodo.com/practice-lab">Admin Dashboard</a>
+                <a href="https://careertodo.com/practice-lab">Lab Dashboard</a>
               </Button>
               
               {/* Wishlist - Hidden on mobile */}
