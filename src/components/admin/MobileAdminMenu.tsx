@@ -3,7 +3,6 @@ import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { 
-  Menu, 
   BarChart3, 
   Package, 
   Users, 
@@ -12,7 +11,6 @@ import {
   Tags,
   TrendingUp,
   FileText,
-  Gift,
   UserCheck,
   Shield
 } from 'lucide-react';
@@ -32,61 +30,16 @@ const MobileAdminMenu = ({ isOpen, onOpenChange }: MobileAdminMenuProps) => {
   };
 
   const menuItems = [
-    {
-      title: 'Dashboard',
-      href: '/admin/dashboard',
-      icon: BarChart3
-    },
-    {
-      title: 'Products',
-      href: '/admin/products',
-      icon: Package
-    },
-    {
-      title: 'Orders',
-      href: '/admin/orders',
-      icon: ShoppingCart
-    },
-    {
-      title: 'Customers',
-      href: '/admin/customers',
-      icon: Users
-    },
-    {
-      title: 'Categories',
-      href: '/admin/categories',
-      icon: Tags
-    },
-    {
-      title: 'Marketing',
-      href: '/admin/marketing',
-      icon: TrendingUp
-    },
-    {
-      title: 'Reports',
-      href: '/admin/reports',
-      icon: FileText
-    },
-    {
-      title: 'Coupons',
-      href: '/admin/coupons',
-      icon: Gift
-    },
-    {
-      title: 'Admin Role',
-      href: '/admin/admin-role',
-      icon: UserCheck
-    },
-    {
-      title: 'Admin Authority',
-      href: '/admin/admin-authority',
-      icon: Shield
-    },
-    {
-      title: 'Settings',
-      href: '/admin/settings',
-      icon: Settings
-    }
+    { title: 'Dashboard', href: '/admin/dashboard', icon: BarChart3 },
+    { title: 'Products', href: '/admin/products', icon: Package },
+    { title: 'Orders', href: '/admin/order-management', icon: ShoppingCart },
+    { title: 'Customers', href: '/admin/customers', icon: Users },
+    { title: 'Marketing', href: '/admin/marketing', icon: TrendingUp },
+    { title: 'Categories', href: '/admin/categories', icon: Tags },
+    { title: 'Reports', href: '/admin/reports', icon: FileText },
+    { title: 'Admin Role', href: '/admin/admin-role', icon: UserCheck },
+    { title: 'Admin Authority', href: '/admin/admin-authority', icon: Shield },
+    { title: 'Settings', href: '/admin/settings', icon: Settings },
   ];
 
   const isActiveLink = (href: string) => {

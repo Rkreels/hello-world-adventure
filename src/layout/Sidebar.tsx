@@ -24,7 +24,8 @@ import {
   Bell,
   Camera,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  LogOut
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
@@ -80,20 +81,14 @@ const Sidebar = () => {
     {
       title: 'Customers',
       icon: Users,
-      section: 'customers',
-      children: [
-        { title: 'All Customers', path: '/admin/customers', icon: Users },
-        { title: 'Customer Management', path: '/admin/customer-management', icon: UserCheck }
-      ]
+      path: '/admin/customers',
+      badge: null
     },
     {
       title: 'Marketing',
       icon: TrendingUp,
-      section: 'marketing',
-      children: [
-        { title: 'Marketing Dashboard', path: '/admin/marketing', icon: TrendingUp },
-        { title: 'Coupons', path: '/admin/coupons', icon: Percent }
-      ]
+      path: '/admin/marketing',
+      badge: null
     },
     {
       title: 'Analytics',
@@ -209,8 +204,8 @@ const Sidebar = () => {
         ))}
       </nav>
 
-      {/* Footer */}
-      <div className="p-4 border-t border-gray-200">
+      {/* Footer with Logout */}
+      <div className="p-4 border-t border-gray-200 space-y-3">
         <div className="flex items-center gap-3 text-sm text-gray-600">
           <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
             <span className="text-xs text-white font-medium">A</span>
@@ -223,6 +218,16 @@ const Sidebar = () => {
             <Bell className="h-4 w-4" />
           </Button>
         </div>
+        <Button 
+          variant="ghost" 
+          className="w-full justify-start text-red-600 hover:bg-red-50 hover:text-red-700 h-9 px-3"
+          onClick={() => {
+            window.location.href = '/';
+          }}
+        >
+          <LogOut className="h-4 w-4 mr-3" />
+          <span className="font-medium text-sm">Logout</span>
+        </Button>
       </div>
     </div>
   );
