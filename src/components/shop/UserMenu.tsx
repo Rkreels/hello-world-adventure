@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingBag, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -30,6 +30,7 @@ const UserMenu = () => {
   }
 
   const { user, isAuthenticated, logout } = authData;
+  const navigate = useNavigate();
   const { items } = useCart();
   
   const getInitials = (name: string) => {
@@ -74,7 +75,7 @@ const UserMenu = () => {
             <DropdownMenuSeparator />
             <DropdownMenuItem 
               className="cursor-pointer text-red-600 focus:text-red-600" 
-              onClick={() => logout()}
+              onClick={() => { logout(); navigate('/'); }}
             >
               Logout
             </DropdownMenuItem>
