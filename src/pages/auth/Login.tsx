@@ -18,7 +18,7 @@ const Login = () => {
 
   const handleUserLogin = async () => {
     await login('customer@example.com', 'password123');
-    navigate('/', { replace: true });
+    navigate('/orders', { replace: true });
   };
 
   return (
