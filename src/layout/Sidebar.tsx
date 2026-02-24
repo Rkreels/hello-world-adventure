@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import { 
   Home, 
   Package, 
@@ -35,6 +36,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 
 const Sidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logout } = useAuth();
   const [openSections, setOpenSections] = useState<string[]>(['products', 'orders']);
 
   const toggleSection = (section: string) => {
@@ -222,7 +225,8 @@ const Sidebar = () => {
           variant="ghost" 
           className="w-full justify-start text-red-600 hover:bg-red-50 hover:text-red-700 h-9 px-3"
           onClick={() => {
-            window.location.href = '/';
+            logout();
+            navigate('/');
           }}
         >
           <LogOut className="h-4 w-4 mr-3" />
