@@ -51,10 +51,7 @@ const AdminLayout = () => {
         <div className="hidden md:block bg-white border-b border-gray-200 p-4">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between gap-4">
-              <a 
-                href="https://skillsim.vercel.app/dashboard" 
-                target="_self"
-              >
+              <a href="https://careertodo.com/practice-lab">
                 <Button variant="default" size="sm" className="bg-primary hover:bg-primary/90">
                   Master Dashboard
                 </Button>
